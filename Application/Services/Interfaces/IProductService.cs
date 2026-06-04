@@ -20,6 +20,6 @@ namespace Application.Services.Interfaces
 
         Task<List<Product>> GetProductsBatchForMonitoringAsync(BotSideGetProductsBatchForMonitoringDto dto);
 
-        Task UpdateProductPrices(BotSideUpdateProductPricesDto dto);
+        Task<Result> UpdateProductPrices(BotSideUpdateProductPricesDto dto);
     }
 }

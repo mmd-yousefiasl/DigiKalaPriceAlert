@@ -91,14 +91,46 @@ namespace Application.Services.Implementaions
                 .ToListAsync(dto.CancellationToken);
         }
 
-        public async Task UpdateProductPrices(BotSideUpdateProductPricesDto dto)
+        public async Task<Result> UpdateProductPrices(BotSideUpdateProductPricesDto dto)
         {
-            await _context.Products
-                .Where(p => p.Id == dto.ProductId)
-                .ExecuteUpdateAsync(s => s
-                    .SetProperty(p => p.OldPrice, p => p.NewPrice)
-                    .SetProperty(p => p.NewPrice, dto.NewPrice)
-                    .SetProperty(p => p.LastUpdatedDate, DateTime.UtcNow), dto.CancellationToken);
+            var strategy = _context.Database.CreateExecutionStrategy();
+
+            return await strategy.ExecuteAsync(async () =>
+            {
+                using var transaction = await _context.Database.BeginTransactionAsync(dto.CancellationToken);
+                try
+                {
+                    var rowsAffected = await _context.Products
+                        .Where(p => p.Id == dto.ProductId)
+                        .ExecuteUpdateAsync(s => s
+                            .SetProperty(p => p.OldPrice, p => p.NewPrice)
+                            .SetProperty(p => p.NewPrice, dto.NewPrice)
+                            .SetProperty(p => p.LastUpdatedDate, DateTime.UtcNow),
+                        dto.CancellationToken);
+
+                    if (rowsAffected == 0)
+                        return Result.Failure(Messages.OperationFailedError);
+
+                    var history = new ProductPriceHistory
+                    {
+                        ProductId = dto.ProductId,
+                        Price = dto.NewPrice,
+                    };
+                    _context.ProductPriceHistory.Add(history);
+
+                    await _context.SaveChangesAsync(dto.CancellationToken);
+
+                    await transaction.CommitAsync(dto.CancellationToken);
+
+                    return Result.Success();
+                }
+                catch (Exception ex)
+                {
+                    await transaction.RollbackAsync(dto.CancellationToken);
+                    _logger.LogError(ex, "Error updating prices for product {ProductId}", dto.ProductId);
+                    throw;
+                }
+            });
         }
 
         public async Task<Result<List<BotSideUserWatchListProductsDto>>> GetUserProducts(long chatId)
@@ -128,6 +160,10 @@ namespace Application.Services.Implementaions
             if (digiKalaResult.IsFailure)
                 return Result.Failure<BotSideProductDto>(digiKalaResult.Message!);
 
+            var userIdResult = await _userService.GetUserIdByChatId(dto.ChatId);
+            if (userIdResult.IsFailure)
+                return Result.Failure<BotSideProductDto>(userIdResult.Message!);
+
             var product = new Product
             {
                 DigiKalaId = dto.DigiKalaId,
@@ -137,10 +173,12 @@ namespace Application.Services.Implementaions
                 Url = $"https://www.digikala.com/product/dkp-{dto.DigiKalaId}/",
                 LastUpdatedDate = DateTime.UtcNow,
                 ImageUrl = digiKalaResult.Value.ImageUrl,
-                ImageFileName = $"{dto.DigiKalaId}.jpg"
+                ImageFileName = $"{dto.DigiKalaId}.jpg",
+                PriceHistory = new List<ProductPriceHistory>
+        {
+            new() { Price = digiKalaResult.Value.Price }
+        }
             };
-
-            _context.Products.Add(product);
 
             if (digiKalaResult.Value.ImageBytes is not null)
             {
@@ -154,10 +192,6 @@ namespace Application.Services.Implementaions
                 }
             }
 
-            var userIdResult = await _userService.GetUserIdByChatId(dto.ChatId);
-            if (userIdResult.IsFailure)
-                return Result.Failure<BotSideProductDto>(userIdResult.Message!);
-
             var userProduct = new UserProductMapping
             {
                 UserId = userIdResult.Value,
@@ -167,7 +201,7 @@ namespace Application.Services.Implementaions
 
             await _context.SaveChangesAsync();
 
-            return new BotSideProductDto()
+            return new BotSideProductDto
             {
                 Title = product.Title,
                 DigiKalaId = product.DigiKalaId,
