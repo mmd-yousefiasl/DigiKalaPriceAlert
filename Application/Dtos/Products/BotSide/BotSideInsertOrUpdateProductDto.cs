@@ -1,0 +1,8 @@
+﻿namespace Application.Dtos.Products.BotSide
+{
+    public class BotSideInsertOrUpdateProductDto
+    {
+        public string Text { get; set; }
+        public long ChatId { get; set; }
+    }
+}
