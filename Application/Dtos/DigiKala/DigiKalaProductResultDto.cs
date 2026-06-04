@@ -4,6 +4,7 @@
         (
         string Title,
         decimal Price,
+        string? ImageUrl,
         byte[]? ImageBytes
         );
 }

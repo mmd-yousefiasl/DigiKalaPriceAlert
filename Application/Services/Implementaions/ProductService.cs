@@ -132,10 +132,11 @@ namespace Application.Services.Implementaions
             {
                 DigiKalaId = dto.DigiKalaId,
                 Title = digiKalaResult.Value.Title,
-                OldPrice = null,
+                OldPrice = 0,
                 NewPrice = digiKalaResult.Value.Price,
                 Url = $"https://www.digikala.com/product/dkp-{dto.DigiKalaId}/",
                 LastUpdatedDate = DateTime.UtcNow,
+                ImageUrl = digiKalaResult.Value.ImageUrl,
                 ImageFileName = $"{dto.DigiKalaId}.jpg"
             };
 

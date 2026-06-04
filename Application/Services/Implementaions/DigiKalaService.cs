@@ -108,7 +108,7 @@ namespace Application.Services.Implementaions
                     }
                 }
 
-                var dto = new DigiKalaProductResultDto(title, price, imageBytes);
+                var dto = new DigiKalaProductResultDto(title, price, imageUrl, imageBytes);
                 return Result.Success(dto);
             }
             catch (Exception ex)

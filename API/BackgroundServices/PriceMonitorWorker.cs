@@ -80,7 +80,7 @@ namespace API.BackgroundServices
                     if (scrapResult.IsFailure) continue;
 
                     decimal newPrice = scrapResult.Value.Price;
-                    decimal oldPrice = product.NewPrice ?? 0;
+                    decimal oldPrice = product.NewPrice;
 
                     if (newPrice != oldPrice)
                     {
