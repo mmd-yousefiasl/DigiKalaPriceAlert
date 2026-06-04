@@ -272,7 +272,11 @@ namespace Application.Services.Implementaions
                     break;
 
                 case "view_product":
-                    var productResult = await _productService.GetProductByDigiKalaId(digiKalaId);
+                    var productResult = await _productService.GetProductForUserByDigiKalaId(new BotSideGetProductForUserDto()
+                    {
+                        ChatId = chatId,
+                        DigiKalaId = digiKalaId
+                    });
 
                     if (productResult.IsFailure)
                     {

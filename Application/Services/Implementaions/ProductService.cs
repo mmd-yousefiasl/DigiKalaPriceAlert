@@ -177,5 +177,33 @@ namespace Application.Services.Implementaions
                 Url = product.Url
             };
         }
+
+        public async Task<Result<BotSideProductDto>> GetProductForUserByDigiKalaId(BotSideGetProductForUserDto dto)
+        {
+            var userIdResult = await _userService.GetUserIdByChatId(dto.ChatId);
+            if (userIdResult.IsFailure)
+                return Result.Failure<BotSideProductDto>(userIdResult.Message!);
+
+            var product = await _context.UserProductMapping
+                .AsNoTracking()
+                .Where(upm => upm.UserId == userIdResult.Value && upm.Product.DigiKalaId == dto.DigiKalaId)
+                .Select(upm => upm.Product)
+                .Select(p => new BotSideProductDto()
+                {
+                    Id = p.Id,
+                    DigiKalaId = p.DigiKalaId,
+                    ImageFileName = p.ImageFileName,
+                    LastUpdatedDate = p.LastUpdatedDate,
+                    NewPrice = p.NewPrice,
+                    OldPrice = p.OldPrice,
+                    Title = p.Title,
+                    Url = p.Url
+                })
+                .FirstOrDefaultAsync();
+            if (product is null)
+                return Result.Failure<BotSideProductDto>(AppStatics.YouDontCheckThisProductError);
+
+            return product;
+        }
     }
 }

@@ -16,6 +16,8 @@ namespace Application.Services.Interfaces
 
         Task<Result<BotSideProductDto>> GetProductByDigiKalaId(string digiKalaId);
 
+        Task<Result<BotSideProductDto>> GetProductForUserByDigiKalaId(BotSideGetProductForUserDto dto);
+
         Task<List<Product>> GetProductsBatchForMonitoringAsync(BotSideGetProductsBatchForMonitoringDto dto);
 
         Task UpdateProductPrices(BotSideUpdateProductPricesDto dto);
