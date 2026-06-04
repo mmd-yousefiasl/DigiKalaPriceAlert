@@ -4,7 +4,7 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Application.Tools
 {
-    public static class AppStatics
+    public static class BotMessages
     {
         // 🛠 نام و مشخصات اصلی (با رعایت نیم‌فاصله‌ها)
         public const string BotName = "دیده‌بان قیمت";

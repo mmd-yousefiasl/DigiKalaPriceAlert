@@ -20,7 +20,7 @@ namespace Application.Tools
 
         public static Result<string> NormalizeIranPhoneNumber(this string phoneNumber)
         {
-            if (string.IsNullOrWhiteSpace(phoneNumber)) return Result.Failure<string>(AppStatics.OnlyIranPhoneNumberError);
+            if (string.IsNullOrWhiteSpace(phoneNumber)) return Result.Failure<string>(BotMessages.OnlyIranPhoneNumberError);
 
             string cleaned = phoneNumber.Trim().Replace(" ", "").Replace("-", "");
 
@@ -38,7 +38,7 @@ namespace Application.Tools
                 return cleaned;
             }
 
-            return Result.Failure<string>(AppStatics.OnlyIranPhoneNumberError);
+            return Result.Failure<string>(BotMessages.OnlyIranPhoneNumberError);
         }
     }
 }

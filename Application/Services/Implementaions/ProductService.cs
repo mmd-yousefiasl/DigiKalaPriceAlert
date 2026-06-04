@@ -50,12 +50,12 @@ namespace Application.Services.Implementaions
                 .FirstOrDefaultAsync(up => up.User.ChatId == dto.ChatId && up.Product.DigiKalaId == dto.DigiKalaId);
 
             if (userProduct is null)
-                return Result.Failure(AppStatics.ProductNotFoundInServerError);
+                return Result.Failure(BotMessages.ProductNotFoundInServerError);
 
             _context.UserProductMapping.Remove(userProduct);
             await _context.SaveChangesAsync();
 
-            return Result.Success(AppStatics.ProductDeletedSuccessfullyMessage);
+            return Result.Success(BotMessages.ProductDeletedSuccessfullyMessage);
         }
 
         public async Task<Result<BotSideProductDto>> GetProductByDigiKalaId(string digiKalaId)
@@ -76,7 +76,7 @@ namespace Application.Services.Implementaions
                         }).FirstOrDefaultAsync();
 
             if (product == null)
-                return Result.Failure<BotSideProductDto>(AppStatics.YouDontCheckThisProductError);
+                return Result.Failure<BotSideProductDto>(BotMessages.YouDontCheckThisProductError);
 
             return product;
         }
@@ -146,7 +146,7 @@ namespace Application.Services.Implementaions
                           DigiKalaId = p.DigiKalaId
                       }).ToListAsync();
             if (!products.Any())
-                return Result.Failure<List<BotSideUserWatchListProductsDto>>(AppStatics.ProductCheckListEmptyError);
+                return Result.Failure<List<BotSideUserWatchListProductsDto>>(BotMessages.ProductCheckListEmptyError);
 
             return products;
         }
@@ -154,7 +154,7 @@ namespace Application.Services.Implementaions
         public async Task<Result<BotSideProductDto>> CreateProductForUser(BotSideCreateProductForUserDto dto)
         {
             if (await _context.Products.AnyAsync(p => p.DigiKalaId == dto.DigiKalaId))
-                return Result.Failure<BotSideProductDto>(AppStatics.OperationFailedError);
+                return Result.Failure<BotSideProductDto>(BotMessages.OperationFailedError);
 
             var digiKalaResult = await _digiKalaService.GetProductDetailsAsync(dto.DigiKalaId);
             if (digiKalaResult.IsFailure)
@@ -236,7 +236,7 @@ namespace Application.Services.Implementaions
                 })
                 .FirstOrDefaultAsync();
             if (product is null)
-                return Result.Failure<BotSideProductDto>(AppStatics.YouDontCheckThisProductError);
+                return Result.Failure<BotSideProductDto>(BotMessages.YouDontCheckThisProductError);
 
             return product;
         }

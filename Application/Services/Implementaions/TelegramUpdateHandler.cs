@@ -60,7 +60,7 @@ namespace Application.Services.Implementaions
             var userExist = await _userService.BotSideDoesUserExist(chatId);
             if (userExist.IsFailure && message.Contact == null)
             {
-                await _telegramService.SendShareContactAsync(chatId, AppStatics.ShareYourPhoneNumberToCreateAccountAndConnectToWebsite);
+                await _telegramService.SendShareContactAsync(chatId, BotMessages.ShareYourPhoneNumberToCreateAccountAndConnectToWebsite);
 
                 return;
             }
@@ -71,7 +71,7 @@ namespace Application.Services.Implementaions
                     await _telegramService.SendTextMessageAsync(new SendTextMessageDto
                     {
                         ChatId = chatId,
-                        Message = AppStatics.InvalidContactError
+                        Message = BotMessages.InvalidContactError
                     });
                     return;
                 }
@@ -95,7 +95,7 @@ namespace Application.Services.Implementaions
                 }
                 else
                 {
-                    await _telegramService.SendMainMenuAsync(chatId, AppStatics.WelcomeMessage(user?.FirstName));
+                    await _telegramService.SendMainMenuAsync(chatId, BotMessages.WelcomeMessage(user?.FirstName));
                     return;
                 }
             }
@@ -103,27 +103,27 @@ namespace Application.Services.Implementaions
             if (string.IsNullOrEmpty(text)) return;
 
             #region Start
-            if (text.StartsWith("/start", StringComparison.OrdinalIgnoreCase) || text == AppStatics.MenuBack)
+            if (text.StartsWith("/start", StringComparison.OrdinalIgnoreCase) || text == BotMessages.MenuBack)
             {
-                await _telegramService.SendMainMenuAsync(chatId, AppStatics.WelcomeMessage(user?.FirstName));
+                await _telegramService.SendMainMenuAsync(chatId, BotMessages.WelcomeMessage(user?.FirstName));
                 return;
             }
             #endregion
 
             #region AboutUs
-            if (text == AppStatics.MenuAboutUs)
+            if (text == BotMessages.MenuAboutUs)
             {
                 await _telegramService.SendTextMessageAsync(new SendTextMessageDto()
                 {
                     ChatId = chatId,
-                    Message = AppStatics.AboutUsMessage
+                    Message = BotMessages.AboutUsMessage
                 });
                 return;
             }
             #endregion
 
             #region MyProducts
-            if (text == AppStatics.MenuMyProducts)
+            if (text == BotMessages.MenuMyProducts)
             {
                 var userProductsResult = await _productService.GetUserProducts(chatId);
 
@@ -137,12 +137,12 @@ namespace Application.Services.Implementaions
                     return;
                 }
 
-                var userProductsListMarkup = AppStatics.GetUserProductsListMarkup(userProductsResult.Value);
+                var userProductsListMarkup = BotMessages.GetUserProductsListMarkup(userProductsResult.Value);
 
                 await _telegramService.SendTextMessageWithMarkupAsync(new SendTextMessageWithMarkupDto()
                 {
                     ChatId = chatId,
-                    Text = AppStatics.UserProductsWatchListTitle(userProductsResult.Value.Count),
+                    Text = BotMessages.UserProductsWatchListTitle(userProductsResult.Value.Count),
                     ReplyMarkup = userProductsListMarkup
                 });
 
@@ -161,8 +161,8 @@ namespace Application.Services.Implementaions
             if (validInputs.Any())
             {
                 string searchMsg = validInputs.Count > 1
-                    ? AppStatics.SearchingMultipleDigiKalaMessage(validInputs.Count)
-                    : AppStatics.SearchingDigiKalaMessage;
+                    ? BotMessages.SearchingMultipleDigiKalaMessage(validInputs.Count)
+                    : BotMessages.SearchingDigiKalaMessage;
 
                 await _telegramService.SendTextMessageAsync(new SendTextMessageDto()
                 {
@@ -247,7 +247,7 @@ namespace Application.Services.Implementaions
             await _telegramService.SendTextMessageAsync(new SendTextMessageDto()
             {
                 ChatId = chatId,
-                Message = AppStatics.InvalidOrderError
+                Message = BotMessages.InvalidOrderError
             });
         }
 
@@ -267,8 +267,8 @@ namespace Application.Services.Implementaions
             {
                 case "confirm_delete":
                     await _telegramService.EditMessageReplyMarkupAsync(chatId, messageId,
-                        AppStatics.GetDeleteConfirmationMarkup(digiKalaId));
-                    await _telegramService.AnswerCallbackQueryAsync(callbackQuery.Id, AppStatics.ConfirmProductDeleteMessage);
+                        BotMessages.GetDeleteConfirmationMarkup(digiKalaId));
+                    await _telegramService.AnswerCallbackQueryAsync(callbackQuery.Id, BotMessages.ConfirmProductDeleteMessage);
                     break;
 
                 case "view_product":
@@ -319,8 +319,8 @@ namespace Application.Services.Implementaions
 
                 case "delete_no":
                     await _telegramService.EditMessageReplyMarkupAsync(chatId, messageId,
-                        AppStatics.GetProductReplyMarkup(digiKalaId));
-                    await _telegramService.AnswerCallbackQueryAsync(callbackQuery.Id, AppStatics.OperationCancelledMessage);
+                        BotMessages.GetProductReplyMarkup(digiKalaId));
+                    await _telegramService.AnswerCallbackQueryAsync(callbackQuery.Id, BotMessages.OperationCancelledMessage);
                     break;
             }
         }

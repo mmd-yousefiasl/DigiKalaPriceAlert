@@ -24,7 +24,7 @@ namespace Application.Services.Implementaions
         public async Task<Result> BotSideCanUserAddProduct(long chatId)
         {
             if (await _context.UserProductMapping.CountAsync(up => up.User.ChatId == chatId) > AppInfo.MaxUserProducts)
-                return Result.Failure(AppStatics.CantAddMoreProductsError);
+                return Result.Failure(BotMessages.CantAddMoreProductsError);
 
             return Result.Success();
         }
@@ -32,7 +32,7 @@ namespace Application.Services.Implementaions
         public async Task<Result> BotSideCreateNewUser(BotSideCreateNewUserDto dto)
         {
             if (await _context.Users.AnyAsync(u => u.ChatId == dto.ChatId))
-                return Result.Failure(AppStatics.UserAlreadyExistMessage);
+                return Result.Failure(BotMessages.UserAlreadyExistMessage);
 
             var mobileResult = dto.Mobile.NormalizeIranPhoneNumber();
             if (mobileResult.IsFailure)
@@ -70,7 +70,7 @@ namespace Application.Services.Implementaions
         public async Task<Result> BotSideCreateNewUserProduct(BotSideCreateNewUserProductDto dto)
         {
             if (await _context.UserProductMapping.AnyAsync(up => up.User.ChatId == dto.ChatId && up.ProductId == dto.ProductId))
-                return Result.Failure(AppStatics.ProductAlreadyInWatchListError);
+                return Result.Failure(BotMessages.ProductAlreadyInWatchListError);
 
             var userIdResult = await GetUserIdByChatId(dto.ChatId);
             if (userIdResult.IsFailure)

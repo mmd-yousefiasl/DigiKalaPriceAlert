@@ -59,7 +59,7 @@ namespace Application.Services.Implementaions
                 if (!root.TryGetProperty("data", out JsonElement dataElement) ||
                     !dataElement.TryGetProperty("product", out JsonElement productElement))
                 {
-                    return Result.Failure<DigiKalaProductResultDto>(AppStatics.ProductNotFoundError);
+                    return Result.Failure<DigiKalaProductResultDto>(BotMessages.ProductNotFoundError);
                 }
 
                 string title = productElement.TryGetProperty("title_fa", out var titleElement)
@@ -116,21 +116,21 @@ namespace Application.Services.Implementaions
                 _logger.LogError(ex, "Error fetching product details from DigiKala for DKP: {DkpId}", digiKalaId);
             }
 
-            return Result.Failure<DigiKalaProductResultDto>(AppStatics.ProductNotFoundError);
+            return Result.Failure<DigiKalaProductResultDto>(BotMessages.ProductNotFoundError);
         }
         #endregion
 
         public Result<string> ExtractProductIdFromUrl(string url)
         {
             if (string.IsNullOrWhiteSpace(url))
-                return Result.Failure<string>(AppStatics.InvalidLinkError);
+                return Result.Failure<string>(BotMessages.InvalidLinkError);
 
             var match = Regex.Match(url, @"dkp-(\d+)", RegexOptions.IgnoreCase);
             if (match.Success) return match.Groups[1].Value;
 
             if (long.TryParse(url.Trim(), out _)) return url.Trim();
 
-            return Result.Failure<string>(AppStatics.InvalidLinkError);
+            return Result.Failure<string>(BotMessages.InvalidLinkError);
         }
 
         public async Task<Result<DigiKalaProductResultDto>> GetProductDetailsAsync(string digiKalaId)

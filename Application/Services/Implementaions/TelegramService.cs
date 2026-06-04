@@ -28,8 +28,8 @@ namespace Application.Services.Implementaions
 
         public async Task SendProductAlertAsync(SendProductAlertDto dto)
         {
-            string message = AppStatics.TelegramAlert(dto.Title, dto.OldPrice, dto.NewPrice);
-            var replyMarkup = AppStatics.GetProductReplyMarkup(dto.DigiKalaId);
+            string message = BotMessages.TelegramAlert(dto.Title, dto.OldPrice, dto.NewPrice);
+            var replyMarkup = BotMessages.GetProductReplyMarkup(dto.DigiKalaId);
 
             try
             {
@@ -83,7 +83,7 @@ namespace Application.Services.Implementaions
                 chatId: chatId,
                 text: text,
                 parseMode: ParseMode.Html,
-                replyMarkup: AppStatics.GetMainMenuMarkup()
+                replyMarkup: BotMessages.GetMainMenuMarkup()
             );
         }
 
@@ -94,7 +94,7 @@ namespace Application.Services.Implementaions
                 chatId: chatId,
                 text: text,
                 parseMode: ParseMode.Html,
-                replyMarkup: AppStatics.GetUserContactMarkup()
+                replyMarkup: BotMessages.GetUserContactMarkup()
             );
         }
 
