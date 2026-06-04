@@ -57,10 +57,16 @@ namespace Application.Services.Implementaions
             var text = message.Text?.Trim();
             var user = message.From;
 
+            #region Check User Account
             var userExist = await _userService.BotSideDoesUserExist(chatId);
             if (userExist.IsFailure && message.Contact == null)
             {
-                await _telegramService.SendShareContactAsync(chatId, BotMessages.ShareYourPhoneNumberToCreateAccountAndConnectToWebsite);
+                await _telegramService.SendTextMessageWithMarkupAsync(new SendTextMessageWithMarkupDto()
+                {
+                    ChatId = chatId,
+                    Text = BotMessages.ShareYourPhoneNumberToCreateAccountAndConnectToWebsite,
+                    ReplyMarkup = BotMessages.GetUserContactMarkup(),
+                });
 
                 return;
             }
@@ -95,17 +101,28 @@ namespace Application.Services.Implementaions
                 }
                 else
                 {
-                    await _telegramService.SendMainMenuAsync(chatId, BotMessages.WelcomeMessage(user?.FirstName));
+                    await _telegramService.SendTextMessageWithMarkupAsync(new SendTextMessageWithMarkupDto()
+                    {
+                        ChatId = chatId,
+                        Text = BotMessages.WelcomeMessage(user?.FirstName),
+                        ReplyMarkup = BotMessages.GetMainMenuMarkup()
+                    });
                     return;
                 }
             }
+            #endregion
 
             if (string.IsNullOrEmpty(text)) return;
 
             #region Start
             if (text.StartsWith("/start", StringComparison.OrdinalIgnoreCase) || text == BotMessages.MenuBack)
             {
-                await _telegramService.SendMainMenuAsync(chatId, BotMessages.WelcomeMessage(user?.FirstName));
+                await _telegramService.SendTextMessageWithMarkupAsync(new SendTextMessageWithMarkupDto()
+                {
+                    ChatId = chatId,
+                    Text = BotMessages.WelcomeMessage(user?.FirstName),
+                    ReplyMarkup = BotMessages.GetMainMenuMarkup()
+                });
                 return;
             }
             #endregion
@@ -150,6 +167,33 @@ namespace Application.Services.Implementaions
             }
             #endregion
 
+            #region MyAccount
+            if (text == BotMessages.MenuMyAccount)
+            {
+                var subscriptionDetailsResult = await _userService.GetCurrenUserSubscriptionPlanByChatId(chatId);
+                if (subscriptionDetailsResult.IsFailure)
+                {
+                    await _telegramService.SendTextMessageAsync(new SendTextMessageDto()
+                    {
+                        ChatId = chatId,
+                        Message = subscriptionDetailsResult.Message!
+                    });
+                    return;
+                }
+                else
+                {
+                    await _telegramService.SendTextMessageWithMarkupAsync(new SendTextMessageWithMarkupDto()
+                    {
+                        ChatId = chatId,
+                        Text = BotMessages.SubscriptionStatusMessage(subscriptionDetailsResult.Value),
+                        ReplyMarkup = BotMessages.GetSubscriptionUpgradeReplyMarkup("https://google.com")
+                    });
+                }
+
+                return;
+            }
+            #endregion
+
             #region Add Product To Watch List
             // بررسی می‌کنیم که آیا متن شامل یک یا چند ورودی معتبر هست یا خیر
             var validInputs = text.Split(new[] { ' ', '\n', '\r', ',' }, StringSplitOptions.RemoveEmptyEntries)
@@ -175,10 +219,11 @@ namespace Application.Services.Implementaions
                     var canUserAddProduct = await _userService.BotSideCanUserAddProduct(chatId);
                     if (canUserAddProduct.IsFailure)
                     {
-                        await _telegramService.SendTextMessageAsync(new SendTextMessageDto()
+                        await _telegramService.SendTextMessageWithMarkupAsync(new SendTextMessageWithMarkupDto()
                         {
                             ChatId = chatId,
-                            Message = canUserAddProduct.Message!
+                            Text = canUserAddProduct.Message!,
+                            ReplyMarkup = BotMessages.GetSubscriptionLimitReplyMarkup()
                         });
                         break;
                     }
@@ -321,6 +366,29 @@ namespace Application.Services.Implementaions
                     await _telegramService.EditMessageReplyMarkupAsync(chatId, messageId,
                         BotMessages.GetProductReplyMarkup(digiKalaId));
                     await _telegramService.AnswerCallbackQueryAsync(callbackQuery.Id, BotMessages.OperationCancelledMessage);
+                    break;
+
+                case "view_subscription_status":
+                    var subscriptionDetailsResult = await _userService.GetCurrenUserSubscriptionPlanByChatId(chatId);
+                    if (subscriptionDetailsResult.IsFailure)
+                    {
+                        await _telegramService.SendTextMessageAsync(new SendTextMessageDto()
+                        {
+                            ChatId = chatId,
+                            Message = subscriptionDetailsResult.Message!
+                        });
+                        return;
+                    }
+                    else
+                    {
+                        await _telegramService.DeleteMessageAsync(chatId, messageId);
+                        await _telegramService.SendTextMessageWithMarkupAsync(new SendTextMessageWithMarkupDto()
+                        {
+                            ChatId = chatId,
+                            Text = BotMessages.SubscriptionStatusMessage(subscriptionDetailsResult.Value),
+                            ReplyMarkup = BotMessages.GetSubscriptionUpgradeReplyMarkup("https://google.com")
+                        });
+                    }
                     break;
             }
         }

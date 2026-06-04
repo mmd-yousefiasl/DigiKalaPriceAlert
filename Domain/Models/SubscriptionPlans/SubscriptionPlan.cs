@@ -8,6 +8,7 @@ namespace Domain.Models.SubscriptionPlans
 
         public decimal? DisplayPrice { get; set; }
         public decimal OrderPrice { get; set; }
+        public int MaximumProductCount { get; set; }
 
         #region Relations   
         public ICollection<SubscriptionPlanFeature>? Features { get; set; }

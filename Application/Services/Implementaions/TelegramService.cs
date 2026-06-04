@@ -77,27 +77,6 @@ namespace Application.Services.Implementaions
             await _botClient.AnswerCallbackQuery(callbackQueryId, text);
         }
 
-        public async Task SendMainMenuAsync(long chatId, string text)
-        {
-            await _botClient.SendMessage(
-                chatId: chatId,
-                text: text,
-                parseMode: ParseMode.Html,
-                replyMarkup: BotMessages.GetMainMenuMarkup()
-            );
-        }
-
-        public async Task SendShareContactAsync(long chatId, string text)
-        {
-
-            await _botClient.SendMessage(
-                chatId: chatId,
-                text: text,
-                parseMode: ParseMode.Html,
-                replyMarkup: BotMessages.GetUserContactMarkup()
-            );
-        }
-
         public async Task SendTextMessageWithMarkupAsync(SendTextMessageWithMarkupDto dto)
         {
             await _botClient.SendMessage(

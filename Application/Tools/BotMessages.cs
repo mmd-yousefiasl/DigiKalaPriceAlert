@@ -1,4 +1,5 @@
 ﻿using Application.Dtos.Products.BotSide;
+using Application.Dtos.SubscriptionPlans.BotSide;
 using System.Net;
 using Telegram.Bot.Types.ReplyMarkups;
 
@@ -13,11 +14,12 @@ namespace Application.Tools
 
         // 💬 متن دکمه‌های ثابت منو
         public const string MenuMyProducts = "📦 محصولات در حال رصد";
-        public const string MenuAboutUs = "ℹ️ درباره ما";
+        public const string MenuAboutUs = "🌐 درباره ما";
         public const string MenuBack = "🔙 بازگشت به منوی اصلی";
+        public const string MenuMyAccount = "👤 حساب کاربری من";
 
         // 🔔 پیام‌های سیستم (یکپارچه و شیک با ایموجی‌های مرتبط)
-        public const string UserAlreadyExistMessage = "ℹ️ حساب کاربری شما پیش از این فعال شده است.";
+        public const string UserAlreadyExistMessage = "🌐 حساب کاربری شما پیش از این فعال شده است.";
         public const string SuccessfullyDone = "🟢 <b>عملیات با موفقیت انجام شد.</b>";
         public const string InvalidOrderError = "⚠️ <b>درخواست نامعتبر!</b>\nلطفاً دوباره تلاش کنید.";
         public const string ProductAlreadyInWatchListError = "⚠️ <b>کالای تکراری!</b>\nاین محصول در حال حاضر در لیست رصد شما قرار دارد.";
@@ -42,7 +44,10 @@ namespace Application.Tools
         public const string ProductNotFoundInServerError = "⚠️ <b>خطا!</b>\nمشخصات این کالا در سیستم یافت نشد.";
         public const string ProductDeletedSuccessfullyMessage = "🗑️ کالا با موفقیت از لیست رصد شما حذف شد.";
         public const string OperationCancelledMessage = "🔙 عملیات لغو شد.";
-        public const string CantAddMoreProductsError = "🛑 <b>محدودیت تعداد کالا!</b>\n\nشما در حال حاضر ۱۰ کالا در لیست رصد خود دارید و به سقف مجاز رسیده‌اید. برای اضافه کردن کالای جدید، لطفاً ابتدا یکی از کالاهای فعلی را حذف کنید.";
+        public static string CantAddMoreProductsError(int maxCount) =>
+            $"🛑 <b>محدودیت تعداد کالا!</b>\n\n" +
+            $"شما به سقف مجاز <b>{maxCount} کالا</b> در لیست رصد خود رسیده‌اید و امکان افزودن کالای جدید را ندارید.\n\n" +
+            $"💳 برای مشاهده مشخصات اشتراک فعلی یا ارتقای آن، لطفاً روی دکمهٔ زیر کلیک کنید👇";
 
         // 🌟 پیام‌های پویا (متدها)
         public static string WelcomeMessage(string? firstName) =>
@@ -53,7 +58,7 @@ namespace Application.Tools
             BotFooter;
 
         public static string AboutUsMessage =
-            $"ℹ️ <b>درباره دستیار هوشمند {BotName}</b>\n\n" +
+            $"🌐 <b>درباره دستیار هوشمند {BotName}</b>\n\n" +
             $"این ربات با هدف پایش دقیق و مانیتورینگ ۲۴ ساعته قیمت محصولات دیجی‌کالا برای شما طراحی شده است. " +
             $"به کمک این ابزار، دیگر نیازی به چک کردن دستی و مداوم صفحات نیست؛ سیستم به محض هرگونه <b>کاهش یا افزایش قیمت</b>، فوراً شما را باخبر می‌کند تا در بهترین زمان تصمیم‌گیری کنید. 🎯\n\n" +
             $"✨ <b>امکانات کلیدی:</b>\n" +
@@ -64,6 +69,32 @@ namespace Application.Tools
             $"🛠 <b>مشخصات فنی سرور:</b>\n" +
             $"توسعه‌یافته با معماری پرسرعت <b>.NET 10</b> و پایگاه‌داده قدرتمند <b>PostgreSQL</b> جهت تضمین پایداری و پردازش بی‌درنگ داده‌ها. 🚀" +
             BotFooter;
+
+        public static string SubscriptionStatusMessage(BotSideSubscriptionPlanDto plan)
+        {
+            var message = $"💳 <b>وضعیت حساب و اشتراک شما</b>\n\n" +
+                          $"📌 <b>نوع اشتراک فعلی:</b> {plan.Name}\n" +
+                          $"📦 <b>سقف مجاز رصد کالا:</b> {plan.MaximumProductCount} کالا\n" +
+                          $"⏱ <b>وضعیت اعتبار:</b> {plan.StatusDescription}\n";
+
+            // اگر اشتراک ویژه فعال بود و تاریخ پایان داشت
+            if (plan.SubscriptionEndDate.HasValue)
+            {
+                var remainingDays = (plan.SubscriptionEndDate.Value - DateTime.UtcNow).Days;
+                var displayDays = remainingDays < 0 ? 0 : remainingDays;
+
+                message += $"📅 <b>تاریخ اتمام اشتراک:</b> {plan.SubscriptionEndDate.Value.ToString("yyyy/MM/dd")}\n" +
+                           $"⏳ <b>زمان باقی‌مانده:</b> {displayDays} روز\n\n" +
+                           $"🚀 برای ارتقای ظرفیت و استفاده از امکانات ویژه، می‌توانید اشتراک خود را ارتقا دهید.\n";
+            }
+            else
+            {
+                message += "\n🚀 با ارتقای اشتراک خود، کالا‌های بیشتری را به صورت همزمان رصد کنید!\n";
+            }
+
+            message += BotFooter;
+            return message;
+        }
 
         public static string SearchingMultipleDigiKalaMessage(int count) => $"⚡️ در حال بررسی {count} محصول...\nلطفاً چند لحظه شکیبا باشید ⏳";
 
@@ -145,10 +176,11 @@ namespace Application.Tools
         public static ReplyKeyboardMarkup GetMainMenuMarkup()
         {
             return new ReplyKeyboardMarkup(new[]
-            {
-                new[] { new KeyboardButton(MenuMyProducts) },
-                new[] { new KeyboardButton(MenuAboutUs) }
-            })
+                {
+        new[] { new KeyboardButton(MenuMyProducts) },
+        new[] { new KeyboardButton(MenuMyAccount) },
+        new[] { new KeyboardButton(MenuAboutUs) }
+    })
             {
                 ResizeKeyboard = true
             };
@@ -204,6 +236,20 @@ namespace Application.Tools
             };
 
             return replyKeyboardMarkup;
+        }
+
+        public static InlineKeyboardMarkup GetSubscriptionLimitReplyMarkup()
+        {
+            return new InlineKeyboardMarkup(new[]
+            {
+        new[] { InlineKeyboardButton.WithCallbackData("💎 مشاهده مشخصات اشتراک من", "view_subscription_status") }});
+        }
+
+        public static InlineKeyboardMarkup GetSubscriptionUpgradeReplyMarkup(string targetUrl)
+        {
+            return new InlineKeyboardMarkup(new[]
+            {
+        new[] { InlineKeyboardButton.WithUrl("💳 خرید یا ارتقای اشتراک", targetUrl) }});
         }
     }
 }

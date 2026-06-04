@@ -1,4 +1,5 @@
-﻿using Application.Dtos.Users.BotSide;
+﻿using Application.Dtos.SubscriptionPlans.BotSide;
+using Application.Dtos.Users.BotSide;
 using Application.Services.Interfaces;
 using Application.Tools;
 using Data.Context;
@@ -11,7 +12,7 @@ namespace Application.Services.Implementaions
     public class UserService : IUserService
     {
         #region Fields
-        private readonly DigiKalaPriceAlertDbContext _context;
+        private protected DigiKalaPriceAlertDbContext _context;
         #endregion
 
         #region Ctor
@@ -23,8 +24,43 @@ namespace Application.Services.Implementaions
 
         public async Task<Result> BotSideCanUserAddProduct(long chatId)
         {
-            if (await _context.UserProductMapping.CountAsync(up => up.User.ChatId == chatId) > AppInfo.MaxUserProducts)
-                return Result.Failure(BotMessages.CantAddMoreProductsError);
+            var currentDateTime = DateTime.UtcNow;
+
+            var verificationData = await _context.Users
+                .Where(u => u.ChatId == chatId)
+                .Select(u => new
+                {
+                    u.SubscriptionPlanId,
+                    u.SubscriptionEndDate,
+                    PremiumMaxCount = u.SubscriptionPlan.MaximumProductCount,
+
+                    CurrentProductCount = _context.UserProductMapping.Count(up => up.User.ChatId == chatId),
+
+                    FreePlanMaxCount = _context.SubscriptionPlans
+                        .Where(sp => sp.Id == 1)
+                        .Select(sp => sp.MaximumProductCount)
+                        .FirstOrDefault()
+                })
+                .FirstOrDefaultAsync();
+
+            if (verificationData is null)
+                return Result.Failure(Messages.OperationFailedError);
+
+            int allowedMax;
+
+            if (verificationData.SubscriptionPlanId == 1 || currentDateTime > verificationData.SubscriptionEndDate)
+            {
+                allowedMax = verificationData.FreePlanMaxCount > 0
+                    ? verificationData.FreePlanMaxCount
+                    : AppInfo.DefaultMaxProductsForUser;
+            }
+            else
+            {
+                allowedMax = verificationData.PremiumMaxCount;
+            }
+
+            if (verificationData.CurrentProductCount >= allowedMax)
+                return Result.Failure(BotMessages.CantAddMoreProductsError(allowedMax));
 
             return Result.Success();
         }
@@ -57,6 +93,7 @@ namespace Application.Services.Implementaions
                     LastName = dto.LastName,
                     Username = dto.UserName,
                     ChatId = dto.ChatId,
+                    SubscriptionPlanId = 1,
                 };
 
                 _context.Users.Add(user);
@@ -104,6 +141,59 @@ namespace Application.Services.Implementaions
                 .ToListAsync(dto.CancellationToken);
         }
 
+        public async Task<Result<BotSideSubscriptionPlanDto>> GetCurrenUserSubscriptionPlanByChatId(long chatId)
+        {
+            var currentDateTime = DateTime.UtcNow;
+
+            var dbData = await _context.Users
+                .Where(u => u.ChatId == chatId)
+                .Select(u => new
+                {
+                    u.SubscriptionPlanId,
+                    u.SubscriptionEndDate,
+                    CurrentPlanName = u.SubscriptionPlan.Name,
+                    CurrentPlanMaxCount = u.SubscriptionPlan.MaximumProductCount,
+
+                    FreePlan = _context.SubscriptionPlans
+                        .Where(sp => sp.Id == 1)
+                        .Select(sp => new { sp.Name, sp.MaximumProductCount })
+                        .FirstOrDefault()
+                })
+                .FirstOrDefaultAsync();
+
+            if (dbData is null)
+                return Result.Failure<BotSideSubscriptionPlanDto>(Messages.OperationFailedError);
+
+            var dto = new BotSideSubscriptionPlanDto();
+
+            if (dbData.SubscriptionPlanId == 1)
+            {
+                dto.Name = "پلن رایگان";
+                dto.MaximumProductCount = dbData.CurrentPlanMaxCount;
+                dto.SubscriptionEndDate = null;
+                dto.StatusDescription = "دائمی (بدون انقضا) ♾"; // اصلاح شد
+            }
+            else if (dbData.SubscriptionEndDate.HasValue && currentDateTime > dbData.SubscriptionEndDate.Value)
+            {
+                dto.Name = "پلن رایگان (انتقال اضطراری)";
+                dto.MaximumProductCount = dbData.FreePlan?.MaximumProductCount ?? AppInfo.DefaultMaxProductsForUser;
+                dto.SubscriptionEndDate = null;
+                dto.StatusDescription = "⚠️ اشتراک ویژه شما منقضی شده و حساب به طرح پایه منتقل شده است."; // اصلاح شد
+            }
+            else
+            {
+                dto.Name = dbData.CurrentPlanName;
+                dto.MaximumProductCount = dbData.CurrentPlanMaxCount;
+                dto.SubscriptionEndDate = dbData.SubscriptionEndDate;
+
+                var remainingDays = (dbData.SubscriptionEndDate!.Value - currentDateTime).Days;
+                var displayDays = remainingDays < 0 ? 0 : remainingDays;
+                dto.StatusDescription = $"فعال و معتبر (دارای زمان باقی‌مانده) ✅"; // اصلاح شد
+            }
+
+            return dto;
+        }
+
         public async Task<Result<int>> GetUserIdByChatId(long chatId)
         {
             var userId = await _context.Users
@@ -114,5 +204,6 @@ namespace Application.Services.Implementaions
 
             return userId;
         }
+
     }
 }

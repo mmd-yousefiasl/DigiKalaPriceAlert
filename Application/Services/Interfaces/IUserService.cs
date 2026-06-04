@@ -1,4 +1,5 @@
-﻿using Application.Dtos.Users.BotSide;
+﻿using Application.Dtos.SubscriptionPlans.BotSide;
+using Application.Dtos.Users.BotSide;
 using Domain.Shared;
 
 namespace Application.Services.Interfaces
@@ -16,5 +17,7 @@ namespace Application.Services.Interfaces
         Task<Result> BotSideDoesUserExist(long chatId);
 
         Task<Result<int>> GetUserIdByChatId(long chatId);
+
+        Task<Result<BotSideSubscriptionPlanDto>> GetCurrenUserSubscriptionPlanByChatId(long chatId);
     }
 }

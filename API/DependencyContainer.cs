@@ -29,6 +29,7 @@ namespace API
             services.AddScoped<IProductService, ProductService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<ITelegramUpdateHandler, TelegramUpdateHandler>();
+            services.AddScoped<ISubscriptionPlanService, SubscriptionPlanService>();
 
             services.AddSingleton<INotificationQueue, NotificationQueue>();
 

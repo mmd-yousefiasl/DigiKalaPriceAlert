@@ -6,6 +6,6 @@ namespace Application.Dtos.TelegramDto
     {
         public long ChatId { get; set; }
         public string Text { get; set; }
-        public InlineKeyboardMarkup ReplyMarkup { get; set; }
+        public ReplyMarkup ReplyMarkup { get; set; }
     }
 }

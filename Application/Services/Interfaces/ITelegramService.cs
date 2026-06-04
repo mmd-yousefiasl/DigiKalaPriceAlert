@@ -15,10 +15,6 @@ namespace Application.Services.Interfaces
 
         Task AnswerCallbackQueryAsync(string callbackQueryId, string text);
 
-        Task SendMainMenuAsync(long chatId, string text);
-
-        Task SendShareContactAsync(long chatId, string text);
-
         Task SendTextMessageWithMarkupAsync(SendTextMessageWithMarkupDto dto);
 
         Task DeleteMessageAsync(long chatId, int messageId);
