@@ -33,17 +33,6 @@ namespace Application.Services.Implementaions
         }
         #endregion
 
-        public async Task<Result<List<Product>>> GetUserProductsAsync(long chatId)
-        {
-            var products = await _context.UserProductMapping
-                .Where(up => up.UserId == chatId)
-                .Include(up => up.Product)
-                .Select(up => up.Product)
-                .ToListAsync();
-
-            return products;
-        }
-
         public async Task<Result> RemoveProductFromUserAsync(BotSideProductUserInfoDto dto)
         {
             var userProduct = await _context.UserProductMapping
@@ -79,16 +68,6 @@ namespace Application.Services.Implementaions
                 return Result.Failure<BotSideProductDto>(BotMessages.YouDontCheckThisProductError);
 
             return product;
-        }
-
-        public async Task<List<Product>> GetProductsBatchForMonitoringAsync(BotSideGetProductsBatchForMonitoringDto dto)
-        {
-            return await _context.Products
-                .AsNoTracking()
-                .OrderBy(p => p.Id)
-                .Skip(dto.Page * dto.BarchSize)
-                .Take(dto.BarchSize)
-                .ToListAsync(dto.CancellationToken);
         }
 
         public async Task<Result> UpdateProductPrices(BotSideUpdateProductPricesDto dto)
@@ -239,6 +218,14 @@ namespace Application.Services.Implementaions
                 return Result.Failure<BotSideProductDto>(BotMessages.YouDontCheckThisProductError);
 
             return product;
+        }
+
+        public async Task<List<Product>> GetProductsBatchForMonitoringAsync(BotSideGetProductsBatchForMonitoringDto dto)
+        {
+            return await _context.Products
+                .AsNoTracking()
+                .Where(p => dto.ProductIds.Contains(p.Id))
+                .ToListAsync(dto.CancellationToken);
         }
     }
 }

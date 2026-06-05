@@ -10,16 +10,14 @@ namespace Application.Services.Interfaces
 
         Task<Result<BotSideProductDto>> CreateProductForUser(BotSideCreateProductForUserDto dto);
 
-        Task<Result<List<Product>>> GetUserProductsAsync(long chatId);
-
         Task<Result> RemoveProductFromUserAsync(BotSideProductUserInfoDto dto);
 
         Task<Result<BotSideProductDto>> GetProductByDigiKalaId(string digiKalaId);
 
         Task<Result<BotSideProductDto>> GetProductForUserByDigiKalaId(BotSideGetProductForUserDto dto);
 
-        Task<List<Product>> GetProductsBatchForMonitoringAsync(BotSideGetProductsBatchForMonitoringDto dto);
-
         Task<Result> UpdateProductPrices(BotSideUpdateProductPricesDto dto);
+
+        Task<List<Product>> GetProductsBatchForMonitoringAsync(BotSideGetProductsBatchForMonitoringDto dto);
     }
 }

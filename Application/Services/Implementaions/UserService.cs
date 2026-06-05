@@ -132,15 +132,6 @@ namespace Application.Services.Implementaions
             return Result.Failure(Messages.UserDoesNotExistError);
         }
 
-        public async Task<List<long>> BotSideGetUserChatIdsTrackingThisProduct(BotSideGetUsersTrackingProductDto dto)
-        {
-            return await _context.UserProductMapping
-                .AsNoTracking()
-                .Where(upm => upm.ProductId == dto.ProductId && upm.User.ChatId != null)
-                .Select(upm => upm.User.ChatId!.Value)
-                .ToListAsync(dto.CancellationToken);
-        }
-
         public async Task<Result<BotSideSubscriptionPlanDto>> GetCurrenUserSubscriptionPlanByChatId(long chatId)
         {
             var currentDateTime = DateTime.UtcNow;
@@ -205,5 +196,83 @@ namespace Application.Services.Implementaions
             return userId;
         }
 
+        public async Task<List<BotSideUserMonitoringDto>> GetUsersBatchForMonitoringAsync(int page, int batchSize, CancellationToken cancellationToken)
+        {
+            var now = DateTime.UtcNow;
+
+            var users = await _context.Users
+                .AsNoTracking()
+                .OrderBy(u => u.Id)
+                .Skip(page * batchSize)
+                .Take(batchSize)
+                .Select(u => new
+                {
+                    u.ChatId,
+                    u.SubscriptionPlanId,
+                    u.SubscriptionEndDate,
+                    MaxAllowed = (u.SubscriptionPlanId == 1 || (u.SubscriptionEndDate.HasValue && now > u.SubscriptionEndDate.Value))
+                        ? _context.SubscriptionPlans.Where(sp => sp.Id == 1).Select(sp => sp.MaximumProductCount).FirstOrDefault()
+                        : u.SubscriptionPlan.MaximumProductCount,
+
+                    AllProducts = u.Products
+                        .Select(upm => new BotSideUserProductDetailsDto
+                        {
+                            ProductId = upm.ProductId,
+                            DigiKalaId = upm.Product.DigiKalaId,
+                            Title = upm.Product.Title,
+                            CurrentPrice = upm.Product.NewPrice,
+                            ImageFileName = upm.Product.ImageFileName
+                        })
+                })
+                .ToListAsync(cancellationToken);
+
+            return users.Select(u => new BotSideUserMonitoringDto
+            {
+                ChatId = u.ChatId,
+                AllowedProducts = u.AllProducts.Take(u.MaxAllowed).ToList()
+            }).ToList();
+        }
+
+        public async Task<List<BotSideUserTrackingProductDto>> GetUsersTrackingProduct(BotSideGetUsersTrackingProductDto dto)
+        {
+            var now = DateTime.UtcNow;
+
+            return await _context.UserProductMapping
+                .AsNoTracking()
+                .Where(up => up.ProductId == dto.ProductId)
+                .Select(up => new BotSideUserTrackingProductDto()
+                {
+                    Mobile = up.User.Mobile,
+                    ChatId = up.User.ChatId,
+                    IsPaidPlan = up.User.SubscriptionPlanId != 1 && (up.User.SubscriptionEndDate == null || up.User.SubscriptionEndDate > now)
+                })
+                .ToListAsync(dto.CancellationToken);
+        }
+
+        public async Task<Result<List<int>>> GetAllEligibleProductIdsAsync(CancellationToken cancellationToken)
+        {
+            var now = DateTime.UtcNow;
+
+            var rawUsersData = await _context.Users
+                .AsNoTracking()
+                .Select(u => new
+                {
+                    MaxAllowed = (u.SubscriptionPlanId == 1 || (u.SubscriptionEndDate.HasValue && now > u.SubscriptionEndDate.Value))
+                        ? _context.SubscriptionPlans.Where(sp => sp.Id == 1).Select(sp => sp.MaximumProductCount).FirstOrDefault()
+                        : u.SubscriptionPlan.MaximumProductCount,
+
+                    ProductIds = u.Products.Select(upm => upm.ProductId)
+                })
+                .ToListAsync(cancellationToken);
+
+            var allUniqueEligibleProductIds = rawUsersData
+                .SelectMany(u => u.ProductIds.Take(u.MaxAllowed))
+                .Distinct()
+                .ToList();
+            if (!allUniqueEligibleProductIds.Any())
+                return Result.Failure<List<int>>(Messages.OperationFailedError);
+
+            return allUniqueEligibleProductIds;
+        }
     }
 }

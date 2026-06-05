@@ -3,6 +3,7 @@ using Application.Dtos.Products.BotSide;
 using Application.Dtos.Users.BotSide;
 using Application.Services.Interfaces;
 using Application.Tools;
+using Domain.Shared;
 
 namespace API.BackgroundServices
 {
@@ -49,27 +50,42 @@ namespace API.BackgroundServices
 
         private async Task RunMonitoringCycleAsync(CancellationToken stoppingToken)
         {
+            using var scope = _scopeFactory.CreateScope();
+            var productService = scope.ServiceProvider.GetRequiredService<IProductService>();
+            var scraperService = scope.ServiceProvider.GetRequiredService<IDigiKalaService>();
+            var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
+
+            var productIdsResult = await userService.GetAllEligibleProductIdsAsync(stoppingToken);
+            if (productIdsResult.IsFailure || !productIdsResult.Value.Any())
+                return;
+
+            var allProductIds = productIdsResult.Value;
+            int batchSize = AppInfo.PriceMonitorBatchSize;
             int page = 0;
             bool hasMoreProducts = true;
 
+            var mobilesToNotify = new List<string>();
+
             while (hasMoreProducts && !stoppingToken.IsCancellationRequested)
             {
-                using var scope = _scopeFactory.CreateScope();
-                var productService = scope.ServiceProvider.GetRequiredService<IProductService>();
-                var scraperService = scope.ServiceProvider.GetRequiredService<IDigiKalaService>();
-                var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
+                var batchIds = allProductIds.Skip(page * batchSize).Take(batchSize).ToList();
+
+                if (!batchIds.Any())
+                {
+                    hasMoreProducts = false;
+                    break;
+                }
 
                 var productsBatch = await productService.GetProductsBatchForMonitoringAsync(new BotSideGetProductsBatchForMonitoringDto()
                 {
-                    Page = page,
-                    BarchSize = AppInfo.PriceMonitorBatchSize,
+                    ProductIds = batchIds,
                     CancellationToken = stoppingToken
                 });
 
                 if (!productsBatch.Any())
                 {
-                    hasMoreProducts = false;
-                    break;
+                    page++;
+                    continue;
                 }
 
                 foreach (var product in productsBatch)
@@ -92,27 +108,47 @@ namespace API.BackgroundServices
                             CancellationToken = stoppingToken
                         });
 
-                        var trackingUsers = await userService.BotSideGetUserChatIdsTrackingThisProduct(new BotSideGetUsersTrackingProductDto()
+                        var trackingUsers = await userService.GetUsersTrackingProduct(new BotSideGetUsersTrackingProductDto()
                         {
                             ProductId = product.Id,
                             CancellationToken = stoppingToken
                         });
 
-                        foreach (var chatId in trackingUsers)
+                        foreach (var user in trackingUsers)
                         {
-                            await _notificationQueue.QueueNotificationAsync(new NotificationMessage(
-                                ChatId: chatId,
-                                Title: product.Title,
-                                OldPrice: oldPrice,
-                                NewPrice: newPrice,
-                                DigiKalaId: product.DigiKalaId,
-                                ImageFileName: product.ImageFileName
-                            ));
+                            if (user.IsPaidPlan)
+                                mobilesToNotify.Add(user.Mobile);
+                            if (user.ChatId is not null)
+                            {
+                                await _notificationQueue.QueueNotificationAsync(new NotificationMessage(
+                                    ChatId: user.ChatId,
+                                    Title: product.Title,
+                                    OldPrice: oldPrice,
+                                    NewPrice: newPrice,
+                                    DigiKalaId: product.DigiKalaId,
+                                    ImageFileName: product.ImageFileName
+                                    ));
+                            }
                         }
                     }
                 }
 
                 page++;
+            }
+
+            var uniqueMobiles = mobilesToNotify.Distinct().ToList();
+
+            if (uniqueMobiles.Any() && !stoppingToken.IsCancellationRequested)
+            {
+                var smsQueue = scope.ServiceProvider.GetRequiredService<ISmsQueue>();
+                string textMessage = Messages.ProductPriceChangedMessage;
+
+                foreach (var mobile in uniqueMobiles)
+                {
+                    if (stoppingToken.IsCancellationRequested) break;
+
+                    await smsQueue.QueueSmsAsync(new SmsMessage(mobile, textMessage));
+                }
             }
         }
     }

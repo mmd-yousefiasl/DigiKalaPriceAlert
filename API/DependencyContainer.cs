@@ -32,9 +32,11 @@ namespace API
             services.AddScoped<ISubscriptionPlanService, SubscriptionPlanService>();
 
             services.AddSingleton<INotificationQueue, NotificationQueue>();
+            services.AddSingleton<ISmsQueue, SmsQueue>();
 
             services.AddHostedService<PriceMonitorWorker>();
             services.AddHostedService<NotificationConsumerWorker>();
+            services.AddHostedService<SmsConsumerWorker>();
         }
     }
 }

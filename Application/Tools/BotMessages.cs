@@ -83,7 +83,7 @@ namespace Application.Tools
                 var remainingDays = (plan.SubscriptionEndDate.Value - DateTime.UtcNow).Days;
                 var displayDays = remainingDays < 0 ? 0 : remainingDays;
 
-                message += $"📅 <b>تاریخ اتمام اشتراک:</b> {plan.SubscriptionEndDate.Value.ToString("yyyy/MM/dd")}\n" +
+                message += $"📅 <b>تاریخ اتمام اشتراک:</b> {plan.SubscriptionEndDate.Value.ConvertToShamsi()}\n" +
                            $"⏳ <b>زمان باقی‌مانده:</b> {displayDays} روز\n\n" +
                            $"🚀 برای ارتقای ظرفیت و استفاده از امکانات ویژه، می‌توانید اشتراک خود را ارتقا دهید.\n";
             }

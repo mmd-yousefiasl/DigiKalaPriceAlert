@@ -2,7 +2,7 @@
 {
     public class SendProductAlertDto
     {
-        public long ChatId { get; set; }
+        public long? ChatId { get; set; }
         public string Title { get; set; }
         public decimal? OldPrice { get; set; }
         public decimal? NewPrice { get; set; }

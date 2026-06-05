@@ -2,8 +2,7 @@
 {
     public class BotSideGetProductsBatchForMonitoringDto
     {
-        public int Page { get; set; }
-        public int BarchSize { get; set; }
+        public List<int> ProductIds { get; set; }
         public CancellationToken CancellationToken { get; set; }
     }
 }

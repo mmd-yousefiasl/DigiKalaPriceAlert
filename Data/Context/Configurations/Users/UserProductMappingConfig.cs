@@ -12,6 +12,8 @@ namespace Data.Context.Configurations.Users
 
             builder.HasKey(upm => new { upm.UserId, upm.ProductId });
 
+            builder.HasIndex(upm => upm.ProductId);
+
             builder.HasOne(upm => upm.User)
                 .WithMany(u => u.Products)
                 .HasForeignKey(upm => upm.UserId);

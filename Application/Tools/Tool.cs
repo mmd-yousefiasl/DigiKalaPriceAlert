@@ -1,4 +1,5 @@
 ﻿using Domain.Shared;
+using System.Globalization;
 
 namespace Application.Tools
 {
@@ -39,6 +40,16 @@ namespace Application.Tools
             }
 
             return Result.Failure<string>(BotMessages.OnlyIranPhoneNumberError);
+        }
+
+        public static string ConvertToShamsi(this DateTime value)
+        {
+            PersianCalendar pc = new PersianCalendar();
+            int year = pc.GetYear(value);
+            int month = pc.GetMonth(value);
+            int day = pc.GetDayOfMonth(value);
+
+            return year + "/" + month.ToString("00") + "/" + day.ToString("00");
         }
     }
 }

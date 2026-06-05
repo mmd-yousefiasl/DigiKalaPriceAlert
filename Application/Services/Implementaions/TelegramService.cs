@@ -28,6 +28,9 @@ namespace Application.Services.Implementaions
 
         public async Task SendProductAlertAsync(SendProductAlertDto dto)
         {
+            if (dto.ChatId is null)
+                return;
+
             string message = BotMessages.TelegramAlert(dto.Title, dto.OldPrice, dto.NewPrice);
             var replyMarkup = BotMessages.GetProductReplyMarkup(dto.DigiKalaId);
 

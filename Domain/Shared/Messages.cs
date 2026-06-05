@@ -15,5 +15,11 @@
         public const string SuccessfullyDone = "عملیات با موفقیت به پایان رسید";
 
         #endregion
+
+        #region Message
+
+        public const string ProductPriceChangedMessage = "کاربر گرامی، قیمت حداقل یکی از محصولات مورد رصد شما تغییر یافته است. جهت مشاهده جزئیات به ربات مراجعه کنید.";
+
+        #endregion
     }
 }
