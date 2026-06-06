@@ -3,6 +3,7 @@ using Application.Services.Implementaions;
 using Application.Services.Interfaces;
 using Data.Context;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace API
 {
@@ -11,17 +12,22 @@ namespace API
         public static void RegisterDependencies(IServiceCollection services, string connectionString)
         {
             #region Config DataBase
-            services.AddDbContext<DigiKalaPriceAlertDbContext>(options =>
-            options.UseNpgsql(
-                connectionString,
-                npgsqlOptions =>
-                {
-                    npgsqlOptions.EnableRetryOnFailure(
-                        maxRetryCount: 5,
-                        maxRetryDelay: TimeSpan.FromSeconds(5),
-                        errorCodesToAdd: null);
-                }
-            ));
+            services.AddDbContextPool<DigiKalaPriceAlertDbContext>(options =>
+            {
+                options.UseNpgsql(
+                    connectionString,
+                    npgsqlOptions =>
+                    {
+                        npgsqlOptions.EnableRetryOnFailure(
+                            maxRetryCount: 5,
+                            maxRetryDelay: TimeSpan.FromSeconds(5),
+                            errorCodesToAdd: null);
+                    }
+                );
+
+                options.ConfigureWarnings(warnings =>
+                    warnings.Ignore(RelationalEventId.PendingModelChangesWarning));
+            });
             #endregion
 
             services.AddHttpClient<IDigiKalaService, DigiKalaService>();

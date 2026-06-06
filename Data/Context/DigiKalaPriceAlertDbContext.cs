@@ -1,39 +1,31 @@
-﻿using Domain.Models.Products;
-using Domain.Models.SubscriptionPlans;
-using Domain.Models.Users;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
+﻿    using Domain.Models.Products;
+    using Domain.Models.SubscriptionPlans;
+    using Domain.Models.Users;
+    using Microsoft.EntityFrameworkCore;
+    using Microsoft.EntityFrameworkCore.Diagnostics;
 
-namespace Data.Context
-{
-    public class DigiKalaPriceAlertDbContext : DbContext
+    namespace Data.Context
     {
-        public DigiKalaPriceAlertDbContext(DbContextOptions<DigiKalaPriceAlertDbContext> options) : base(options)
+        public class DigiKalaPriceAlertDbContext : DbContext
         {
+            public DigiKalaPriceAlertDbContext(DbContextOptions<DigiKalaPriceAlertDbContext> options) : base(options)
+            {
+            }
+
+            protected override void OnModelCreating(ModelBuilder modelBuilder)
+            {
+                modelBuilder.ApplyConfigurationsFromAssembly(typeof(DigiKalaPriceAlertDbContext).Assembly);
+                modelBuilder.Seed();
+            }
+
+            public DbSet<User> Users => Set<User>();
+            public DbSet<UserProductMapping> UserProductMapping => Set<UserProductMapping>();
+
+            public DbSet<Product> Products => Set<Product>();
+            public DbSet<ProductPriceHistory> ProductPriceHistory => Set<ProductPriceHistory>();
+
+
+            public DbSet<SubscriptionPlan> SubscriptionPlans => Set<SubscriptionPlan>();
+            public DbSet<SubscriptionPlanFeature> SubscriptionPlanFeatures => Set<SubscriptionPlanFeature>();
         }
-
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            modelBuilder.ApplyConfigurationsFromAssembly(typeof(DigiKalaPriceAlertDbContext).Assembly);
-            modelBuilder.Seed();
-        }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder
-                .ConfigureWarnings(warnings => warnings.Ignore(RelationalEventId.PendingModelChangesWarning));
-
-            base.OnConfiguring(optionsBuilder);
-        }
-
-        public DbSet<User> Users => Set<User>();
-        public DbSet<UserProductMapping> UserProductMapping => Set<UserProductMapping>();
-
-        public DbSet<Product> Products => Set<Product>();
-        public DbSet<ProductPriceHistory> ProductPriceHistory => Set<ProductPriceHistory>();
-
-
-        public DbSet<SubscriptionPlan> SubscriptionPlans => Set<SubscriptionPlan>();
-        public DbSet<SubscriptionPlanFeature> SubscriptionPlanFeatures => Set<SubscriptionPlanFeature>();
     }
-}
