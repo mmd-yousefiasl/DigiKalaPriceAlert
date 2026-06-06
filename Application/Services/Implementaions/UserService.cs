@@ -196,43 +196,6 @@ namespace Application.Services.Implementaions
             return userId;
         }
 
-        public async Task<List<BotSideUserMonitoringDto>> GetUsersBatchForMonitoringAsync(int page, int batchSize, CancellationToken cancellationToken)
-        {
-            var now = DateTime.UtcNow;
-
-            var users = await _context.Users
-                .AsNoTracking()
-                .OrderBy(u => u.Id)
-                .Skip(page * batchSize)
-                .Take(batchSize)
-                .Select(u => new
-                {
-                    u.ChatId,
-                    u.SubscriptionPlanId,
-                    u.SubscriptionEndDate,
-                    MaxAllowed = (u.SubscriptionPlanId == 1 || (u.SubscriptionEndDate.HasValue && now > u.SubscriptionEndDate.Value))
-                        ? _context.SubscriptionPlans.Where(sp => sp.Id == 1).Select(sp => sp.MaximumProductCount).FirstOrDefault()
-                        : u.SubscriptionPlan.MaximumProductCount,
-
-                    AllProducts = u.Products
-                        .Select(upm => new BotSideUserProductDetailsDto
-                        {
-                            ProductId = upm.ProductId,
-                            DigiKalaId = upm.Product.DigiKalaId,
-                            Title = upm.Product.Title,
-                            CurrentPrice = upm.Product.NewPrice,
-                            ImageFileName = upm.Product.ImageFileName
-                        })
-                })
-                .ToListAsync(cancellationToken);
-
-            return users.Select(u => new BotSideUserMonitoringDto
-            {
-                ChatId = u.ChatId,
-                AllowedProducts = u.AllProducts.Take(u.MaxAllowed).ToList()
-            }).ToList();
-        }
-
         public async Task<List<BotSideUserTrackingProductDto>> GetUsersTrackingProduct(BotSideGetUsersTrackingProductDto dto)
         {
             var now = DateTime.UtcNow;

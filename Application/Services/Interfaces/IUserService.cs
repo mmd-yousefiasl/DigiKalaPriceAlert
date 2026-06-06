@@ -18,8 +18,6 @@ namespace Application.Services.Interfaces
 
         Task<Result<BotSideSubscriptionPlanDto>> GetCurrenUserSubscriptionPlanByChatId(long chatId);
 
-        Task<List<BotSideUserMonitoringDto>> GetUsersBatchForMonitoringAsync(int page, int batchSize, CancellationToken cancellationToken);
-
         Task<List<BotSideUserTrackingProductDto>> GetUsersTrackingProduct(BotSideGetUsersTrackingProductDto dto);
 
         Task<Result<List<int>>> GetAllEligibleProductIdsAsync(CancellationToken cancellationToken);

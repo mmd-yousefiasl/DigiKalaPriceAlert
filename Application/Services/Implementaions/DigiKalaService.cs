@@ -34,77 +34,61 @@ namespace Application.Services.Implementaions
         {
             try
             {
-                string apiUrl = $"https://api.digikala.com/v2/product/{digiKalaId}/";
+                // آدرس اختصاصی لایه ورکر کلودفلر شما
+                string workerUrl = "https://flat-sunset-4db4.mmdyousefi95.workers.dev/";
+                string apiUrl = $"{workerUrl}?id={digiKalaId}";
 
                 var request = new HttpRequestMessage(HttpMethod.Get, apiUrl);
-                var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
 
-                if ((int)response.StatusCode == 307 || (int)response.StatusCode == 302 || (int)response.StatusCode == 301)
-                {
-                    var redirectUrl = response.Headers.Location?.ToString();
-                    if (!string.IsNullOrEmpty(redirectUrl))
-                    {
-                        _logger.LogInformation("Following 307 Redirect to: {RedirectUrl}", redirectUrl);
-                        request = new HttpRequestMessage(HttpMethod.Get, redirectUrl);
-                        response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
-                    }
-                }
+                // ارسال درخواست به ورکر کلودفلر
+                var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
+                _logger.LogInformation("Worker Response Details: {Response}", response);
 
                 response.EnsureSuccessStatusCode();
-                string responseBody = await response.Content.ReadAsStringAsync();
 
-                using JsonDocument doc = JsonDocument.Parse(responseBody);
+                // ۱. دریافت پاسخ متنی به صورت استریم زنده شبکه (فوق‌العاده بهینه و سریع)
+                using Stream responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+
+                // ۲. پارس ناهمگام استریم جی‌سان مینی‌مال
+                using JsonDocument doc = await JsonDocument.ParseAsync(responseStream).ConfigureAwait(false);
                 JsonElement root = doc.RootElement;
 
-                if (!root.TryGetProperty("data", out JsonElement dataElement) ||
-                    !dataElement.TryGetProperty("product", out JsonElement productElement))
+                // ۳. استخراج مستقیم فیلدها از ریشه (به دلیل بهینه‌سازی در سمت پی‌اچ‌پی)
+                string title = root.TryGetProperty("Title", out var titleElement)
+                    ? titleElement.GetString() ?? "بدون عنوان"
+                    : "بدون عنوان";
+
+                decimal price = root.TryGetProperty("Price", out var priceElement)
+                    ? priceElement.GetDecimal()
+                    : 0;
+
+                string? imageUrl = root.TryGetProperty("ImageUrl", out var imgElement)
+                    ? imgElement.GetString()
+                    : null;
+
+                // اگر عنوان "بدون عنوان" باشد یا ساختار جی‌سان نامعتبر باشد، کالا یافت نشده است
+                if (title == "بدون عنوان" && price == 0 && string.IsNullOrEmpty(imageUrl))
                 {
                     return Result.Failure<DigiKalaProductResultDto>(BotMessages.ProductNotFoundError);
                 }
 
-                string title = productElement.TryGetProperty("title_fa", out var titleElement)
-                    ? titleElement.GetString() ?? "بدون عنوان"
-                    : "بدون عنوان";
-
-                decimal price = 0;
-                string? imageUrl = null;
-
-                if (productElement.TryGetProperty("default_variant", out JsonElement defaultVariant) &&
-                    defaultVariant.ValueKind == JsonValueKind.Object)
+                // لاگ زدن وضعیت محصولات ناموجود یا بدون تنوع فعال
+                if (price == 0)
                 {
-                    if (defaultVariant.TryGetProperty("price", out JsonElement priceElement) &&
-                        priceElement.ValueKind == JsonValueKind.Object &&
-                        priceElement.TryGetProperty("selling_price", out JsonElement sellingPriceElement))
-                    {
-                        price = sellingPriceElement.GetDecimal() / 10;
-                    }
-                }
-                else
-                {
-                    _logger.LogInformation("Product DKP: {DkpId} has no default variant. It might be out of stock.", digiKalaId);
+                    _logger.LogInformation("Product DKP: {DkpId} has 0 price or no default variant. It might be out of stock.", digiKalaId);
                 }
 
                 byte[]? imageBytes = null;
-                if (downloadImage)
+                if (downloadImage && !string.IsNullOrEmpty(imageUrl))
                 {
-                    if (productElement.TryGetProperty("images", out JsonElement imagesElement) &&
-                        imagesElement.TryGetProperty("main", out JsonElement mainImageElement) &&
-                        mainImageElement.TryGetProperty("url", out JsonElement urlArrayElement) &&
-                        urlArrayElement.ValueKind == JsonValueKind.Array && urlArrayElement.GetArrayLength() > 0)
+                    try
                     {
-                        imageUrl = urlArrayElement[0].GetString();
+                        // دانلود مستقیم تصویر کالا از CDN دیجی‌کالا توسط سرور دات‌نت
+                        imageBytes = await _httpClient.GetByteArrayAsync(imageUrl).ConfigureAwait(false);
                     }
-
-                    if (!string.IsNullOrEmpty(imageUrl))
+                    catch (Exception ex)
                     {
-                        try
-                        {
-                            imageBytes = await _httpClient.GetByteArrayAsync(imageUrl);
-                        }
-                        catch (Exception ex)
-                        {
-                            _logger.LogWarning(ex, "Failed to download image for DKP: {DkpId}", digiKalaId);
-                        }
+                        _logger.LogWarning(ex, "Failed to download image for DKP: {DkpId}", digiKalaId);
                     }
                 }
 
@@ -113,7 +97,7 @@ namespace Application.Services.Implementaions
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error fetching product details from DigiKala for DKP: {DkpId}", digiKalaId);
+                _logger.LogError(ex, "Error processing optimized product details from DigiKala Proxy for DKP: {DkpId}", digiKalaId);
             }
 
             return Result.Failure<DigiKalaProductResultDto>(BotMessages.ProductNotFoundError);
