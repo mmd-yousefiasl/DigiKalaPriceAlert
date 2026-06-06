@@ -42,7 +42,6 @@ namespace Application.Services.Implementaions
 
                 // ارسال درخواست به ورکر کلودفلر
                 var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
-                _logger.LogInformation("Worker Response Details: {Response}", response);
 
                 response.EnsureSuccessStatusCode();
 

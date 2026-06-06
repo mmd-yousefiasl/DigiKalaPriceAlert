@@ -87,10 +87,16 @@ namespace API.BackgroundServices
                     page++;
                     continue;
                 }
+                var random = new Random();
 
                 foreach (var product in productsBatch)
                 {
                     if (stoppingToken.IsCancellationRequested) break;
+
+                    // --- افزودن وقفه تصادفی (مثلاً بین 1 تا 3 ثانیه) ---
+                    // این کار باعث می‌شود سرور دیجی‌کالا درخواست‌های شما را رگباری نبیند
+                    int delay = random.Next(1000, 2800);
+                    await Task.Delay(delay, stoppingToken);
 
                     var scrapResult = await scraperService.GetProductDetailsWithoutImageAsync(product.DigiKalaId);
                     if (scrapResult.IsFailure) continue;
