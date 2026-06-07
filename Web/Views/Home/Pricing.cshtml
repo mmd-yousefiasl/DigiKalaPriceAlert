@@ -1,0 +1,384 @@
+﻿@{
+    ViewData["Title"] = "پلن ها و تعرفه ها";
+}
+
+@section HeaderReferences {
+    <style>
+        /* ریست و تنظیمات پایه برای بخش قیمت‌گذاری */
+        .digito-wrapper {
+            color: #27272a;
+            direction: rtl;
+            font-family: 'Vazir';
+            padding: 60px 16px;
+            box-sizing: border-box;
+            line-height: 1.5;
+        }
+
+            .digito-wrapper *, .digito-wrapper *::before, .digito-wrapper *::after {
+                box-sizing: inherit;
+                margin: 0;
+                padding: 0;
+            }
+
+        /* بخش معرفی هدر */
+        .digito-hero {
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto 60px auto;
+        }
+
+        .digito-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background-color: #fef2f2;
+            color: #ed1945;
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 24px;
+        }
+
+        .digito-badge-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #ed1945;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .digito-hero-title {
+            color: #18181b;
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+
+            .digito-hero-title .highlight {
+                color: #ed1945;
+            }
+
+        .digito-hero-desc {
+            color: #52525b;
+            font-size: 15px;
+            line-height: 1.8;
+        }
+
+        /* گرید کارت‌های قیمت‌گذاری */
+        .digito-pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            max-width: 1100px;
+            margin: 0 auto 60px auto;
+            align-items: stretch; /* برای هم‌ارتفاع شدن کارت‌ها */
+        }
+
+        /* استایل کارت‌ها */
+        .digito-pricing-card {
+            background-color: #ffffff;
+            border: 1px solid #e4e4e7;
+            border-radius: 16px;
+            padding: 40px 24px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+            .digito-pricing-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            }
+
+            .digito-pricing-card.popular {
+                border: 2px solid #ed1945;
+                box-shadow: 0 10px 25px rgba(237, 25, 69, 0.15);
+                transform: scale(1.03); /* کمی بزرگتر برای برجسته شدن */
+                z-index: 2;
+            }
+
+                .digito-pricing-card.popular:hover {
+                    transform: scale(1.03) translateY(-5px);
+                }
+
+        .digito-popular-badge {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #ed1945;
+            color: #ffffff;
+            padding: 6px 20px;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: bold;
+            white-space: nowrap;
+            box-shadow: 0 4px 6px rgba(237, 25, 69, 0.3);
+        }
+
+        /* متون داخل کارت */
+        .digito-plan-name {
+            color: #09090b;
+            font-size: 20px;
+            font-weight: 800;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .digito-plan-desc {
+            color: #71717a;
+            font-size: 13px;
+            text-align: center;
+            margin-bottom: 30px;
+            line-height: 1.6;
+            height: 40px; /* ثابت نگه داشتن ارتفاع توضیحات */
+        }
+
+        .digito-plan-price {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid #f4f4f5;
+        }
+
+        .digito-price-amount {
+            color: #ed1945;
+            font-size: 38px;
+            font-weight: 900;
+            display: block;
+        }
+
+        .digito-price-currency {
+            color: #71717a;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* لیست ویژگی‌ها */
+        .digito-features-list {
+            list-style: none;
+            margin-bottom: 32px;
+            flex-grow: 1; /* پر کردن فضای خالی تا دکمه به پایین بچسبد */
+        }
+
+            .digito-features-list li {
+                display: flex;
+                align-items: flex-start;
+                gap: 12px;
+                color: #3f3f46;
+                font-size: 14px;
+                margin-bottom: 16px;
+                line-height: 1.5;
+            }
+
+        .digito-icon-check {
+            color: #10b981; /* سبز */
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .digito-icon-cross {
+            color: #a1a1aa; /* خاکستری */
+            font-size: 14px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .digito-feature-disabled {
+            color: #a1a1aa;
+        }
+
+        /* دکمه‌ها */
+        .digito-btn {
+            display: block;
+            width: 100%;
+            text-align: center;
+            padding: 14px 20px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: bold;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .digito-btn-primary {
+            background-color: #ed1945;
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(237, 25, 69, 0.25);
+        }
+
+            .digito-btn-primary:hover {
+                background-color: #d1123a;
+            }
+
+        .digito-btn-secondary {
+            background-color: #f4f4f5;
+            color: #27272a;
+        }
+
+            .digito-btn-secondary:hover {
+                background-color: #e4e4e7;
+            }
+
+        .digito-btn-outline {
+            background-color: transparent;
+            color: #ed1945;
+            border: 2px solid #ed1945;
+        }
+
+            .digito-btn-outline:hover {
+                background-color: #fef2f2;
+            }
+
+        /* بنر بازگشت سرمایه */
+        .digito-roi-banner {
+            background: linear-gradient(135deg, #18181b 0%, #27272a 100%);
+            border-radius: 16px;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 30px;
+            flex-wrap: wrap;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .digito-roi-content {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .digito-roi-title {
+            color: #ffffff;
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 16px;
+        }
+
+        .digito-roi-desc {
+            color: #a1a1aa;
+            font-size: 15px;
+            line-height: 1.8;
+        }
+
+        /* رسپانسیو کردن گرید برای موبایل‌های کوچک */
+        @@media (max-width: 768px) {
+            .digito-pricing-card.popular {
+                transform: scale(1);
+            }
+
+                .digito-pricing-card.popular:hover {
+                    transform: translateY(-5px);
+                }
+
+            .digito-roi-banner {
+                text-align: center;
+                justify-content: center;
+            }
+        }
+    </style>
+}
+
+<main class="digito-wrapper">
+    
+    <section class="digito-hero">
+        <div class="digito-badge">
+            <span class="digito-badge-dot"></span>
+            تعرفه‌های شفاف، بدون هزینه‌های پنهان
+        </div>
+        <h1 class="digito-hero-title">
+            خرید اشتراک ربات دیجی‌کالا؛ سرمایه‌گذاری روی <span class="highlight">حفظ بای‌باکس</span>
+        </h1>
+        <p class="digito-hero-desc">
+            از دست دادن بای‌باکس حتی برای یک روز، ده‌ها برابر حق اشتراک ما به شما ضرر می‌زند. با روزی تنها ۳۳ هزار تومان، یک دستیار خستگی‌ناپذیر استخدام کنید که شبانه‌روز مراقب قیمت‌هاست.
+        </p>
+    </section>
+
+    <section class="digito-pricing-grid">
+        
+        <div class="digito-pricing-card">
+            <h3 class="digito-plan-name">پلن استارتر (رایگان)</h3>
+            <p class="digito-plan-desc">مناسب برای شروع و تست هوشمندی ربات.</p>
+            
+            <div class="digito-plan-price">
+                <span class="digito-price-amount">۰</span>
+                <span class="digito-price-currency">همیشه رایگان</span>
+            </div>
+            
+            <ul class="digito-features-list">
+                <li><span class="digito-icon-check">✔️</span> پایش همزمان <b>حداکثر ۵ کالا</b></li>
+                <li><span class="digito-icon-check">✔️</span> بررسی کالا <b>هر ۳۰ دقیقه</b></li>
+                <li><span class="digito-icon-check">✔️</span> افزودن کالا با ارسال لینک در ربات</li>
+                <li><span class="digito-icon-check">✔️</span> دریافت هشدار متنی در تلگرام</li>
+                <li class="digito-feature-disabled"><span class="digito-icon-cross">✖️</span> گزارش دوره‌ای وضعیت رقبا</li>
+                <li class="digito-feature-disabled"><span class="digito-icon-cross">✖️</span> پشتیبانی انسانی اختصاصی</li>
+            </ul>
+            
+            <a href="https://t.me/DigitoBot" target="_blank" class="digito-btn digito-btn-secondary">شروع تست رایگان</a>
+        </div>
+
+        <div class="digito-pricing-card popular">
+            <div class="digito-popular-badge">محبوب‌ترین انتخاب</div>
+            <h3 class="digito-plan-name">پلن رشد (ماهانه)</h3>
+            <p class="digito-plan-desc">ویژه فروشندگانی که می‌خواهند بای‌باکس را تصاحب کنند.</p>
+            
+            <div class="digito-plan-price">
+                <span class="digito-price-amount">۹۹۰,۰۰۰</span>
+                <span class="digito-price-currency">تومان / ماهانه</span>
+            </div>
+            
+            <ul class="digito-features-list">
+                <li><span class="digito-icon-check">✔️</span> پایش همزمان <b>تا ۳۰۰ کالا</b></li>
+                <li><span class="digito-icon-check">✔️</span> بررسی مستمر <b>هر ۱۵ دقیقه</b></li>
+                <li><span class="digito-icon-check">✔️</span> ارسال هشدار سریع به محض تشخیص تغییر</li>
+                <li><span class="digito-icon-check">✔️</span> دسته‌بندی و مدیریت کالاها در ربات</li>
+                <li><span class="digito-icon-check">✔️</span> گزارش متنی روزانه از نوسانات قیمت</li>
+                <li><span class="digito-icon-check">✔️</span> پشتیبانی اختصاصی تلگرامی</li>
+            </ul>
+            
+            <a href="https://t.me/DigitoBot" target="_blank" class="digito-btn digito-btn-primary">خرید اشتراک یک ماهه</a>
+        </div>
+
+        <div class="digito-pricing-card">
+            <h3 class="digito-plan-name">پلن حرفه‌ای (۳ ماهه)</h3>
+            <p class="digito-plan-desc">بهترین انتخاب برای کاهش هزینه‌ها و تمرکز کامل بر فروش.</p>
+            
+            <div class="digito-plan-price">
+                <span class="digito-price-amount">۲,۶۵۰,۰۰۰</span>
+                <span class="digito-price-currency">تومان / ۳ ماهه</span>
+            </div>
+            
+            <ul class="digito-features-list">
+                <li><span class="digito-icon-check">✔️</span> <b>۱۰٪ تخفیف (صرفه‌جویی ۳۰۰ هزار تومانی)</b></li>
+                <li><span class="digito-icon-check">✔️</span> تمام امکانات پلن حرفه‌ای</li>
+                <li><span class="digito-icon-check">✔️</span> پایش همزمان تا ۳۰۰ کالا (بررسی هر ۱۵ دقیقه)</li>
+                <li><span class="digito-icon-check">✔️</span> مصونیت از افزایش قیمت اشتراک در ۳ ماه</li>
+                <li><span class="digito-icon-check">✔️</span> اولویت بالا در دریافت آپدیت‌های جدید ربات</li>
+            </ul>
+            
+            <a href="https://t.me/DigitoBot" target="_blank" class="digito-btn digito-btn-outline">خرید اشتراک ۳ ماهه</a>
+        </div>
+
+    </section>
+
+    <section class="digito-roi-banner">
+        <div class="digito-roi-content">
+            <h3 class="digito-roi-title">آیا ۱ میلیون تومان در ماه هزینه زیادی است؟</h3>
+            <p class="digito-roi-desc">
+                تصور کنید روزانه فقط ۵ فروش را به خاطر تغییر قیمت رقیبتان از دست بدهید. با میانگین سود ۵۰ هزار تومان روی هر کالا، شما روزانه ۲۵۰ هزار تومان (ماهیانه ۷.۵ میلیون تومان) از دست می‌دهید! ربات دیجیتو با <b>تنها روزی ۳۳ هزار تومان</b> جلوی این ضرر را گرفته و فروش شما را تضمین می‌کند. این یک هزینه نیست، راه‌حل نجات کسب‌وکار شما در دیجی‌کالاست.
+            </p>
+        </div>
+        <div style="flex-shrink: 0; min-width: 200px;">
+            <a href="https://t.me/DigitoBot" target="_blank" class="digito-btn digito-btn-primary" style="padding: 16px 24px; font-size: 16px;">
+                جلوی ضرر را بگیر!
+            </a>
+        </div>
+    </section>
+
+</main>

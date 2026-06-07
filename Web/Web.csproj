@@ -6,4 +6,22 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <ItemGroup>
+    <None Include="wwwroot\assets\fontawesome\.DS_Store" />
+    <None Include="wwwroot\assets\libs\%40fullcalendar\.DS_Store" />
+    <None Include="wwwroot\assets\libs\.DS_Store" />
+    <None Include="wwwroot\assets\libs\admin-resources\.DS_Store" />
+    <None Include="wwwroot\assets\libs\bootstrap-datepicker\.DS_Store" />
+    <None Include="wwwroot\assets\libs\bootstrap-editable\.DS_Store" />
+    <None Include="wwwroot\assets\libs\datatables.net-bs4\.DS_Store" />
+    <None Include="wwwroot\assets\libs\datatables.net-buttons-bs4\.DS_Store" />
+    <None Include="wwwroot\assets\libs\datatables.net-responsive-bs4\.DS_Store" />
+    <None Include="wwwroot\assets\libs\datatables.net\.DS_Store" />
+    <None Include="wwwroot\assets\libs\ion-rangeslider\.DS_Store" />
+    <None Include="wwwroot\assets\libs\select2\.DS_Store" />
+    <None Include="wwwroot\assets\tinymce\.DS_Store" />
+    <None Include="wwwroot\assets\tinymce\js\.DS_Store" />
+    <None Include="wwwroot\assets\tinymce\js\tinymce\.DS_Store" />
+  </ItemGroup>
+
 </Project>

@@ -1,0 +1,172 @@
+﻿<header>
+    <!-- top header -->
+    <div class="flex justify-between bg-white shadow-lg px-4 md:px-8 lg:px-14 py-5 relative">
+        <div class="flex justify-between items-center gap-x-5 w-full md:w-auto">
+            <!-- btn menu mobile -->
+            <svg class="md:hidden menu-mobile" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="#000000" viewBox="0 0 256 256"><path d="M224,128a8,8,0,0,1-8,8H40a8,8,0,0,1,0-16H216A8,8,0,0,1,224,128ZM40,72H216a8,8,0,0,0,0-16H40a8,8,0,0,0,0,16ZM216,184H40a8,8,0,0,0,0,16H216a8,8,0,0,0,0-16Z"></path></svg>
+            <!-- bg blur mobile -->
+            <div id="overlay" class="fixed z-10 inset-0 bg-black/35 hidden transition-opacity duration-300"></div>
+            <!-- Sidebar mobile -->
+            <div id="mobile-menu" class="z-20 fixed top-0 right-0 w-10/12 h-full bg-white shadow-lg transform translate-x-full transition-transform duration-300 ease-in-out">
+                <div class="p-5 flex flex-col gap-y-3 justify-center items-center">
+                    <!-- logo -->
+                    <a href="/">
+                        <img src="/assets/image/logo.png" class="max-w-24 md:max-w-32 h-fit" alt="">
+                    </a>
+                </div>
+                <ul class="p-5 space-y-1 text-sm text-zinc-800 h-screen overflow-y-auto pb-48">
+                    <li>
+                        <a asp-area="" asp-controller="Home" asp-action="Index" class="py-3 px-4 hover:bg-gray-100 rounded-lg flex gap-x-2">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path class="fill-gray-700 group-hover/cat:fill-primary-500 transition" d="M11.25 18C11.25 18.1989 11.329 18.3897 11.4697 18.5303C11.6103 18.671 11.8011 18.75 12 18.75C12.1989 18.75 12.3897 18.671 12.5303 18.5303C12.671 18.3897 12.75 18.1989 12.75 18V15C12.75 14.8011 12.671 14.6103 12.5303 14.4697C12.3897 14.329 12.1989 14.25 12 14.25C11.8011 14.25 11.6103 14.329 11.4697 14.4697C11.329 14.6103 11.25 14.8011 11.25 15V18Z" fill="" />
+                                <path class="fill-gray-700 group-hover/cat:fill-primary-500 transition" fill-rule="evenodd" clip-rule="evenodd" d="M12 1.25C11.292 1.25 10.649 1.453 9.95 1.792C9.276 2.12 8.496 2.604 7.523 3.208L5.456 4.491C4.536 5.063 3.797 5.521 3.229 5.956C2.64 6.406 2.188 6.866 1.861 7.463C1.535 8.058 1.389 8.692 1.318 9.441C1.25 10.166 1.25 11.054 1.25 12.167V13.78C1.25 15.684 1.25 17.187 1.403 18.362C1.559 19.567 1.889 20.54 2.633 21.309C3.38 22.082 4.33 22.428 5.508 22.591C6.648 22.75 8.106 22.75 9.942 22.75H14.058C15.894 22.75 17.352 22.75 18.492 22.591C19.669 22.428 20.62 22.082 21.368 21.309C22.111 20.54 22.441 19.567 22.598 18.362C22.75 17.187 22.75 15.684 22.75 13.78V12.167C22.75 11.054 22.75 10.167 22.682 9.441C22.612 8.691 22.465 8.058 22.139 7.463C21.812 6.866 21.359 6.407 20.771 5.956C20.203 5.52 19.465 5.063 18.544 4.491L16.477 3.208C15.504 2.604 14.724 2.12 14.049 1.792C13.352 1.452 12.709 1.25 12 1.25ZM8.28 4.504C9.295 3.874 10.01 3.432 10.607 3.141C11.188 2.858 11.6 2.75 12 2.75C12.4 2.75 12.812 2.858 13.393 3.141C13.991 3.431 14.705 3.874 15.72 4.504L17.72 5.745C18.681 6.342 19.356 6.761 19.86 7.147C20.349 7.522 20.63 7.831 20.823 8.183C21.016 8.536 21.129 8.949 21.188 9.581C21.249 10.229 21.25 11.046 21.25 12.204V13.725C21.25 15.695 21.248 17.101 21.11 18.168C20.974 19.216 20.717 19.824 20.29 20.267C19.865 20.706 19.287 20.967 18.286 21.106C17.26 21.248 15.907 21.25 14 21.25H10C8.092 21.25 6.74 21.248 5.714 21.106C4.713 20.966 4.135 20.706 3.711 20.266C3.283 19.824 3.026 19.216 2.891 18.168C2.751 17.101 2.75 15.696 2.75 13.725V12.204C2.75 11.046 2.75 10.229 2.812 9.581C2.871 8.949 2.984 8.536 3.177 8.183C3.37 7.831 3.651 7.522 4.141 7.147C4.644 6.761 5.319 6.342 6.28 5.745L8.28 4.504Z" fill="" />
+                            </svg>
+                            صفحه اصلی
+                        </a>
+                    </li>
+                    <li>
+                        <a asp-area="" asp-controller="Home" asp-action="Features" class="py-3 px-4 hover:bg-gray-100 rounded-lg flex gap-x-2">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9.144 2.5C6.487 2.56 4.935 2.815 3.874 3.875C2.813 4.935 2.562 6.487 2.5 9.145M14.856 2.5C17.513 2.56 19.065 2.815 20.126 3.875C21.187 4.935 21.439 6.487 21.5 9.145M14.856 21.5C17.513 21.44 19.065 21.185 20.126 20.125C21.187 19.065 21.439 17.513 21.5 14.855M9.144 21.5C6.487 21.44 4.935 21.185 3.874 20.125C2.813 19.065 2.561 17.513 2.5 14.855M8 8H8.009M16 16H16.009M8 16L16 8" stroke="#3f3f46" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                            امکانات دیجیتو
+                        </a>
+                    </li>
+                    <li>
+                        <a asp-area="" asp-controller="Home" asp-action="Pricing" class="py-3 px-4 hover:bg-gray-100 rounded-lg flex gap-x-2">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M17 15.245V22.117C17 22.2055 16.9766 22.2924 16.932 22.3688C16.8875 22.4452 16.8235 22.5085 16.7465 22.5521C16.6696 22.5957 16.5824 22.6181 16.4939 22.6171C16.4055 22.616 16.3189 22.5915 16.243 22.546L12 20L7.757 22.546C7.68104 22.5915 7.59436 22.616 7.50581 22.6171C7.41727 22.6181 7.33004 22.5956 7.25304 22.5519C7.17605 22.5081 7.11205 22.4447 7.06759 22.3681C7.02313 22.2916 6.9998 22.2046 7 22.116V15.246C5.70615 14.2101 4.76599 12.7979 4.30946 11.2045C3.85293 9.6112 3.90256 7.91539 4.45149 6.35147C5.00043 4.78756 6.02156 3.43275 7.37378 2.47428C8.726 1.51581 10.3425 1.001 12 1.001C13.6575 1.001 15.274 1.51581 16.6262 2.47428C17.9784 3.43275 18.9996 4.78756 19.5485 6.35147C20.0974 7.91539 20.1471 9.6112 19.6905 11.2045C19.234 12.7979 18.2939 14.2101 17 15.246M9 16.42V19.469L12 17.669L15 19.469V16.419C14.0466 16.8036 13.028 17.0009 12 17C10.972 17.0009 9.95338 16.8046 9 16.42ZM12 15C13.5913 15 15.1174 14.3679 16.2426 13.2426C17.3679 12.1174 18 10.5913 18 9C18 7.4087 17.3679 5.88258 16.2426 4.75736C15.1174 3.63214 13.5913 3 12 3C10.4087 3 8.88258 3.63214 7.75736 4.75736C6.63214 5.88258 6 7.4087 6 9C6 10.5913 6.63214 12.1174 7.75736 13.2426C8.88258 14.3679 10.4087 15 12 15Z" fill="#364153" />
+                            </svg>
+                            پلن‌ها و تعرفه‌ها
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="py-3 px-4 hover:bg-gray-100 rounded-lg block">
+                            وبلاگ آموزشی
+                        </a>
+                    </li>
+                    <li>
+                        <a asp-area="" asp-controller="Home" asp-action="AboutUs" class="py-3 px-4 hover:bg-gray-100 rounded-lg block">
+                            درباره ما
+                        </a>
+                    </li>
+                    <li>
+                        <a asp-area="" asp-controller="Home" asp-action="ContactUs" class="py-3 px-4 hover:bg-gray-100 rounded-lg block">
+                            تماس با ما
+                        </a>
+                    </li>
+                </ul>
+                <div class="bg-zinc-100 w-full h-16 px-2 py-4 flex justify-between items-center fixed bottom-0">
+                    <div class="text-zinc-600 text-xs lg:text-sm">
+                        نیاز به دستیار هوشمند داری؟
+                    </div>
+                    <a href="https://t.me/DigitoBot" target="_blank" class="text-primary-500 flex text-xs lg:text-base gap-x-1 items-start">
+                        ورود به ربات تلگرام
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M21.98 3.12c-.22-.21-.53-.27-.8-.16l-19 7c-.32.12-.53.43-.53.77s.2.65.51.78l4.76 1.89 1.9 6.04c.1.33.37.58.71.63.05.01.11.01.16.01.29 0 .56-.13.74-.35l2.84-3.48 4.67 3.5c.2.15.46.2.7.13.23-.07.42-.25.5-.49l4-15.5c.09-.32-.01-.67-.26-.88zM6.16 12l10.9-6.42-8.58 7.84-.28 1.13-.27-1.12.06-.06-.11.06-.05-.06a.35.35 0 0 1 .03-.13z" fill="currentColor" />
+                        </svg>
+                    </a>
+                </div>
+            </div>
+            <!-- logo -->
+            <a href="/">
+                <img src="/assets/image/logo.png" class="max-w-24 md:max-w-32 h-fit" alt="">
+            </a>
+            <!-- empty -->
+            <div class="md:hidden size-8">
+            </div>
+        </div>
+        <div class="hidden md:flex items-center gap-x-2 lg:gap-x-3">
+            <div class="text-zinc-600 text-xs lg:text-sm">
+                نیاز به دستیار هوشمند داری؟
+            </div>
+            <div class="text-zinc-300">
+                |
+            </div>
+            <a href="https://t.me/DigitoBot" target="_blank" class="text-primary-500 flex text-xs lg:text-sm font-medium gap-x-1.5 items-center hover:text-primary-600 transition-colors">
+                <span>ورود به ربات تلگرام</span>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M21.98 3.12c-.22-.21-.53-.27-.8-.16l-19 7c-.32.12-.53.43-.53.77s.2.65.51.78l4.76 1.89 1.9 6.04c.1.33.37.58.71.63.05.01.11.01.16.01.29 0 .56-.13.74-.35l2.84-3.48 4.67 3.5c.2.15.46.2.7.13.23-.07.42-.25.5-.49l4-15.5c.09-.32-.01-.67-.26-.88zM6.16 12l10.9-6.42-8.58 7.84-.28 1.13-.27-1.12.06-.06-.11.06-.05-.06a.35.35 0 0 1 .03-.13z" fill="currentColor" />
+                </svg>
+            </a>
+        </div>
+        <svg class="hidden md:block absolute top-full md:right-4 lg:right-10" width="158" height="19" viewBox="0 0 158 19" fill="white" xmlns="http://www.w3.org/2000/svg">
+            <g clip-path="url(#clip0_4623_10410)">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M101.486 -121.419C121.078 -114.984 140.312 -105 160.935 -105H506.5C535.495 -105 559 -81.4949 559 -52.5V-52.5C559 -23.5051 535.495 0 506.5 0H158.936C138.871 0 120.093 9.46189 100.984 15.5822C94.0537 17.8017 86.6668 19 79 19C71.3332 19 63.9463 17.8017 57.0164 15.5822C37.9074 9.46189 19.1287 0 -0.936457 0H-1468.5C-1497.49 0 -1521 -23.5051 -1521 -52.5V-52.5C-1521 -81.4949 -1497.49 -105 -1468.5 -105H-2.93493C17.6877 -105 36.9216 -114.984 56.5145 -121.419C63.5893 -123.743 71.1478 -125 79 -125C86.8522 -125 94.4107 -123.743 101.486 -121.419Z" fill="white"></path>
+            </g>
+            <defs>
+                <clipPath id="clip0_4623_10410">
+                    <rect width="158" height="19" fill="white"></rect>
+                </clipPath>
+            </defs>
+        </svg>
+    </div>
+    <!-- bottom header -->
+    <div class="md:bg-zinc-50 py-6 px-6 lg:px-14 justify-between flex">
+        <!-- menu -->
+        <ul class="hidden md:flex gap-x-5 xl:gap-x-8 items-center">
+            <li>
+                <a asp-area="" asp-controller="Home" asp-action="Features" class="pt-1 flex gap-x-2 items-center group relative">
+                    <img class="mb-2 size-4.5" src="./assets/image/icons/discount.svg" alt="">
+                    <div class="relative text-zinc-600 text-sm group-hover:text-primary-500 transition pb-2
+                        after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-[2px]
+                        after:bg-primary-500 after:scale-x-0 after:origin-right after:transition-transform after:duration-300
+                        group-hover:after:scale-x-100">
+                        امکانات دیجیتو
+                    </div>
+                </a>
+            </li>
+            <li>
+                <a asp-area="" asp-controller="Home" asp-action="Pricing" class="pt-1 flex gap-x-1 items-center group relative">
+                    <img class="mb-2 size-4.5" src="./assets/image/icons/award.svg" alt="">
+                    <div class="relative text-zinc-600 text-sm group-hover:text-primary-500 transition pb-2
+                        after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-[2px]
+                        after:bg-primary-500 after:scale-x-0 after:origin-right after:transition-transform after:duration-300
+                        group-hover:after:scale-x-100">
+                        پلن‌ها و تعرفه‌ها
+                    </div>
+                </a>
+            </li>
+            <li>
+                <a href="#" class="pt-1 flex gap-x-2 items-center group relative">
+                    <div class="relative text-zinc-600 text-sm group-hover:text-primary-500 transition pb-2
+                        after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-[2px]
+                        after:bg-primary-500 after:scale-x-0 after:origin-right after:transition-transform after:duration-300
+                        group-hover:after:scale-x-100">
+                        وبلاگ آموزشی
+                    </div>
+                </a>
+            </li>
+            <li>
+                <a asp-area="" asp-controller="Home" asp-action="AboutUs" class="pt-1 flex gap-x-2 items-center group relative">
+                    <div class="relative text-zinc-600 text-sm group-hover:text-primary-500 transition pb-2
+                        after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-[2px]
+                        after:bg-primary-500 after:scale-x-0 after:origin-right after:transition-transform after:duration-300
+                        group-hover:after:scale-x-100">
+                        درباره ما
+                    </div>
+                </a>
+            </li>
+            <li>
+                <a asp-area="" asp-controller="Home" asp-action="ContactUs" class="pt-1 flex gap-x-2 items-center group relative">
+                    <div class="relative text-zinc-600 text-sm group-hover:text-primary-500 transition pb-2
+                        after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-[2px]
+                        after:bg-primary-500 after:scale-x-0 after:origin-right after:transition-transform after:duration-300
+                        group-hover:after:scale-x-100">
+                        تماس با ما
+                    </div>
+                </a>
+            </li>
+        </ul>
+        <!-- buttons -->
+        <div class="flex gap-x-5">
+            <!-- login / register -->
+            <a href="#" class="open-modal absolute md:static top-3.5 left-3 md:flex bg-gradient-to-bl from-primary-500 to-primary-400 hover:opacity-90 hover:shadow-lg transition rounded-xl p-2.5 items-center gap-x-2 text-sm text-white">
+                <p class="hidden lg:block">
+                    ورود | ثبت نام
+                </p>
+                <img src="/assets/image/icons/user.svg" alt="ورود | ثبت نام">
+            </a>
+        </div>
+    </div>
+</header>

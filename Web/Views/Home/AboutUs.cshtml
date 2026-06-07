@@ -1,0 +1,204 @@
+﻿@{
+    ViewData["Title"] = "درباره ما";
+}
+
+@section HeaderReferences {
+    <style>
+        /* استایل‌های پایه صفحه درباره ما */
+        .about-wrapper {
+            background-color: #ffffff;
+            padding: 60px 16px;
+            direction: rtl;
+            font-family: 'Vazir', Tahoma, sans-serif;
+            color: #27272a;
+        }
+
+        .about-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* هدر صفحه */
+        .about-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .about-title {
+            font-size: 36px;
+            font-weight: 800;
+            color: #09090b;
+            margin-bottom: 16px;
+        }
+
+        .about-subtitle {
+            color: #71717a;
+            font-size: 16px;
+        }
+
+        /* بخش‌های متنی */
+        .about-section {
+            margin-bottom: 60px;
+        }
+
+        .about-section-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #09090b;
+            margin-bottom: 24px;
+        }
+
+        .about-text {
+            line-height: 1.8;
+            color: #3f3f46;
+            font-size: 15px;
+            margin-bottom: 20px;
+        }
+
+            .about-text.no-margin {
+                margin-bottom: 0;
+            }
+
+        /* کارت ماموریت */
+        .mission-card {
+            background-color: #f4f4f5;
+            padding: 32px;
+            border-radius: 16px;
+            border-right: 4px solid #ed1945;
+        }
+
+        .mission-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: #09090b;
+        }
+
+        /* گرید ویژگی‌ها (چرا به دیجیتو اعتماد کنید) */
+        .team-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+        }
+
+        .feature-box {
+            border: 1px solid #e4e4e7;
+            padding: 24px;
+            border-radius: 16px;
+        }
+
+        .feature-icon {
+            font-size: 24px;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .feature-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #09090b;
+            margin-bottom: 8px;
+        }
+
+        .feature-desc {
+            font-size: 13px;
+            color: #71717a;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        /* بخش دعوت به اقدام (CTA) پایین صفحه */
+        .cta-section {
+            text-align: center;
+            margin-top: 40px;
+            padding: 48px 24px;
+            background-color: #ed1945;
+            border-radius: 16px;
+            color: #ffffff;
+        }
+
+        .cta-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .cta-desc {
+            font-size: 15px;
+            margin-bottom: 32px;
+            opacity: 0.9;
+        }
+
+        .cta-btn {
+            display: inline-block;
+            background-color: #ffffff;
+            color: #ed1945;
+            padding: 14px 32px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 15px;
+            transition: transform 0.2s, background-color 0.2s;
+        }
+
+            .cta-btn:hover {
+                background-color: #fef2f2;
+                transform: translateY(-2px);
+            }
+    </style>
+}
+
+<main class="about-wrapper">
+    <div class="about-container">
+        
+        <header class="about-header">
+            <h1 class="about-title">داستان دیجیتو؛ همراهِ هوشمند شما در بازار</h1>
+            <p class="about-subtitle">ما در دیجیتو معتقدیم فروشنده دیجی‌کالا نباید قربانی نوسانات قیمت شود.</p>
+        </header>
+
+        <section class="about-section">
+            <h2 class="about-section-title">دیجیتو از کجا شروع شد؟</h2>
+            <p class="about-text">
+                همه چیز از یک تجربه شخصی شروع شد. دیدن این که چگونه ساعت‌ها تلاش برای رقابت در فروش دیجی‌کالا، به خاطر یک تغییر قیمت کوچک توسط رقبا در نیمه‌شب هدر می‌رفت، ما را بر آن داشت تا به دنبال راه‌حلی هوشمندانه باشیم. دیجیتو نتیجه ساعت‌ها تحقیق، کدنویسی دقیق و درک عمیق از پنل فروشندگان (سلر سنتر) است.
+            </p>
+            <p class="about-text">
+                ما برخلاف ابزارهای پیچیده، دیجیتو را در بستر تلگرام طراحی کردیم تا هر فروشنده‌ای، در هر لحظه و بدون نیاز به دانش فنی، بتواند قدرت تحلیل بازار را در جیب خود داشته باشد.
+            </p>
+        </section>
+
+        <section class="about-section mission-card">
+            <h3 class="mission-title">ماموریت ما چیست؟</h3>
+            <p class="about-text no-margin">
+                ماموریت ما ساده است: <b>بازگرداندن آرامش و سودآوری به فروشندگان.</b> ما به شما ابزاری می‌دهیم که نه تنها بای‌باکس را برایتان حفظ می‌کند، بلکه با تحلیل هوشمندانه، به شما کمک می‌کند استراتژی فروش خود را از حالت «دستی و پرخطا» به «اتوماتیک و هوشمند» تغییر دهید.
+            </p>
+        </section>
+
+        <section class="about-section">
+            <h2 class="about-section-title">چرا به دیجیتو اعتماد کنید؟</h2>
+            <div class="team-features">
+                <div class="feature-box">
+                    <span class="feature-icon">🛡️</span>
+                    <h4 class="feature-title">امنیت در اولویت</h4>
+                    <p class="feature-desc">اطلاعات پنل شما کاملاً امن است. دیجیتو هرگز درخواست رمز عبور یا دسترسی‌های غیرضروری نمی‌کند.</p>
+                </div>
+                <div class="feature-box">
+                    <span class="feature-icon">🚀</span>
+                    <h4 class="feature-title">دقت و سرعت</h4>
+                    <p class="feature-desc">الگوریتم‌های ما به گونه‌ای بهینه شده‌اند که در سریع‌ترین زمان ممکن، نوسانات بازار را به شما گزارش دهند.</p>
+                </div>
+                <div class="feature-box">
+                    <span class="feature-icon">🤝</span>
+                    <h4 class="feature-title">پشتیبانی فروشنده‌محور</h4>
+                    <p class="feature-desc">تیم ما متشکل از افرادی است که خود چالش‌های فروش در مارکت‌پلیس‌های آنلاین را تجربه کرده‌اند.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="cta-section">
+            <h3 class="cta-title">آماده‌اید فروش خود را متحول کنید؟</h3>
+            <p class="cta-desc">همین حالا به جمع ۵۰۰ فروشنده فعال دیجیتو بپیوندید.</p>
+            <a href="https://t.me/DigitoBot" target="_blank" class="cta-btn">شروع پایش رایگان</a>
+        </section>
+
+    </div>
+</main>

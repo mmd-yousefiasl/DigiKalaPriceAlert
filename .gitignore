@@ -364,3 +364,4 @@ FodyWeavers.xsd
 /API/cached_images/
 /Data/Migrations/
 /API/appsettings.json
+/Web/appsettings.json

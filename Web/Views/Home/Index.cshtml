@@ -1,8 +1,476 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "صفحه اصلی";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+@section HeaderReferences {
+    <style>
+        :root {
+            --dk-red: #ef4056;
+            --dk-red-hover: #c82a3c;
+            --bg-white: #ffffff;
+            --bg-light: #f0f0f2;
+            --text-dark: #23254e;
+            --text-muted: #62666d;
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 8px 24px rgba(239, 64, 86, 0.08);
+        }
+
+        .seller-main-container {
+            font-family: Vazir;
+            background-color: var(--bg-white);
+            color: var(--text-dark);
+            line-height: 1.7;
+        }
+
+        .section-wrapper {
+            padding: 80px 0;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1140px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .row-layout {
+            display: table;
+            width: 100%;
+            table-layout: fixed;
+        }
+
+        .col-6 {
+            display: table-cell;
+            width: 50%;
+            vertical-align: middle;
+        }
+
+        /* بخش Hero */
+        .hero-section {
+            background: linear-gradient(180deg, rgba(239, 64, 86, 0.03) 0%, rgba(255, 255, 255, 0) 100%);
+            padding: 60px 0;
+        }
+
+        .hero-content {
+            padding-left: 40px;
+        }
+
+            /* بهینه‌سازی شده: هم h2 قبلی و هم h1 جدید سئو را استایل‌دهی می‌کند */
+            .hero-content h2,
+            .hero-content h1 {
+                font-size: 28pt;
+                font-weight: 800;
+                line-height: 1.4;
+                margin-bottom: 20px;
+            }
+
+                .hero-content h2 span,
+                .hero-content h1 span {
+                    color: var(--dk-red);
+                }
+
+            .hero-content p {
+                font-size: 12pt;
+                color: var(--text-muted);
+                margin-bottom: 35px;
+                text-align: justify;
+            }
+
+        .btn {
+            display: inline-block;
+            padding: 14px 32px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 11pt;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .btn-red {
+            background-color: var(--dk-red);
+            color: var(--bg-white);
+            border: 2px solid var(--dk-red);
+            box-shadow: var(--shadow-md);
+            margin-left: 15px;
+        }
+
+            .btn-red:hover {
+                background-color: var(--dk-red-hover);
+                border-color: var(--dk-red-hover);
+            }
+
+        .btn-outline {
+            background-color: transparent;
+            color: var(--text-dark);
+            border: 2px solid var(--bg-light);
+        }
+
+            .btn-outline:hover {
+                background-color: var(--bg-light);
+            }
+
+        /* موکاپ پیش‌نمایش اعلان */
+        .mockup-display {
+            background-color: var(--bg-white);
+            border: 3px solid var(--bg-light);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: var(--shadow-sm);
+            max-width: 380px;
+            margin: 0 auto;
+        }
+
+        .mockup-top {
+            border-bottom: 1px solid var(--bg-light);
+            padding-bottom: 12px;
+            margin-bottom: 15px;
+            font-weight: 700;
+            color: var(--dk-red);
+            font-size: 10.5pt;
+        }
+
+        .mockup-msg {
+            background-color: var(--bg-light);
+            padding: 12px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            font-size: 10pt;
+        }
+
+        .mockup-alert {
+            border-right: 4px solid var(--dk-red);
+            background-color: rgba(239, 64, 86, 0.03);
+        }
+
+        /* عناوین بخش‌ها */
+        .center-title {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+            /* بهینه‌سازی شده: هم h3 قبلی و هم h2 جدید بخش‌ها را استایل‌دهی می‌کند */
+            .center-title h3,
+            .center-title h2 {
+                font-size: 22pt;
+                font-weight: 800;
+                margin-bottom: 12px;
+            }
+
+            .center-title p {
+                color: var(--text-muted);
+                font-size: 11pt;
+            }
+
+        /* گرید ۳ ستونه */
+        .grid-3-columns {
+            display: table;
+            width: 100%;
+            table-layout: fixed;
+            border-spacing: 20px 0;
+        }
+
+        .grid-cell {
+            display: table-cell;
+            background-color: var(--bg-white);
+            border: 1px solid var(--bg-light);
+            border-radius: 12px;
+            padding: 35px 25px;
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .icon-container {
+            width: 60px;
+            height: 60px;
+            background-color: rgba(239, 64, 86, 0.06);
+            border-radius: 50%;
+            display: block;
+            margin: 0 auto 20px auto;
+            padding: 15px;
+        }
+
+            .icon-container svg {
+                width: 100%;
+                height: 100%;
+                fill: var(--dk-red);
+            }
+
+        /* بهینه‌سازی شده: هم h4 قبلی و هم h3 جدید کارت‌ها را استایل‌دهی می‌کند */
+        .grid-cell h4,
+        .grid-cell h3 {
+            font-size: 14pt;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .grid-cell p {
+            font-size: 10.5pt;
+            color: var(--text-muted);
+            text-align: justify;
+        }
+
+        /* بخش لایه خاکستری */
+        .bg-alt-section {
+            background-color: rgba(239, 64, 86, 0.01);
+            border-top: 1px solid var(--bg-light);
+            border-bottom: 1px solid var(--bg-light);
+        }
+
+        /* بخش آمار عددی */
+        .stats-bar {
+            background-color: var(--dk-red);
+            color: var(--bg-white);
+            padding: 50px 0;
+            text-align: center;
+        }
+
+        .stats-table {
+            display: table;
+            width: 100%;
+            table-layout: fixed;
+        }
+
+        .stat-node {
+            display: table-cell;
+        }
+
+            .stat-node .number {
+                font-size: 26pt;
+                font-weight: 900;
+                display: block;
+                margin-bottom: 5px;
+            }
+
+            .stat-node .desc {
+                font-size: 11pt;
+                opacity: 0.9;
+            }
+
+        /* سوالات متداول */
+        .faq-block {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .faq-row {
+            border-bottom: 1px solid var(--bg-light);
+            padding: 24px 10px;
+        }
+
+            /* بهینه‌سازی شده: هم h4 قبلی و هم h3 جدید سوالات متداول را استایل‌دهی می‌کند */
+            .faq-row h4,
+            .faq-row h3 {
+                font-size: 13pt;
+                font-weight: 700;
+                margin-bottom: 10px;
+                margin-top: 0;
+            }
+
+            .faq-row p {
+                font-size: 11pt;
+                color: var(--text-muted);
+                text-align: justify;
+            }
+
+        @@media (max-width: 768px) {
+            .col-6, .grid-cell, .stat-node {
+                display: block !important;
+                width: 100% !important;
+                text-align: center !important;
+                padding-left: 0 !important;
+                margin-bottom: 30px;
+            }
+
+            .grid-3-columns {
+                display: block;
+                border-spacing: 0;
+            }
+
+            .hero-content {
+                padding-left: 0;
+            }
+
+            .btn {
+                width: 100%;
+                margin-left: 0;
+                margin-bottom: 12px;
+            }
+        }
+    </style>
+}
+
+<main class="seller-main-container" dir="rtl">
+
+    <!-- ۱. بخش معرفی و فراخوان (Hero Section) -->
+    <section class="section-wrapper hero-section">
+        <div class="container">
+            <div class="row-layout">
+                <div class="col-6 hero-content">
+                    <!-- تغییر به h1 برای معرفی کلمه کلیدی اصلی صفحه به گوگل -->
+                    <h1>ربات هوشمند پایش قیمت رقبا در <span>دیجی‌کالا</span>؛ سریع، خودکار و شبانه‌روزی!</h1>
+                    <p>به عنوان فروشنده دیجی‌کالا، نوسان قیمت رقبا مستقیماً روی برنده شدن در بای‌باکس و حجم فروش شما تأثیر می‌گذارد. با دیجیتو، کافیست لینک محصول را ثبت کنید تا سیستم به صورت خودکار و در بازه‌های منظم، قیمت کالاها را بررسی کند. به محض کوچک‌ترین تغییر قیمت، فوراً از طریق ربات تلگرام، پیامک (SMS) یا پنل سایت باخبر شوید و سهم بازار خود را حفظ کنید.</p>
+                    <div>
+                        <a href="https://t.me/دیجیتو_bot" class="btn btn-red" target="_blank" rel="noopener noreferrer">💰 مشاهده تعرفه‌ها</a>
+                        <a href="#plans" class="btn btn-outline">🚀 شروع تست رایگان (همین حالا)</a>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="mockup-display">
+                        <div class="mockup-top">📱 سیستم مانیتورینگ دیجیتو</div>
+                        <div class="mockup-msg">لینک محصول با موفقیت ثبت شد. پایش منظم و بررسی خودکار قیمت آغاز گردید...</div>
+                        <div class="mockup-msg mockup-alert">
+                            💬 [پیامک / تلگرام]<br>
+                            <b>تغییر قیمت جدید کالا شناسایی شد!</b><br>
+                            قیمت قبلی: ۵,۴۰۰,۰۰۰ تومان<br>
+                            <b>قیمت جدید رقیب: ۵,۲۵۰,۰۰۰ تومان</b>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ۲. مراحل کارکرد ربات (How It Works) -->
+    <section id="steps" class="section-wrapper">
+        <div class="container">
+            <div class="center-title">
+                <!-- تغییر به h2 برای رعایت سلسله‌مراتب محتوایی -->
+                <h2>نظارت بر قیمت کالاها در ۳ مرحله ساده</h2>
+                <p>فرآیندی شفاف، خودکار و بدون پیچیدگی برای رصد مداوم قیمت‌های رقبا</p>
+            </div>
+            <div class="grid-3-columns">
+                <div class="grid-cell">
+                    <span class="icon-container">
+                        <!-- SVG آیکون کپی لینک -->
+                        <svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z" /></svg>
+                    </span>
+                    <!-- تغییر به h3 به عنوان زیرمجموعه h2 اصلی بخش -->
+                    <h3>۱. ثبت لینک محصول</h3>
+                    <p>لینک صفحه محصول موردنظرتان را از وب‌سایت یا اپلیکیشن دیجی‌کالا کپی کرده و آن را در ربات تلگرام یا پنل اختصاصی سایت وارد کنید.</p>
+                </div>
+                <div class="grid-cell">
+                    <span class="icon-container">
+                        <!-- SVG آیکون ساعت پایش -->
+                        <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z" /></svg>
+                    </span>
+                    <!-- تغییر به h3 -->
+                    <h3>۲. پایش خودکار و مداوم</h3>
+                    <p>سیستم هوشمند ما بدون توقف، در بازه‌های زمانی منظم و دوره‌ای قیمت روز کالا را استخراج کرده و با آخرین قیمت ثبت‌شده مقایسه می‌کند.</p>
+                </div>
+                <div class="grid-cell">
+                    <span class="icon-container">
+                        <!-- SVG آیکون زنگوله نوتیفیکیشن -->
+                        <svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z" /></svg>
+                    </span>
+                    <!-- تغییر به h3 -->
+                    <h3>۳. دریافت هشدار تغییر قیمت</h3>
+                    <p>نیازی به چک کردن مداوم ندارید؛ تنها در صورتی که قیمت کالا نوسان داشته باشد، سیستم از طریق کانال انتخابی شما فوراً اطلاع‌رسانی می‌کند.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ۳. کانال‌های دریافت مانیتورینگ (Flexible Platforms) -->
+    <section id="plans" class="section-wrapper bg-alt-section">
+        <div class="container">
+            <div class="center-title">
+                <!-- تغییر به h2 -->
+                <h2>روش‌های متنوع پایش قیمت و دریافت اعلان</h2>
+                <p>از شروع سریع و رایگان در تلگرام تا امکانات پیشرفته تحت وب و پیامکی ویژه فروشندگان حرفه‌ای</p>
+            </div>
+            <div class="grid-3-columns">
+                <article class="grid-cell">
+                    <span class="icon-container">
+                        <!-- SVG آیکون پیام‌رسان تلگرام -->
+                        <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" /></svg>
+                    </span>
+                    <!-- تغییر به h3 -->
+                    <h3>نسخه تلگرام (کاملاً رایگان)</h3>
+                    <p>بدون نیاز به پرداخت هزینه، کار خود را شروع کنید! لینک محصولات را در ربات تلگرام ثبت کنید و هشدارهای خودکار تغییر قیمت را مستقیماً در حساب تلگرام خود تحویل بگیرید.</p>
+                </article>
+                <article class="grid-cell">
+                    <span class="icon-container">
+                        <!-- SVG آیکون گوشی / پیامک -->
+                        <svg viewBox="0 0 24 24"><path d="M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z" /></svg>
+                    </span>
+                    <!-- تغییر به h3 -->
+                    <h3>اعلام پیشرفته پیامکی (اشتراک ویژه)</h3>
+                    <p>برای کسانی که به اینترنت مداوم دسترسی ندارند یا می‌خواهند هیچ نوسانی را از دست ندهند؛ با فعال‌سازی این قابلیت، هشدارهای تغییر قیمت به صورت SMS به شماره موبایل شما ارسال می‌شود.</p>
+                </article>
+                <article class="grid-cell">
+                    <span class="icon-container">
+                        <!-- SVG آیکون سایت / لپ‌تاپ -->
+                        <svg viewBox="0 0 24 24"><path d="M20 18c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2H0v2h24v-2h-4zM4 4h16v12H4V4z" /></svg>
+                    </span>
+                    <!-- تغییر به h3 -->
+                    <h3>پنل اختصاصی وب‌سایت (اشتراک ویژه)</h3>
+                    <p>مدیریت همزمان و یکجای صدها محصول بدون نیاز به تلگرام! در داشبورد پیشرفته سایت، لیست تمام کالاهای تحت نظر و تاریخچه نوسانات قیمت رقبا را به صورت یکپارچه رصد کنید.</p>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- ۴. بخش آمار اثربخشی ابزار (Stats Bar) -->
+    <section class="stats-bar">
+        <div class="container stats-table">
+            <div class="stat-node">
+                <span class="number">۲۴ ساعته</span>
+                <span class="desc">پایش منظم، خودکار و شبانه‌روزی قیمت‌ها</span>
+            </div>
+            <div class="stat-node">
+                <span class="number">۳ کانال</span>
+                <span class="desc">اطلاع‌رسانی هوشمند (تلگرام، SMS و پنل سایت)</span>
+            </div>
+            <div class="stat-node">
+                <span class="number">۰ تومان</span>
+                <span class="desc">هزینه شروع رصد محصولات در نسخه پایه تلگرام</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ۵. بخش پاسخ به سوالات متداول فروشندگان (FAQ) -->
+    <section class="section-wrapper">
+        <div class="container">
+            <div class="center-title">
+                <!-- تغییر به h2 برای تفکیک بخش سوالات متداول در ساختار سئو -->
+                <h2>سوالات متداول فروشندگان دیجی‌کالا</h2>
+                <p>پاسخ به سوالات کلیدی شما درباره نحوه رصد قیمت‌ها و افزایش فروش با ربات قیمت</p>
+            </div>
+            <div class="faq-block">
+                
+                <div class="faq-row">
+                    <!-- تبدیل سوالات به h3 جهت بهینه‌سازی برای الگوریتم‌های پرسش و پاسخ گوگل -->
+                    <h3>تفاوت نسخه رایگان تلگرام با نسخه‌های پولی (اشتراک ویژه) در چیست؟</h3>
+                    <p>در نسخه رایگان, تمام اعلان‌ها و مدیریت کالاها فقط در محیط ربات تلگرام انجام می‌شود. اما در نسخه‌های پولی و حرفه‌ای، علاوه‌بر تلگرام، هشدار تغییر قیمت از طریق پیامک (SMS) نیز ارسال شده و امکان مدیریت انبوه کالاها مستقیماً از طریق پنل کاربری وب‌سایت (بدون نیاز به تلگرام) فراهم است.</p>
+                </div>
+
+                <div class="faq-row">
+                    <h3>سیستم با چه سرعتی تغییرات قیمت کالاها را شناسایی می‌کند؟</h3>
+                    <p>ربات مانیتورینگ ما به صورت خودکار، منظم و شبانه‌روزی در بازه‌های زمانی کوتاه و بهینه‌سازی شده، قیمت محصولات را بررسی می‌کند. به محض اینکه سیستم متوجه تفاوت قیمت جدید با قیمت قبلی ثبت‌شده شود، فوراً سیگنال هشدار را برای شما ارسال خواهد کرد.</p>
+                </div>
+
+                <div class="faq-row">
+                    <h3>چگونه این ربات به برنده شدن ما در بای‌باکس (Buy Box) دیجی‌کالا کمک می‌کند؟</h3>
+                    <p>بزرگ‌ترین عامل برنده شدن در بای‌باکس، داشتن قیمت رقابتی است. این ربات به عنوان یک ابزار تحلیل قیمت رقبا، به شما کمک می‌کند تا به محض اینکه رقیبتان قیمت خود را کاهش داد باخبر شوید و با اصلاح سریع قیمت خود، جایگاه بای‌باکس و فروش کالا را از دست ندهید.</p>
+                </div>
+
+                <div class="faq-row">
+                    <h3>چگونه می‌توانم از نسخه تحت وب سایت به جای ربات تلگرام استفاده کنم؟</h3>
+                    <p>کافیست در سایت ما با شماره موبایل خود ثبت‌نام کرده و یکی از اشتراک‌های تجاری را فعال کنید. پس از آن، یک پنل اختصاصی و داشبورد پیشرفته در اختیار خواهید داشت که بدون نیاز به پیام‌رسان، می‌توانید لینک محصولات دیجی‌کالا را در آن ثبت، پایش و مدیریت کنید.</p>
+                </div>
+
+                <div class="faq-row">
+                    <h3>آیا برای شروع استفاده از ربات مانیتورینگ قیمت باید هزینه‌ای پرداخت کنیم؟</h3>
+                    <p>خیر، نسخه پایه‌ای ربات در تلگرام کاملاً رایگان است. شما می‌توانید بدون پرداخت هیچ هزینه‌ای، کارایی سیستم را تست کنید و پس از اطمینان از سرعت و دقت عملکرد ربات، برای دسترسی به امکاناتی مثل هشدار پیامکی و پنل وب، اکانت خود را ارتقا دهید.</p>
+                </div>
+
+                <div class="faq-row">
+                    <h3>آیا محدودیتی در تعداد لینک‌های ثبت‌شده برای استعلام قیمت وجود دارد?</h3>
+                    <p>در نسخه رایگان تلگرام سقف مشخصی برای ثبت کالا دارید؛ اما در نسخه‌های پولی و تحت وب سایت، امکان رصد گروهی و انبوه کالاها برای فروشگاه‌های بزرگ فراهم شده است تا بتوانید به راحتی کل سبد کالایی خود را مانیتور کنید.</p>
+                </div>
+
+            </div>
+        </div>
+    </section>
+</main>
