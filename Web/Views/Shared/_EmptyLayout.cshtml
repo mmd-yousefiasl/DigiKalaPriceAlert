@@ -1,0 +1,23 @@
+﻿<!DOCTYPE html>
+<html lang="fa" dir="rtl" class="scroll-smooth">
+<head>
+    <partial name="_Meta" />
+    <title>@ViewData["Title"] | ربات دیجی کالا</title>
+    <script type="importmap"></script>
+
+    <partial name="_HeaderReferences" />
+
+    @await RenderSectionAsync("HeaderReferences", required: false)
+</head>
+<body class="max-w-[1700px] mx-auto">
+    <partial name="_Loader" />
+    <partial name="_ProgressBar" />
+
+    @RenderBody()
+
+    <partial name="_FooterReferences" />
+    <partial name="_Notification" />
+    <partial name="_ValidationScriptsPartial" />
+    @await RenderSectionAsync("FooterReferences", required: false)
+</body>
+</html>
