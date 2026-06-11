@@ -21,7 +21,7 @@ namespace Application.Services.Implementaions
         public TelegramService(IConfiguration configuration,
             ILogger<TelegramService> logger)
         {
-            _botClient = new TelegramBotClient(configuration["TelegramSettings:BotToken"]!);
+            _botClient = new TelegramBotClient(configuration["TelegramSettings:TestBotToken"]!);
             _logger = logger;
         }
         #endregion

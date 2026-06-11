@@ -36,23 +36,25 @@ namespace Application.Services.Implementaions
             {
                 // آدرس اختصاصی لایه ورکر کلودفلر شما
                 string workerUrl = "https://flat-sunset-4db4.mmdyousefi95.workers.dev/";
-                string apiUrl = $"{workerUrl}?id={digiKalaId}";
+
+                // ۱. اضافه کردن پارامتر دانلود تصویر به آدرس ورکر کلودفلر
+                string apiUrl = $"{workerUrl}?id={digiKalaId}&download_image={downloadImage.ToString().ToLower()}";
 
                 var request = new HttpRequestMessage(HttpMethod.Get, apiUrl);
 
                 // ارسال درخواست به ورکر کلودفلر
-                var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
+                var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
 
                 response.EnsureSuccessStatusCode();
 
-                // ۱. دریافت پاسخ متنی به صورت استریم زنده شبکه (فوق‌العاده بهینه و سریع)
+                // دریافت پاسخ متنی به صورت استریم زنده شبکه (فوق‌العاده بهینه و سریع)
                 using Stream responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
 
-                // ۲. پارس ناهمگام استریم جی‌سان مینی‌مال
+                // پارس ناهمگام استریم جی‌سان مینی‌مال
                 using JsonDocument doc = await JsonDocument.ParseAsync(responseStream).ConfigureAwait(false);
                 JsonElement root = doc.RootElement;
 
-                // ۳. استخراج مستقیم فیلدها از ریشه (به دلیل بهینه‌سازی در سمت پی‌اچ‌پی)
+                // استخراج مستقیم فیلدها از ریشه
                 string title = root.TryGetProperty("Title", out var titleElement)
                     ? titleElement.GetString() ?? "بدون عنوان"
                     : "بدون عنوان";
@@ -65,6 +67,24 @@ namespace Application.Services.Implementaions
                     ? imgElement.GetString()
                     : null;
 
+                // ۲. استخراج رشته Base64 تصویر و تبدیل آن به آرایه بایت (byte[])
+                byte[]? imageBytes = null;
+                if (root.TryGetProperty("ImageBytes", out var bytesElement) && bytesElement.ValueKind != JsonValueKind.Null)
+                {
+                    string? base64String = bytesElement.GetString();
+                    if (!string.IsNullOrEmpty(base64String))
+                    {
+                        try
+                        {
+                            imageBytes = Convert.FromBase64String(base64String);
+                        }
+                        catch (FormatException ex)
+                        {
+                            _logger.LogWarning(ex, "Failed to convert ImageBytes Base64 string for DKP: {DkpId}", digiKalaId);
+                        }
+                    }
+                }
+
                 // اگر عنوان "بدون عنوان" باشد یا ساختار جی‌سان نامعتبر باشد، کالا یافت نشده است
                 if (title == "بدون عنوان" && price == 0 && string.IsNullOrEmpty(imageUrl))
                 {
@@ -75,20 +95,6 @@ namespace Application.Services.Implementaions
                 if (price == 0)
                 {
                     _logger.LogInformation("Product DKP: {DkpId} has 0 price or no default variant. It might be out of stock.", digiKalaId);
-                }
-
-                byte[]? imageBytes = null;
-                if (downloadImage && !string.IsNullOrEmpty(imageUrl))
-                {
-                    try
-                    {
-                        // دانلود مستقیم تصویر کالا از CDN دیجی‌کالا توسط سرور دات‌نت
-                        imageBytes = await _httpClient.GetByteArrayAsync(imageUrl).ConfigureAwait(false);
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogWarning(ex, "Failed to download image for DKP: {DkpId}", digiKalaId);
-                    }
                 }
 
                 var dto = new DigiKalaProductResultDto(title, price, imageUrl, imageBytes);

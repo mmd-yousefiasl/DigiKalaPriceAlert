@@ -11,11 +11,13 @@ namespace Domain.Models.Users
         public string? LastName { get; set; }
         public DateTime? SubscriptionEndDate { get; set; }
 
-
         #region Relations
         public ICollection<UserProductMapping>? Products { get; set; }
         public int SubscriptionPlanId { get; set; }
         public SubscriptionPlan SubscriptionPlan { get; set; }
+
+        public ICollection<UserRoleMapping>? UserRoleMapping { get; set; }
+        public ICollection<BalanceTransaction>? Transactions { get; set; }
         #endregion
     }
 }
