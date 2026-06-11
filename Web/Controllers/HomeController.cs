@@ -33,5 +33,23 @@ namespace Web.Controllers
         {
             return View();
         }
+
+        [HttpGet("/404")]
+        public IActionResult PageNotFound()
+        {
+            return View();
+        }
+
+        [HttpGet("/403")]
+        public IActionResult AccessDenied()
+        {
+            return View();
+        }
+
+        [HttpGet("/500")]
+        public IActionResult InternalServerError()
+        {
+            return View();
+        }
     }
 }
