@@ -1,31 +1,25 @@
-html {
-  font-size: 14px;
+.text-danger {
+    color: red;
+    font-size: small;
 }
 
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+.spinner {
+    display: none;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #3498db;
+    border-radius: 50%;
+    width: 12px;
+    height: 12px;
+    animation: spin 0.3s linear infinite;
+    margin: 0 auto; /* Center it inside the button */
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
 
-html {
-  position: relative;
-  min-height: 100%;
-}
-
-body {
-  margin-bottom: 60px;
-}
-
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
-  color: var(--bs-secondary-color);
-  text-align: end;
-}
-
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
-  text-align: start;
+    100% {
+        transform: rotate(360deg);
+    }
 }

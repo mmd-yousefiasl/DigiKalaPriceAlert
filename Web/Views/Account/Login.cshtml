@@ -1,0 +1,55 @@
+﻿@using Application.Dtos.Users.ClientSide
+@model ClientSideLoginDto
+
+@{
+    ViewData["Title"] = "ورود";
+    Layout = "_EmptyLayout";
+}
+
+<main class="w-full h-screen text-center flex items-center justify-center">
+    <form onsubmit="submitAnimation()" asp-area="" asp-controller="Account" asp-action="Login" method="post" class="bg-white p-6 rounded-3xl shadow-lg w-10/12 md:w-6/12 lg:w-5/12 xl:w-3/12 scale-90">
+        <input type="hidden" asp-for="ReturnUrl" />
+
+        <!-- logo -->
+        <a asp-area="" asp-controller="Home" asp-action="Index">
+            <img src="/assets/image/logo.png" class="max-w-32 h-fit mx-auto" alt="">
+        </a>
+        <!-- login -->
+        <div class="pt-5">
+            <p class="text-lg text-zinc-800">
+                ورود / عضویت
+            </p>
+            <p class="text-sm text-zinc-500 mt-8">
+                شماره موبایل خود را وارد کنید:
+            </p>
+            <div class="relative mt-2">
+                <input class="rounded-xl text-zinc-600 bg-[#f0f0f0] pl-10 pr-4 py-2.5 w-full placeholder:text-zinc-400 placeholder:text-sm focus:outline-0"
+                       type="tel" placeholder="09........." asp-for="Mobile">
+                <span asp-validation-for="Mobile" class="text-danger"></span>
+                <br />
+                <br />
+                <label class="checkbox-inline" asp-for="PrivacyPolicy">
+                    <input type="checkbox" asp-for="PrivacyPolicy">
+                    با
+                    <a asp-area="" asp-controller="Home" asp-action="PrivacyPolicy" target="_blank" class="text-zinc-500 text-xs hover:text-primary-400 transition cursor-pointer">
+                        سیاست حفظ حریم خصوصی
+                    </a>
+                    و
+                    <a asp-area="" asp-controller="Home" asp-action="TermsAndConditions" target="_blank" class="text-zinc-500 text-xs hover:text-primary-400 transition cursor-pointer">
+                        شرایط و ظوابط
+                    </a>
+                    موافقت میکنم
+                </label>
+                <br />
+                <span asp-validation-for="PrivacyPolicy" class="text-danger"></span>
+                <a href="javascript:void(0)">
+                    <img class="top-3 absolute left-3 size-5" src="/assets/image/icons/phone.svg" alt="phone">
+                </a>
+            </div>
+            <button type="submit"
+                    class="btn-submit cursor-pointer text-center w-1/2 mx-auto mt-7 bg-gradient-to-bl from-primary-500 to-primary-400 hover:opacity-90 hover:shadow-lg transition rounded-2xl px-2.5 py-3 flex justify-center items-center gap-x-2 text-sm text-white">
+                ارسال کد تایید
+            </button>
+        </div>
+    </form>
+</main>

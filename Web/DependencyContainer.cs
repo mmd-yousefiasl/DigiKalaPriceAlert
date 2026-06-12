@@ -1,4 +1,6 @@
-﻿using Data.Context;
+﻿using Application.Services.Implementaions;
+using Application.Services.Interfaces;
+using Data.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 
@@ -26,6 +28,10 @@ namespace Web
                     warnings.Ignore(RelationalEventId.PendingModelChangesWarning));
             });
             #endregion
+
+            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IUserValidationService, UserValidationService>();
+            services.AddScoped<IRoleService, RoleService>();
         }
     }
 }

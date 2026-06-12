@@ -1,5 +1,6 @@
 ﻿using Application.Dtos.SubscriptionPlans.BotSide;
 using Application.Dtos.Users.BotSide;
+using Application.Dtos.Users.ClientSide;
 using Application.Services.Interfaces;
 using Application.Tools;
 using Data.Context;
@@ -13,14 +14,33 @@ namespace Application.Services.Implementaions
     {
         #region Fields
         private protected DigiKalaPriceAlertDbContext _context;
+        private readonly IUserValidationService _userValidationService;
         #endregion
 
         #region Ctor
-        public UserService(DigiKalaPriceAlertDbContext context)
+        public UserService(DigiKalaPriceAlertDbContext context,
+            IUserValidationService userValidationService)
         {
             _context = context;
+            _userValidationService = userValidationService;
         }
         #endregion
+
+        public async Task<bool> IsSuperAdmin(int userId)
+        {
+            if (await _context.Users.AnyAsync(user => user.Id == userId && user.UserRoleMapping.Any(mapping => mapping.RoleId == 1)))
+                return true;
+
+            return false;
+        }
+
+        public async Task<bool> CheckUserRoleIds(int userId, List<int> roleIds)
+        {
+            if (await _context.Users.AnyAsync(user => user.Id == userId && user.UserRoleMapping.Any(mapping => roleIds.Contains(mapping.RoleId))))
+                return true;
+
+            return false;
+        }
 
         public async Task<Result> BotSideCanUserAddProduct(long chatId)
         {
@@ -236,6 +256,55 @@ namespace Application.Services.Implementaions
                 return Result.Failure<List<int>>(Messages.OperationFailedError);
 
             return allUniqueEligibleProductIds;
+        }
+
+        public async Task<Result<string>> SendUserLoginCode(ClientSideLoginDto model)
+        {
+            if (model is null) return Result.Failure<string>(Messages.OperationFailedError);
+
+            User loginUser = await _context.Users.Where(n => n.Mobile == model.Mobile).FirstOrDefaultAsync();
+            if (loginUser is null)
+            {
+                loginUser = new User();
+
+                loginUser.Mobile = model.Mobile;
+                loginUser.IsUserBanned = false;
+
+                _context.Users.Add(loginUser);
+                await _context.SaveChangesAsync();
+            }
+            else
+            {
+                if (loginUser.IsUserBanned) return Result.Failure<string>(Messages.OperationFailedError);
+            }
+
+            var validationResult = await _userValidationService.GenerateUserValidationCode(model.Mobile);
+            if (validationResult.IsFailure) return Result.Failure<string>(validationResult.Message);
+
+            Console.WriteLine("Login Code: " + validationResult.Value);
+
+            //await _smsServiec.SendLoginCode(validationResult.Value, loginUser.Mobile);
+
+            return validationResult.Value;
+        }
+
+        public async Task<Result<ClientSideUserDto>> VerifyLoginCode(ClientSideLoginCodeDto model)
+        {
+            if (model is null) return Result.Failure<ClientSideUserDto>(Messages.OperationFailedError);
+
+            string loginCode = string.Join("", model.LoginCode);
+            var validationResult = await _userValidationService.ValidateUserLoginCode(model.Mobile, loginCode);
+            if (validationResult.IsFailure) return Result.Failure<ClientSideUserDto>(validationResult.Message);
+
+            var user = await _context.Users.Where(n => n.Mobile == model.Mobile).Select(n => new ClientSideUserDto()
+            {
+                Id = n.Id,
+                IsBanned = n.IsUserBanned,
+                Mobile = n.Mobile,
+            }).AsNoTracking().FirstOrDefaultAsync();
+            if (user is null) return Result.Failure<ClientSideUserDto>(Messages.OperationFailedError);
+
+            return user;
         }
     }
 }

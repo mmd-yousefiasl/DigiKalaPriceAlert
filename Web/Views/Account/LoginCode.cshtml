@@ -1,0 +1,44 @@
+﻿@using Application.Dtos.Users.ClientSide
+@model ClientSideLoginCodeDto
+
+@{
+    ViewData["Title"] = "ورود";
+    Layout = "_EmptyLayout";
+}
+
+<main class="w-full h-screen text-center flex items-center justify-center">
+    <form onsubmit="submitAnimation()" asp-area="" asp-controller="Account" asp-action="VerifyLoginCode" method="post" class="bg-white p-6 rounded-3xl shadow-lg w-10/12 md:w-6/12 lg:w-5/12 xl:w-3/12 scale-90">
+        <input type="hidden" asp-for="ReturnUrl" />
+        <input type="hidden" asp-for="Mobile" />
+
+        <!-- logo -->
+        <a asp-area="" asp-controller="Home" asp-action="Index">
+            <img src="/assets/image/logo.png" class="max-w-32 h-fit mx-auto" alt="">
+        </a>
+        <!-- verify -->
+        <div class="pt-5">
+            <p class="text-lg text-zinc-800">
+                تایید شماره موبایل
+                <br />
+                <span class="text-sm">@Model.Mobile</span>
+                <br />
+                <a asp-area="" asp-controller="Account" asp-action="Login" class="text-sm text-zinc-500 mt-8">ویرایش شماره موبایل</a>
+            </p>
+            <p class="text-sm text-zinc-500 mt-8">
+                کد 6 رقمی ارسال شده را وارد کنید:
+            </p>
+            <div class="input-field mb-5 flex flex-row-reverse gap-x-4 justify-center mt-2">
+                <input name="LoginCode[0]" value="@Model.LoginCode[0]" class="code-input 213 border-2 border-zinc-400 focus:border-primary-400 transition w-10 h-12 rounded-md outline-none text-center focus:outline-0 focus:shadow-lg text-zinc-700" autocomplete="off" required />
+                <input name="LoginCode[1]" value="@Model.LoginCode[1]" class="code-input border-2 border-zinc-400 focus:border-primary-400 transition w-10 h-12 rounded-md outline-none text-center focus:outline-0 focus:shadow-lg text-zinc-700" autocomplete="off" required />
+                <input name="LoginCode[2]" value="@Model.LoginCode[2]" class="code-input border-2 border-zinc-400 focus:border-primary-400 transition w-10 h-12 rounded-md outline-none text-center focus:outline-0 focus:shadow-lg text-zinc-700" autocomplete="off" required />
+                <input name="LoginCode[3]" value="@Model.LoginCode[3]" class="code-input border-2 border-zinc-400 focus:border-primary-400 transition w-10 h-12 rounded-md outline-none text-center focus:outline-0 focus:shadow-lg text-zinc-700" autocomplete="off" required />
+                <input name="LoginCode[4]" value="@Model.LoginCode[4]" class="code-input border-2 border-zinc-400 focus:border-primary-400 transition w-10 h-12 rounded-md outline-none text-center focus:outline-0 focus:shadow-lg text-zinc-700" autocomplete="off" required />
+                <input name="LoginCode[5]" value="@Model.LoginCode[5]" class="code-input border-2 border-zinc-400 focus:border-primary-400 transition w-10 h-12 rounded-md outline-none text-center focus:outline-0 focus:shadow-lg text-zinc-700" autocomplete="off" required />
+            </div>
+            <span class="text-danger" asp-validation-for="LoginCode"></span>
+            <button type="submit" class="cursor-pointer btn-submit text-center w-1/2 mx-auto mt-7 bg-gradient-to-bl from-primary-500 to-primary-400 hover:opacity-90 hover:shadow-lg transition rounded-2xl px-2.5 py-3 flex justify-center items-center gap-x-2 text-sm text-white">
+                ورود
+            </button>
+        </div>
+    </form>
+</main>

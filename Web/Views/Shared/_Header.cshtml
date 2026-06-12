@@ -55,6 +55,11 @@
                             تماس با ما
                         </a>
                     </li>
+                    <li>
+                        <a permission="AdminPanel" asp-area="Admin" asp-controller="Home" asp-action="Index" class="py-3 px-4 hover:bg-gray-100 rounded-lg block">
+                            پنل ادمین
+                        </a>
+                    </li>
                 </ul>
                 <div class="bg-zinc-100 w-full h-16 px-2 py-4 flex justify-between items-center fixed bottom-0">
                     <div class="text-zinc-600 text-xs lg:text-sm">
@@ -157,15 +162,39 @@
                     </div>
                 </a>
             </li>
+            <li>
+                <a permission="AdminPanel" asp-area="Admin" asp-controller="Home" asp-action="Index" class="pt-1 flex gap-x-2 items-center group relative">
+                    <div class="relative text-zinc-600 text-sm group-hover:text-primary-500 transition pb-2
+                        after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-[2px]
+                        after:bg-primary-500 after:scale-x-0 after:origin-right after:transition-transform after:duration-300
+                        group-hover:after:scale-x-100">
+                        پنل ادمین
+                    </div>
+                </a>
+            </li>
         </ul>
         <!-- buttons -->
         <div class="flex gap-x-5">
-            <a asp-area="" asp-controller="Account" asp-action="Login" class="open-modal absolute md:static top-3.5 left-3 md:flex bg-gradient-to-bl from-primary-500 to-primary-400 hover:opacity-90 hover:shadow-lg transition rounded-xl p-2.5 items-center gap-x-2 text-sm text-white">
-                <p class="hidden lg:block">
-                    ورود | ثبت نام
-                </p>
-                <img src="/assets/image/icons/user.svg" alt="ورود | ثبت نام">
-            </a>
+            @if (User?.Identity?.IsAuthenticated ?? false)
+            {
+                <a asp-area="UserPanel" asp-controller="Home" asp-action="Index"
+                   class="open-modal absolute md:static top-3.5 left-3 md:flex bg-gradient-to-bl from-primary-500 to-primary-400 hover:opacity-90 hover:shadow-lg transition rounded-xl p-2.5 items-center gap-x-2 text-sm text-white">
+                    <p class="hidden lg:block">
+                        حساب کاربری
+                    </p>
+                    <img src="/assets/image/icons/user.svg" alt="کاربر">
+                </a>
+            }
+            else
+            {
+                <a asp-area="" asp-controller="Account" asp-action="Login"
+                   class="open-modal absolute md:static top-3.5 left-3 md:flex bg-gradient-to-bl from-primary-500 to-primary-400 hover:opacity-90 hover:shadow-lg transition rounded-xl p-2.5 items-center gap-x-2 text-sm text-white">
+                    <p class="hidden lg:block">
+                        ورود | ثبت نام
+                    </p>
+                    <img src="/assets/image/icons/user.svg" alt="کاربر">
+                </a>
+            }
         </div>
     </div>
 </header>
