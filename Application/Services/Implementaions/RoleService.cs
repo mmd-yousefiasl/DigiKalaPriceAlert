@@ -1,4 +1,5 @@
-﻿using Application.Services.Interfaces;
+﻿using Application.Dtos.Role.AdminSide;
+using Application.Services.Interfaces;
 using Data.Context;
 using Domain.Shared;
 using Microsoft.EntityFrameworkCore;
@@ -45,6 +46,21 @@ namespace Application.Services.Implementaions
             if (!roleIds?.Any() ?? true) return false;
 
             return await _userService.CheckUserRoleIds(userId, roleIds);
+        }
+
+        public async Task<Result<List<AdminSideRoleDto>>> AdminSideGetAllRolesForUserCRUD()
+        {
+            var roles = await _context.Roles
+                .Select(n => new AdminSideRoleDto()
+                {
+                    Id = n.Id,
+                    Title = n.Title,
+                    UniqueName = n.UniqueName
+                }).AsNoTracking().ToListAsync();
+
+            if (!roles?.Any() ?? true) return Result.Failure<List<AdminSideRoleDto>>(Messages.OperationFailedError);
+
+            return roles;
         }
     }
 }

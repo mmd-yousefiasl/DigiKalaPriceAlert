@@ -1,4 +1,5 @@
-﻿using Domain.Shared;
+﻿using Application.Dtos.Role.AdminSide;
+using Domain.Shared;
 
 namespace Application.Services.Interfaces
 {
@@ -7,5 +8,7 @@ namespace Application.Services.Interfaces
         Task<Result<bool>> UserCanAccessThisPermissions(int userId, string permission);
 
         Task<bool> CheckUserAccess(int userId, string permission);
+
+        Task<Result<List<AdminSideRoleDto>>> AdminSideGetAllRolesForUserCRUD();
     }
 }

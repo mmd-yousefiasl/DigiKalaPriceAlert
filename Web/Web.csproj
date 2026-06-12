@@ -7,6 +7,25 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="wwwroot\adminAssets\fontawesome\**" />
+    <Compile Remove="wwwroot\adminAssets\jalalidatepicker\**" />
+    <Compile Remove="wwwroot\adminAssets\libs\**" />
+    <Compile Remove="wwwroot\adminAssets\tinymce\**" />
+    <Content Remove="wwwroot\adminAssets\fontawesome\**" />
+    <Content Remove="wwwroot\adminAssets\jalalidatepicker\**" />
+    <Content Remove="wwwroot\adminAssets\libs\**" />
+    <Content Remove="wwwroot\adminAssets\tinymce\**" />
+    <EmbeddedResource Remove="wwwroot\adminAssets\fontawesome\**" />
+    <EmbeddedResource Remove="wwwroot\adminAssets\jalalidatepicker\**" />
+    <EmbeddedResource Remove="wwwroot\adminAssets\libs\**" />
+    <EmbeddedResource Remove="wwwroot\adminAssets\tinymce\**" />
+    <None Remove="wwwroot\adminAssets\fontawesome\**" />
+    <None Remove="wwwroot\adminAssets\jalalidatepicker\**" />
+    <None Remove="wwwroot\adminAssets\libs\**" />
+    <None Remove="wwwroot\adminAssets\tinymce\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Include="wwwroot\assets\fontawesome\.DS_Store" />
     <None Include="wwwroot\assets\libs\%40fullcalendar\.DS_Store" />
     <None Include="wwwroot\assets\libs\.DS_Store" />
@@ -38,16 +57,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\adminAssets\fontawesome\css\" />
-    <Folder Include="wwwroot\adminAssets\fontawesome\js\" />
-    <Folder Include="wwwroot\adminAssets\fontawesome\less\" />
-    <Folder Include="wwwroot\adminAssets\fontawesome\metadata\" />
-    <Folder Include="wwwroot\adminAssets\fontawesome\scss\" />
-    <Folder Include="wwwroot\adminAssets\fontawesome\sprites\" />
-    <Folder Include="wwwroot\adminAssets\fontawesome\svgs\brands\" />
-    <Folder Include="wwwroot\adminAssets\fontawesome\svgs\regular\" />
-    <Folder Include="wwwroot\adminAssets\fontawesome\svgs\solid\" />
-    <Folder Include="wwwroot\adminAssets\fontawesome\webfonts\" />
     <Folder Include="wwwroot\adminAssets\fonts\fontawesome\css\" />
     <Folder Include="wwwroot\adminAssets\fonts\fontawesome\js\" />
     <Folder Include="wwwroot\adminAssets\fonts\fontawesome\less\" />
@@ -68,109 +77,7 @@
     <Folder Include="wwwroot\adminAssets\images\layouts\" />
     <Folder Include="wwwroot\adminAssets\images\small\" />
     <Folder Include="wwwroot\adminAssets\images\users\" />
-    <Folder Include="wwwroot\adminAssets\jalalidatepicker\" />
     <Folder Include="wwwroot\adminAssets\js\pages\" />
-    <Folder Include="wwwroot\adminAssets\libs\%40curiosityx\bootstrap-session-timeout\" />
-    <Folder Include="wwwroot\adminAssets\libs\%40fullcalendar\bootstrap\" />
-    <Folder Include="wwwroot\adminAssets\libs\%40fullcalendar\core\" />
-    <Folder Include="wwwroot\adminAssets\libs\%40fullcalendar\daygrid\" />
-    <Folder Include="wwwroot\adminAssets\libs\%40fullcalendar\interaction\" />
-    <Folder Include="wwwroot\adminAssets\libs\%40fullcalendar\timegrid\" />
-    <Folder Include="wwwroot\adminAssets\libs\admin-resources\bootstrap-filestyle\" />
-    <Folder Include="wwwroot\adminAssets\libs\admin-resources\jquery.vectormap\maps\" />
-    <Folder Include="wwwroot\adminAssets\libs\admin-resources\rwd-table\" />
-    <Folder Include="wwwroot\adminAssets\libs\bootstrap-datepicker\css\" />
-    <Folder Include="wwwroot\adminAssets\libs\bootstrap-datepicker\js\" />
-    <Folder Include="wwwroot\adminAssets\libs\bootstrap-editable\css\" />
-    <Folder Include="wwwroot\adminAssets\libs\bootstrap-editable\js\" />
-    <Folder Include="wwwroot\adminAssets\libs\bootstrap-maxlength\" />
-    <Folder Include="wwwroot\adminAssets\libs\bootstrap-touchspin\" />
-    <Folder Include="wwwroot\adminAssets\libs\bootstrap\js\" />
-    <Folder Include="wwwroot\adminAssets\libs\c3\" />
-    <Folder Include="wwwroot\adminAssets\libs\chart.js\" />
-    <Folder Include="wwwroot\adminAssets\libs\chartist-plugin-tooltips\" />
-    <Folder Include="wwwroot\adminAssets\libs\chartist\" />
-    <Folder Include="wwwroot\adminAssets\libs\d3\" />
-    <Folder Include="wwwroot\adminAssets\libs\datatables.net-bs4\css\" />
-    <Folder Include="wwwroot\adminAssets\libs\datatables.net-bs4\js\" />
-    <Folder Include="wwwroot\adminAssets\libs\datatables.net-buttons-bs4\css\" />
-    <Folder Include="wwwroot\adminAssets\libs\datatables.net-buttons-bs4\js\" />
-    <Folder Include="wwwroot\adminAssets\libs\datatables.net-buttons\js\" />
-    <Folder Include="wwwroot\adminAssets\libs\datatables.net-responsive-bs4\css\" />
-    <Folder Include="wwwroot\adminAssets\libs\datatables.net-responsive-bs4\js\" />
-    <Folder Include="wwwroot\adminAssets\libs\datatables.net-responsive\js\" />
-    <Folder Include="wwwroot\adminAssets\libs\datatables.net\js\" />
-    <Folder Include="wwwroot\adminAssets\libs\dropzone\min\" />
-    <Folder Include="wwwroot\adminAssets\libs\flot-charts\" />
-    <Folder Include="wwwroot\adminAssets\libs\flot.curvedlines\" />
-    <Folder Include="wwwroot\adminAssets\libs\gmaps\" />
-    <Folder Include="wwwroot\adminAssets\libs\ion-rangeslider\css\" />
-    <Folder Include="wwwroot\adminAssets\libs\ion-rangeslider\js\" />
-    <Folder Include="wwwroot\adminAssets\libs\jquery-knob\" />
-    <Folder Include="wwwroot\adminAssets\libs\jquery-sparkline\" />
-    <Folder Include="wwwroot\adminAssets\libs\jquery-ui-dist\" />
-    <Folder Include="wwwroot\adminAssets\libs\jquery.flot.tooltip\js\" />
-    <Folder Include="wwwroot\adminAssets\libs\jquery\" />
-    <Folder Include="wwwroot\adminAssets\libs\jszip\" />
-    <Folder Include="wwwroot\adminAssets\libs\magnific-popup\" />
-    <Folder Include="wwwroot\adminAssets\libs\metismenu\" />
-    <Folder Include="wwwroot\adminAssets\libs\moment\min\" />
-    <Folder Include="wwwroot\adminAssets\libs\morris.js\" />
-    <Folder Include="wwwroot\adminAssets\libs\node-waves\" />
-    <Folder Include="wwwroot\adminAssets\libs\parsleyjs\" />
-    <Folder Include="wwwroot\adminAssets\libs\pdfmake\build\" />
-    <Folder Include="wwwroot\adminAssets\libs\raphael\" />
-    <Folder Include="wwwroot\adminAssets\libs\select2\css\" />
-    <Folder Include="wwwroot\adminAssets\libs\select2\js\" />
-    <Folder Include="wwwroot\adminAssets\libs\simplebar\" />
-    <Folder Include="wwwroot\adminAssets\libs\spectrum-colorpicker2\" />
-    <Folder Include="wwwroot\adminAssets\libs\sweetalert2\" />
-    <Folder Include="wwwroot\adminAssets\libs\table-edits\build\" />
-    <Folder Include="wwwroot\adminAssets\libs\tinymce\" />
-    <Folder Include="wwwroot\adminAssets\tinymce\js\tinymce\icons\default\" />
-    <Folder Include="wwwroot\adminAssets\tinymce\js\tinymce\langs\" />
-    <Folder Include="wwwroot\adminAssets\tinymce\js\tinymce\models\dom\" />
-    <Folder Include="wwwroot\adminAssets\tinymce\js\tinymce\plugins\accordion\" />
-    <Folder Include="wwwroot\adminAssets\tinymce\js\tinymce\plugins\advlist\" />
-    <Folder Include="wwwroot\adminAssets\tinymce\js\tinymce\plugins\anchor\" />
-    <Folder Include="wwwroot\adminAssets\tinymce\js\tinymce\plugins\autolink\" />
-    <Folder Include="wwwroot\adminAssets\tinymce\js\tinymce\plugins\autoresize\" />
-    <Folder Include="wwwroot\adminAssets\tinymce\js\tinymce\plugins\autosave\" />
-    <Folder Include="wwwroot\adminAssets\tinymce\js\tinymce\plugins\charmap\" />
-    <Folder Include="wwwroot\adminAssets\tinymce\js\tinymce\plugins\codesample\" />
-    <Folder Include="wwwroot\adminAssets\tinymce\js\tinymce\plugins\code\" />
-    <Folder Include="wwwroot\adminAssets\tinymce\js\tinymce\plugins\directionality\" />
-    <Folder Include="wwwroot\adminAssets\tinymce\js\tinymce\plugins\emoticons\js\" />
-    <Folder Include="wwwroot\adminAssets\tinymce\js\tinymce\plugins\fullscreen\" />
-    <Folder Include="wwwroot\adminAssets\tinymce\js\tinymce\plugins\help\js\i18n\keynav\" />
-    <Folder Include="wwwroot\adminAssets\tinymce\js\tinymce\plugins\image\" />
-    <Folder Include="wwwroot\adminAssets\tinymce\js\tinymce\plugins\importcss\" />
-    <Folder Include="wwwroot\adminAssets\tinymce\js\tinymce\plugins\insertdatetime\" />
-    <Folder Include="wwwroot\adminAssets\tinymce\js\tinymce\plugins\link\" />
-    <Folder Include="wwwroot\adminAssets\tinymce\js\tinymce\plugins\lists\" />
-    <Folder Include="wwwroot\adminAssets\tinymce\js\tinymce\plugins\media\" />
-    <Folder Include="wwwroot\adminAssets\tinymce\js\tinymce\plugins\nonbreaking\" />
-    <Folder Include="wwwroot\adminAssets\tinymce\js\tinymce\plugins\pagebreak\" />
-    <Folder Include="wwwroot\adminAssets\tinymce\js\tinymce\plugins\preview\" />
-    <Folder Include="wwwroot\adminAssets\tinymce\js\tinymce\plugins\quickbars\" />
-    <Folder Include="wwwroot\adminAssets\tinymce\js\tinymce\plugins\save\" />
-    <Folder Include="wwwroot\adminAssets\tinymce\js\tinymce\plugins\searchreplace\" />
-    <Folder Include="wwwroot\adminAssets\tinymce\js\tinymce\plugins\table\" />
-    <Folder Include="wwwroot\adminAssets\tinymce\js\tinymce\plugins\template\" />
-    <Folder Include="wwwroot\adminAssets\tinymce\js\tinymce\plugins\visualblocks\" />
-    <Folder Include="wwwroot\adminAssets\tinymce\js\tinymce\plugins\visualchars\" />
-    <Folder Include="wwwroot\adminAssets\tinymce\js\tinymce\plugins\wordcount\" />
-    <Folder Include="wwwroot\adminAssets\tinymce\js\tinymce\skins\content\dark\" />
-    <Folder Include="wwwroot\adminAssets\tinymce\js\tinymce\skins\content\default\" />
-    <Folder Include="wwwroot\adminAssets\tinymce\js\tinymce\skins\content\document\" />
-    <Folder Include="wwwroot\adminAssets\tinymce\js\tinymce\skins\content\tinymce-5-dark\" />
-    <Folder Include="wwwroot\adminAssets\tinymce\js\tinymce\skins\content\tinymce-5\" />
-    <Folder Include="wwwroot\adminAssets\tinymce\js\tinymce\skins\content\writer\" />
-    <Folder Include="wwwroot\adminAssets\tinymce\js\tinymce\skins\ui\oxide-dark\" />
-    <Folder Include="wwwroot\adminAssets\tinymce\js\tinymce\skins\ui\oxide\" />
-    <Folder Include="wwwroot\adminAssets\tinymce\js\tinymce\skins\ui\tinymce-5-dark\" />
-    <Folder Include="wwwroot\adminAssets\tinymce\js\tinymce\skins\ui\tinymce-5\" />
-    <Folder Include="wwwroot\adminAssets\tinymce\js\tinymce\themes\silver\" />
   </ItemGroup>
 
 </Project>

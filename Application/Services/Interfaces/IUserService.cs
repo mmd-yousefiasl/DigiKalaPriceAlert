@@ -1,4 +1,5 @@
 ﻿using Application.Dtos.SubscriptionPlans.BotSide;
+using Application.Dtos.Users.AdminSide;
 using Application.Dtos.Users.BotSide;
 using Application.Dtos.Users.ClientSide;
 using Domain.Shared;
@@ -30,5 +31,15 @@ namespace Application.Services.Interfaces
         Task<Result<string>> SendUserLoginCode(ClientSideLoginDto model);
 
         Task<Result<ClientSideUserDto>> VerifyLoginCode(ClientSideLoginCodeDto model);
+
+        Task<Result<AdminSideFilterUsersDto>> AdminSideFilterUsers(AdminSideFilterUsersDto filter);
+
+        Task<Result> AdminSideCreateNewUser(AdminSideCreateNewUserDto model);
+
+        Task<Result> AdminSideDeleteUser(int id);
+
+        Task<Result<AdminSideUpdateUserDto>> AdminSideGetUserForUpdate(int id);
+
+        Task<Result> AdminSideUpdateUser(AdminSideUpdateUserDto model);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Application.Dtos.SubscriptionPlans.BotSide;
+using Application.Dtos.Users.AdminSide;
 using Application.Dtos.Users.BotSide;
 using Application.Dtos.Users.ClientSide;
 using Application.Services.Interfaces;
@@ -305,6 +306,150 @@ namespace Application.Services.Implementaions
             if (user is null) return Result.Failure<ClientSideUserDto>(Messages.OperationFailedError);
 
             return user;
+        }
+
+        public async Task<Result<AdminSideFilterUsersDto>> AdminSideFilterUsers(AdminSideFilterUsersDto filter)
+        {
+            if (filter is null) return Result.Failure<AdminSideFilterUsersDto>(Messages.OperationFailedError);
+
+            var conditions = Filter.GenerateConditions<User>();
+
+            if (!string.IsNullOrWhiteSpace(filter.Search))
+            {
+                conditions.Add(n => n.Mobile.Contains(filter.Search) || n.FirstName.Contains(filter.Search) ||
+                n.LastName.Contains(filter.Search) || n.Username.Contains(filter.Search));
+            }
+
+            if (filter.IsUserBanned is not null)
+            {
+                conditions.Add(n => n.IsUserBanned == filter.IsUserBanned);
+            }
+
+            IQueryable<User> query = _context.Users;
+
+            query = query.OrderByDescending(n => n.Id);
+
+            foreach (var condition in conditions ?? new FilterConditions<User>())
+            {
+                query = query.Where(condition);
+            }
+
+            await filter.Paging(query.Select(n => new AdminSideUserDto()
+            {
+                Id = n.Id,
+                Mobile = n.Mobile,
+                Username = n.Username,
+                FirstName = n.FirstName,
+                LastName = n.LastName,
+                IsUserBanned = n.IsUserBanned
+            }));
+
+            return filter;
+        }
+
+        public async Task<Result> AdminSideCreateNewUser(AdminSideCreateNewUserDto model)
+        {
+            if (model is null) return Result.Failure(Messages.OperationFailedError);
+
+            if (await _context.Users.AnyAsync(n => n.Mobile == model.Mobile))
+                return Result.Failure(Messages.ThisPhoneNumberAlreadyRegisteredError);
+
+            User user = new User()
+            {
+                FirstName = model.FirstName,
+                LastName = model.LastName,
+                IsUserBanned = model.IsUserBanned,
+                Mobile = model.Mobile,
+                SubscriptionPlanId = 1,
+                UserRoleMapping = new List<UserRoleMapping>(),
+            };
+
+            if (model.RoleIds?.Any() ?? false)
+            {
+                foreach (var item in model.RoleIds ?? new List<int>())
+                {
+                    user.UserRoleMapping.Add(new UserRoleMapping()
+                    {
+                        UserId = user.Id,
+                        RoleId = item,
+                    });
+                }
+            }
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
+
+            return Result.Success();
+        }
+
+        public async Task<Result> AdminSideDeleteUser(int id)
+        {
+            if (id < 1) return Result.Failure(Messages.OperationFailedError);
+
+            var user = await _context.Users.FindAsync(id);
+            if (user is null) return Result.Failure(Messages.OperationFailedError);
+
+            user.IsDeleted = true;
+            user.LastUpdatedDate = DateTime.UtcNow;
+
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
+
+            return Result.Success();
+        }
+
+        public async Task<Result<AdminSideUpdateUserDto>> AdminSideGetUserForUpdate(int id)
+        {
+            if (id < 1) return Result.Failure<AdminSideUpdateUserDto>(Messages.OperationFailedError);
+
+            var user = await _context.Users.Where(n => n.Id == id).Select(n => new AdminSideUpdateUserDto()
+            {
+                Id = n.Id,
+                FirstName = n.FirstName,
+                LastName = n.LastName,
+                IsUserBanned = n.IsUserBanned,
+                Mobile = n.Mobile,
+                RoleIds = n.UserRoleMapping.Select(n => n.RoleId).ToList()
+            }).AsNoTracking().FirstOrDefaultAsync();
+            if (user is null) return Result.Failure<AdminSideUpdateUserDto>(Messages.OperationFailedError);
+
+            return user;
+        }
+
+        public async Task<Result> AdminSideUpdateUser(AdminSideUpdateUserDto model)
+        {
+            if (model is null) return Result.Failure(Messages.OperationFailedError);
+
+            var user = await _context.Users.Include(n => n.UserRoleMapping).FirstOrDefaultAsync(n => n.Id == model.Id);
+            if (user is null) return Result.Failure(Messages.OperationFailedError);
+
+            user.LastUpdatedDate = DateTime.UtcNow;
+            user.FirstName = model.FirstName;
+            user.LastName = model.LastName;
+            user.IsUserBanned = model.IsUserBanned;
+            user.Mobile = model.Mobile;
+
+            if (await _context.Users.AnyAsync(n => n.Id != model.Id && n.Mobile == model.Mobile))
+                return Result.Failure(Messages.ThisPhoneNumberAlreadyRegisteredError);
+
+            var removedRoles = user.UserRoleMapping.Select(n => n.RoleId).Except(model.RoleIds ?? new List<int>()).ToList();
+
+            foreach (var item in removedRoles ?? new List<int>())
+            {
+                user.UserRoleMapping.Remove(user.UserRoleMapping.First(n => n.RoleId == item));
+            }
+            var newRoles = model.RoleIds?.Except(user.UserRoleMapping.Select(n => n.RoleId)).ToList();
+            foreach (var item in newRoles ?? new List<int>())
+            {
+                user.UserRoleMapping.Add(new UserRoleMapping
+                {
+                    RoleId = item
+                });
+            }
+
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
+
+            return Result.Success();
         }
     }
 }

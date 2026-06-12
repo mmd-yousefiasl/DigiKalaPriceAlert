@@ -12,6 +12,7 @@
         public const string ToManyLoginAttemptError = "تعداد تلاش‌های شما برای ورود از حد مجاز فراتر رفته است. لطفاً بعد از دقایقی دوباره تلاش کنید";
         public const string InvalidLoginCodeError = "کد تایید نامعتبر می باشد.";
         public const string LoginFailedError = "ورود ناموفق، لطفا دوباره امتحان کنید";
+        public const string ThisPhoneNumberAlreadyRegisteredError = "این شماره موبایل قبلا ثبت شده است";
 
         #endregion
 

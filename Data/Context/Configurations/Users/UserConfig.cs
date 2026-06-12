@@ -11,6 +11,8 @@ namespace Data.Context.Configurations.Users
             builder.ToTable("Users");
             builder.HasKey(u => u.Id);
 
+            builder.HasQueryFilter(u => !u.IsDeleted);
+
             builder.Property(u => u.Mobile)
                 .HasMaxLength(11)
                 .IsRequired();
