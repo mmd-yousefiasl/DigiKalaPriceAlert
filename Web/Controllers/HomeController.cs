@@ -28,12 +28,6 @@ namespace Web.Controllers
             return View();
         }
 
-        [HttpGet("/contact-us")]
-        public IActionResult ContactUs()
-        {
-            return View();
-        }
-
         [HttpGet("/404")]
         public IActionResult PageNotFound()
         {

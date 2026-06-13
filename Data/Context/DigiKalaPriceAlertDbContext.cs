@@ -1,9 +1,9 @@
-﻿using Domain.Models.Identity;
+﻿using Domain.Models.ContactUs;
+using Domain.Models.Identity;
 using Domain.Models.Products;
 using Domain.Models.SubscriptionPlans;
 using Domain.Models.Users;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace Data.Context
 {
@@ -35,5 +35,7 @@ namespace Data.Context
         public DbSet<Permission> Permissions => Set<Permission>();
         public DbSet<Role> Roles => Set<Role>();
         public DbSet<RolePermissionMapping> RolePermissionMapping => Set<RolePermissionMapping>();
+
+        public DbSet<ContactUsFrom> ContactUsFroms => Set<ContactUsFrom>();
     }
 }
