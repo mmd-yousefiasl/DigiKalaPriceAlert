@@ -120,9 +120,33 @@ namespace Domain.Statics
                 UniqueName = "ReadContactUsForm"
             },
             #endregion
+
+            #region NewsLetters
+            new Permission
+            {
+                Id = 16,
+                ParentId = 1,
+                Title = "مدیریت ایمیل های خبرنامه",
+                UniqueName = "ManageNewsLetters"
+            },
+            new Permission
+            {
+                Id = 17,
+                ParentId = 16,
+                Title = "لیست ایمیل های خبرنامه",
+                UniqueName = "NewsLettersList"
+            },
+            new Permission
+            {
+                Id = 18,
+                ParentId = 16,
+                Title = "حذف ایمیل خبرنامه",
+                UniqueName = "DeleteNewsLetters"
+            },
+            #endregion
         };
 
-        //Last used id ==> 15
+        //Last used id ==> 18
         public static List<Permission> Permissions = _permissions;
     }
 }

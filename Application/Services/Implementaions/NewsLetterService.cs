@@ -1,4 +1,5 @@
-﻿using Application.Dtos.NewsLetter.ClientSide;
+﻿using Application.Dtos.NewsLetter.AdminSide;
+using Application.Dtos.NewsLetter.ClientSide;
 using Application.Services.Interfaces;
 using Application.Tools;
 using Data.Context;
@@ -52,6 +53,53 @@ namespace Application.Services.Implementaions
             await _context.SaveChangesAsync();
 
             return Result.Success(Messages.SignInNewsLettersSuccessfully);
+        }
+
+        public async Task<Result<AdminSideFilterNewsLettersDto>> AdminSideFilterNewsLetters(AdminSideFilterNewsLettersDto filter)
+        {
+            if (filter is null)
+                return Result.Failure<AdminSideFilterNewsLettersDto>(Messages.OperationFailedError);
+
+            var conditions = Filter.GenerateConditions<NewsLetter>();
+
+            if (!string.IsNullOrWhiteSpace(filter.Search))
+            {
+                conditions.Add(n => n.Email.Contains(filter.Search) ||
+                n.UserIP.Contains(filter.Search));
+            }
+
+            IQueryable<NewsLetter> query = _context.NewsLetters;
+            query = query.OrderByDescending(n => n.Id);
+
+            foreach (var item in conditions ?? new FilterConditions<NewsLetter>())
+            {
+                query = query.Where(item);
+            }
+
+            await filter.Paging(query.Select(n => new AdminSideNewsLetterDto()
+            {
+                Id = n.Id,
+                Email = n.Email,
+                UserIP = n.UserIP
+            }));
+
+            return filter;
+        }
+
+        public async Task<Result> AdminSideDeleteNewsLetter(int id)
+        {
+            if (id < 1) return Result.Failure(Messages.OperationFailedError);
+
+            var newsLetter = await _context.NewsLetters.FindAsync(id);
+            if (newsLetter is null) return Result.Failure(Messages.OperationFailedError);
+
+            newsLetter.IsDeleted = true;
+            newsLetter.LastUpdatedDate = DateTime.UtcNow;
+
+            _context.NewsLetters.Update(newsLetter);
+            await _context.SaveChangesAsync();
+
+            return Result.Success();
         }
     }
 }
