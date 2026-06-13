@@ -36,6 +36,6 @@ namespace Data.Context
         public DbSet<Role> Roles => Set<Role>();
         public DbSet<RolePermissionMapping> RolePermissionMapping => Set<RolePermissionMapping>();
 
-        public DbSet<ContactUsFrom> ContactUsFroms => Set<ContactUsFrom>();
+        public DbSet<ContactUsFrom> ContactUsForms => Set<ContactUsFrom>();
     }
 }

@@ -10,6 +10,8 @@ namespace Data.Context.Configurations.ContactUs
         {
             builder.ToTable("ContactUsForms");
 
+            builder.HasQueryFilter(cuf => !cuf.IsDeleted);
+
             builder.HasKey(cuf => cuf.Id);
 
             builder.Property(cuf => cuf.Name)

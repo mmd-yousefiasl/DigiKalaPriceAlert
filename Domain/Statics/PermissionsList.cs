@@ -89,9 +89,40 @@ namespace Domain.Statics
                 UniqueName = "DeleteRole"
             },
             #endregion
+
+            #region ContactUsForms
+            new Permission
+            {
+                Id = 12,
+                ParentId = 1,
+                Title = "مدیریت فرم های تماس باما",
+                UniqueName = "ManageContactUsForms"
+            },
+            new Permission
+            {
+                Id = 13,
+                ParentId = 12,
+                Title = "لیست فرم های تماس باما",
+                UniqueName = "ContactUsFormsList"
+            },
+            new Permission
+            {
+                Id = 14,
+                ParentId = 12,
+                Title = "حذف فرم تماس باما",
+                UniqueName = "DeleteContactUsForm"
+            },
+            new Permission
+            {
+                Id = 15,
+                ParentId = 12,
+                Title = "خواندن فرم تماس باما",
+                UniqueName = "ReadContactUsForm"
+            },
+            #endregion
         };
 
-        //Last used id ==> 11
+        //Last used id ==> 15
         public static List<Permission> Permissions = _permissions;
     }
 }

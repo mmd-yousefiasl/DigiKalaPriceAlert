@@ -1,0 +1,158 @@
+﻿@using Application.Dtos.ContactUs.AdminSide
+@using Application.Tools
+@using Domain.Enums.ContactUs
+@model AdminSideFilterContactUsFormsDto
+
+@{
+    ViewData["Title"] = "لیست فرم های تماس با ما";
+}
+
+<div class="container-fluid">
+
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="page-title-box">
+                <h4>مدیریت فرم های تماس با ما</h4>
+                <ol class="breadcrumb m-0">
+                    <li class="breadcrumb-item">
+                        <a asp-area="Admin" asp-controller="Home" asp-action="Index">صفحه نخست</a>
+                    </li>
+                    <li class="breadcrumb-item active">@ViewData["Title"]</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xl-12">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">جست و جوی فرم های تماس با ما</h4>
+                    <form novalidate asp-area="Admin" asp-controller="ContactUs" method="get" asp-action="ContactUsFormsList" id="search-form">
+                        <input type="hidden" asp-for="Page" id="Page" />
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label" asp-for="Search"></label>
+                                    <input type="text" class="form-control" asp-for="Search" autocomplete="off">
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label" asp-for="Subject"></label>
+                                    <select type="text" class="form-control" asp-for="Subject" autocomplete="off" asp-items="Html.GetEnumSelectList<ContactUsFormSubjectEnum>()">
+                                        <option value="">همه</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label" asp-for="IsRead"></label>
+                                    <select type="text" class="form-control" asp-for="IsRead" autocomplete="off">
+                                        <option value="">همه</option>
+                                        <option value="true">خوانده شده</option>
+                                        <option value="false">خوانده نشده</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary" type="submit">جست و جو</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (Model?.Entities?.Any() ?? false)
+    {
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>تاریخ</th>
+                                        <th>نام و نام خانوادگی / نام فروشگاه</th>
+                                        <th>شماره موبایل یا آیدی تلگرام</th>
+                                        <th>موضوع پیام</th>
+                                        <th>آیپی</th>
+                                        <th>وضعیت</th>
+                                        <th>عملیات</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @{
+                                        int counter = 0;
+
+                                        foreach (var item in Model.Entities ?? new List<AdminSideContactUsFormDto>())
+                                        {
+                                            counter++;
+
+                                            <tr>
+                                                <th scope="row">@counter</th>
+                                                <td>@item.CreatedDate.GetDate()</td>
+                                                <td>
+                                                    @if (item.UserId > 0)
+                                                    {
+                                                        <a asp-area="Admin" asp-controller="User" asp-action="UpdateUser" asp-route-id="@item.UserId">
+                                                            @item.Name
+                                                        </a>
+                                                    }
+                                                    else
+                                                    {
+                                                        @item.Name
+                                                    }
+                                                </td>
+                                                <td>@item.MobileOrId</td>
+                                                <td>@item.Subject.GetDisplayName()</td>
+                                                <td>@item.UserIP</td>
+                                                <td>
+                                                    @if (item.IsRead)
+                                                    {
+                                                        <span class="text-success">خوانده شده</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="text-warning">خوانده نشده</span>
+                                                    }
+                                                </td>
+                                                <td>
+                                                    <form permission="DeleteContactUsForm" class="btn btn-outline-secondary btn-sm" method="post" onclick="ConfirmDelete(this)" asp-route-id="@item.Id" asp-area="Admin" asp-controller="ContactUs" asp-action="DeleteContactUsForm" title="حذف">
+                                                        <i class="mdi mdi-delete"></i>
+                                                    </form>
+
+                                                    @if (!item.IsRead)
+                                                    {
+                                                        <form permission="ReadContactUsForm" class="btn btn-outline-secondary btn-sm" method="post" onclick="ConfirmDelete(this)" asp-route-id="@item.Id" asp-area="Admin" asp-controller="ContactUs" asp-action="ReadContactUsForm" title="خواندن">
+                                                            <i class="mdi mdi-eye"></i>
+                                                        </form>
+                                                    }
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="1"></td>
+                                                <td colspan="7">@item.Message</td>
+                                            </tr>
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <partial name="_Paging" model="@Model.GetCurrentPaging()" />
+    }
+    else
+    {
+        <partial name="_NotFoundPartial" />
+    }
+</div>
