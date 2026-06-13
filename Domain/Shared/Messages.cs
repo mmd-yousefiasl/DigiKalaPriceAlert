@@ -13,6 +13,8 @@
         public const string InvalidLoginCodeError = "کد تایید نامعتبر می باشد.";
         public const string LoginFailedError = "ورود ناموفق، لطفا دوباره امتحان کنید";
         public const string ThisPhoneNumberAlreadyRegisteredError = "این شماره موبایل قبلا ثبت شده است";
+        public const string RequiredAccessForRoleError = "حداقل یک دسترسی برای نقش انتخاب کنید";
+        public const string DuplicateUniqueNameForRoleError = "نام یکتا برای این نقش قبلاً ثبت شده است";
 
         #endregion
 

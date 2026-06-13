@@ -51,9 +51,47 @@ namespace Domain.Statics
                 UniqueName = "DeleteUser"
             },
             #endregion
+
+            #region Role
+            new Permission
+            {
+                Id = 7,
+                ParentId = 1,
+                Title = "مدیریت نقش ها",
+                UniqueName = "ManageRoles"
+            },
+            new Permission
+            {
+                Id = 8,
+                ParentId = 7,
+                Title = "لیست نقش ها",
+                UniqueName = "RolesList"
+            },
+            new Permission
+            {
+                Id = 9,
+                ParentId = 7,
+                Title = "افزودن نقش جدید",
+                UniqueName = "CreateNewRole"
+            },
+            new Permission
+            {
+                Id = 10,
+                ParentId = 7,
+                Title = "ویرایش نقش",
+                UniqueName = "UpdateRole"
+            },
+            new Permission
+            {
+                Id = 11,
+                ParentId = 7,
+                Title = "حذف نقش",
+                UniqueName = "DeleteRole"
+            },
+            #endregion
         };
 
-        //Last used id ==> 6
+        //Last used id ==> 11
         public static List<Permission> Permissions = _permissions;
     }
 }

@@ -32,6 +32,7 @@ namespace Web
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IUserValidationService, UserValidationService>();
             services.AddScoped<IRoleService, RoleService>();
+            services.AddScoped<IPermissionService, PermissionService>();
         }
     }
 }
