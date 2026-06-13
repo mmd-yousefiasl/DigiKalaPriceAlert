@@ -36,6 +36,7 @@ namespace Web
             services.AddScoped<IRoleService, RoleService>();
             services.AddScoped<IPermissionService, PermissionService>();
             services.AddScoped<IContactUsFormService, ContactUsFormService>();
+            services.AddScoped<INewsLetterService, NewsLetterService>();
         }
     }
 }

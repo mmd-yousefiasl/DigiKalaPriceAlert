@@ -15,6 +15,7 @@
         public const string ThisPhoneNumberAlreadyRegisteredError = "این شماره موبایل قبلا ثبت شده است";
         public const string RequiredAccessForRoleError = "حداقل یک دسترسی برای نقش انتخاب کنید";
         public const string DuplicateUniqueNameForRoleError = "نام یکتا برای این نقش قبلاً ثبت شده است";
+        public const string ThisEmailAlreadyRegisterdError = "این ایمیل قبلا ثبت شده است";
 
         #endregion
 
@@ -26,6 +27,7 @@
         public const string LogedoutSuccessfully = "با موفقیت از حساب کاربری خود خارج شدید";
         public const string ContactUsFormSentSuccessfully = "پیام شما با موفقیت ارسال شد، در صورت نیاز همکاران ما با شما تماس خواهند گرفت";
         public const string ContactUsFormMarkedAsReadSuccessfully = "وضعیت فرم تماس باما به خوانده شده تغییر کرد";
+        public const string SignInNewsLettersSuccessfully = "عضویت شما در خبرنامه با موفقیت انجام شد. از همراهی شما سپاسگزاریم";
 
         #endregion
 

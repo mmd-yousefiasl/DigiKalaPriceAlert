@@ -1,9 +1,22 @@
+using Application.Dtos.NewsLetter.ClientSide;
+using Application.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Web.Controllers
 {
     public class HomeController : BaseController
     {
+        #region Fields
+        private readonly INewsLetterService _newsLettersService;
+        #endregion
+
+        #region Ctor
+        public HomeController(INewsLetterService newsLettersServices)
+        {
+            _newsLettersService = newsLettersServices;
+        }
+        #endregion
+
         [HttpGet("")]
         public IActionResult Index()
         {
@@ -44,6 +57,24 @@ namespace Web.Controllers
         public IActionResult InternalServerError()
         {
             return View();
+        }
+
+        [HttpPost("/sign-in-news-letters"), ValidateAntiForgeryToken]
+        public async Task<IActionResult> SignInNewsLetters(ClientSideSignInNewsLettersDto model)
+        {
+            if (!ModelState.IsValid) return View(nameof(Index), model);
+
+            var result = await _newsLettersService.ClientSideSignInNewsLetters(model);
+            if (result.IsFailure)
+            {
+                TempData[TemporaryErrorMessage] = result.Message;
+            }
+            else
+            {
+                TempData[TemporarySuccessMessage] = result.Message;
+            }
+
+            return RedirectToAction(nameof(Index));
         }
     }
 }

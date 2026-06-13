@@ -1,5 +1,6 @@
 ﻿using Domain.Models.ContactUs;
 using Domain.Models.Identity;
+using Domain.Models.NewsLetters;
 using Domain.Models.Products;
 using Domain.Models.SubscriptionPlans;
 using Domain.Models.Users;
@@ -37,5 +38,8 @@ namespace Data.Context
         public DbSet<RolePermissionMapping> RolePermissionMapping => Set<RolePermissionMapping>();
 
         public DbSet<ContactUsFrom> ContactUsForms => Set<ContactUsFrom>();
+
+        public DbSet<NewsLetter> NewsLetters => Set<NewsLetter>();
+        public DbSet<SentLetter> SentLetters => Set<SentLetter>();
     }
 }

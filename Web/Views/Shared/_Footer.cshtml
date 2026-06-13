@@ -1,4 +1,5 @@
-﻿<footer class="bg-white border-t border-zinc-200 w-full px-5 md:px-10 py-5">
+﻿@using Application.Dtos.NewsLetter.ClientSide
+<footer class="bg-white border-t border-zinc-200 w-full px-5 md:px-10 py-5">
     <!-- logo, des, go to up -->
     <div class="flex gap-x-8 gap-y-4 items-center md:items-start flex-wrap md:flex-nowrap justify-between">
         <div class="w-4/12 md:w-1/12 order-1 md:order-none">
@@ -244,24 +245,7 @@
             <img class="h-fit max-w-20 md:max-w-28" src="/assets/image/service/zarinPal.png" alt="زرین پال">
         </div>
         <div class="md:w-4/12">
-            <p class="text-xs text-zinc-400 pb-3 pr-2">
-                ایمیل خود را وارد کنید تا از آخرین تخفیفات باخبر بشید.
-            </p>
-            <div class="relative">
-                <input class="rounded-3xl rounded-tr-sm text-zinc-600 w-full bg-[#f0f0f0] px-5 py-3.5 placeholder:text-zinc-400 placeholder:text-xs focus:outline-1 focus:outline-zinc-300" type="text" placeholder="ایمیل خود را وارد کنید.">
-                <a href="#" class="top-2 absolute left-3 -rotate-90 bg-primary-500 p-1 rounded-2xl">
-                    <svg class="size-7" width="36" height="36" viewBox="0 0 24 24" fill="" xmlns="http://www.w3.org/2000/svg">
-                        <g clip-path="url(#clip0_2029_2)">
-                            <path fill-rule="evenodd" clip-rule="evenodd" d="M15.536 13.707C15.4431 13.8 15.3328 13.8738 15.2114 13.9241C15.09 13.9744 14.9599 14.0003 14.8285 14.0003C14.6971 14.0003 14.5669 13.9744 14.4455 13.9241C14.3241 13.8738 14.2138 13.8 14.121 13.707L12 11.586L9.87897 13.707C9.69146 13.8947 9.43709 14.0001 9.17182 14.0002C8.90655 14.0003 8.65211 13.895 8.46447 13.7075C8.27683 13.52 8.17136 13.2657 8.17126 13.0004C8.17117 12.7351 8.27646 12.4807 8.46397 12.293L11.293 9.46503C11.4805 9.27756 11.7348 9.17224 12 9.17224C12.2651 9.17224 12.5194 9.27756 12.707 9.46503L15.536 12.293C15.7234 12.4806 15.8288 12.7349 15.8288 13C15.8288 13.2652 15.7234 13.5195 15.536 13.707Z" fill="white" />
-                        </g>
-                        <defs>
-                            <clipPath id="clip0_2029_2">
-                                <rect width="24" height="24" fill="white" />
-                            </clipPath>
-                        </defs>
-                    </svg>
-                </a>
-            </div>
+            <partial name="_SignInNewsLetters" model="@(new ClientSideSignInNewsLettersDto())" />
             <p class="text-xs text-zinc-400 pt-6 pb-3 pr-2">
                 شبکه های اجتماعی
             </p>
