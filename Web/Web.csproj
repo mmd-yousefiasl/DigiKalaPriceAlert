@@ -26,6 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="wwwroot\adminAssets\js\tinymce\.DS_Store" />
     <None Include="wwwroot\assets\fontawesome\.DS_Store" />
     <None Include="wwwroot\assets\libs\%40fullcalendar\.DS_Store" />
     <None Include="wwwroot\assets\libs\.DS_Store" />

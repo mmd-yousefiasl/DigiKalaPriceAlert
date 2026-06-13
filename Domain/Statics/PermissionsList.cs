@@ -144,9 +144,40 @@ namespace Domain.Statics
                 UniqueName = "DeleteNewsLetters"
             },
             #endregion
+
+            #region SentLetter
+            new Permission
+            {
+                Id = 19,
+                ParentId = 1,
+                Title = "مدیریت ایمیل های ارسال شده",
+                UniqueName = "ManageSentLetters"
+            },
+            new Permission
+            {
+                Id = 20,
+                ParentId = 19,
+                Title = "لیست ایمیل های ارسال شده",
+                UniqueName = "SentLettersList"
+            },
+            new Permission
+            {
+                Id = 21,
+                ParentId = 19,
+                Title = "حذف ایمیل ارسال شده",
+                UniqueName = "DeleteSentLetter"
+            },
+            new Permission
+            {
+                Id = 22,
+                ParentId = 19,
+                Title = "ارسال ایمیل جدید",
+                UniqueName = "SendLetter"
+            },
+            #endregion
         };
 
-        //Last used id ==> 18
+        //Last used id ==> 22
         public static List<Permission> Permissions = _permissions;
     }
 }

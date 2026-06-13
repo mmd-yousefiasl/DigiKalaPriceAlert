@@ -22,6 +22,24 @@ namespace Application.Tools
             return persianDate;
         }
 
+        public static string GetDateTime(this DateTime value)
+        {
+            PersianCalendar pc = new PersianCalendar();
+
+            int day = pc.GetDayOfMonth(value);
+            int month = pc.GetMonth(value);
+            int year = pc.GetYear(value);
+            int hour = pc.GetHour(value);
+            int minute = pc.GetMinute(value);
+
+            string[] persianMonthNames = {
+"فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور",
+"مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"};
+
+            string persianDateTime = $"{day} {persianMonthNames[month - 1]} {year} {hour:D2}:{minute:D2}";
+            return persianDateTime;
+        }
+
         public static string GetDisplayName(this Enum value)
         {
             FieldInfo fieldInfo = value.GetType().GetField(value.ToString());

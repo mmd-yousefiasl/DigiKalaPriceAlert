@@ -1,4 +1,5 @@
 ﻿using Domain.Models.ContactUs;
+using Domain.Models.GeneralInfo;
 using Domain.Models.Identity;
 using Domain.Models.NewsLetters;
 using Domain.Models.Products;
@@ -41,5 +42,7 @@ namespace Data.Context
 
         public DbSet<NewsLetter> NewsLetters => Set<NewsLetter>();
         public DbSet<SentLetter> SentLetters => Set<SentLetter>();
+
+        public DbSet<EmailData> EmailData => Set<EmailData>();
     }
 }

@@ -1,5 +1,7 @@
 ﻿using Application.Dtos.NewsLetter.AdminSide;
 using Application.Dtos.NewsLetter.ClientSide;
+using Application.Dtos.SendEmail.AdminSide;
+using Application.Dtos.SentLetter.AdminSide;
 using Application.Services.Interfaces;
 using Application.Tools;
 using Data.Context;
@@ -15,27 +17,33 @@ namespace Application.Services.Implementaions
         #region Fields
         private protected DigiKalaPriceAlertDbContext _context;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly ISendEmailService _sendEmailService;
+        private readonly ISentLetterService _sentLetterService;
         #endregion
 
         #region Ctor
         public NewsLetterService(DigiKalaPriceAlertDbContext context,
-            IHttpContextAccessor httpContextAccessor)
+            IHttpContextAccessor httpContextAccessor,
+            ISendEmailService sendEmailService,
+            ISentLetterService sentLetterService)
         {
             _context = context;
             _httpContextAccessor = httpContextAccessor;
+            _sendEmailService = sendEmailService;
+            _sentLetterService = sentLetterService;
         }
         #endregion
 
-        public async Task<Result> ClientSideSignInNewsLetters(ClientSideSignInNewsLettersDto model)
+        public async Task<Result> ClientSideSignInNewsLetters(ClientSideSignInNewsLettersDto dto)
         {
-            if (model is null) return Result.Failure(Messages.OperationFailedError);
+            if (dto is null) return Result.Failure(Messages.OperationFailedError);
 
-            if (await _context.NewsLetters.AnyAsync(n => n.Email == model.Email))
+            if (await _context.NewsLetters.AnyAsync(n => n.Email == dto.Email))
                 return Result.Failure(Messages.ThisEmailAlreadyRegisterdError);
 
             NewsLetter newsLetter = new NewsLetter()
             {
-                Email = model.Email,
+                Email = dto.Email,
                 UserIP = _httpContextAccessor.HttpContext.GetUserIP(),
             };
 
@@ -100,6 +108,43 @@ namespace Application.Services.Implementaions
             await _context.SaveChangesAsync();
 
             return Result.Success();
+        }
+
+        public async Task<Result> AdminSideSendNews(AdminSideSendLetterDto dto)
+        {
+            var emailsResult = await AdminSideGetNewsLetterEmails();
+            if (emailsResult.IsFailure) return Result.Failure(emailsResult.Message);
+
+            var sendBuckEmailResult = await _sendEmailService.AdminSideSendBuckEmail(new AdminSideSendBuckEmailDto()
+            {
+                Subject = dto.Subject,
+                Body = dto.Message,
+                Recipients = emailsResult.Value
+            });
+
+            await _sentLetterService.AdminSideCreateNewSentLetter(new AdminSideCreateNewSentLetterDto()
+            {
+                Subject = dto.Subject,
+                IsSucceed = sendBuckEmailResult.IsSuccess,
+                Message = dto.Message,
+                TargetMailCount = emailsResult.Value.Count()
+            });
+
+            if (sendBuckEmailResult.IsFailure) return Result.Failure(sendBuckEmailResult.Message);
+
+            return Result.Success();
+        }
+
+        public async Task<Result<List<string>>> AdminSideGetNewsLetterEmails()
+        {
+            var emails = await _context.NewsLetters
+                .Select(n => n.Email)
+                .AsNoTracking()
+                .ToListAsync();
+
+            if (!emails?.Any() ?? true) return Result.Failure<List<string>>(Messages.OperationFailedError);
+
+            return emails;
         }
     }
 }

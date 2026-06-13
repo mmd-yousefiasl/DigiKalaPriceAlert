@@ -16,6 +16,7 @@
         public const string RequiredAccessForRoleError = "حداقل یک دسترسی برای نقش انتخاب کنید";
         public const string DuplicateUniqueNameForRoleError = "نام یکتا برای این نقش قبلاً ثبت شده است";
         public const string ThisEmailAlreadyRegisterdError = "این ایمیل قبلا ثبت شده است";
+        public const string RangeError = "حداقل مقدار {0} {1} و حداکثر {2} می باشد";
 
         #endregion
 

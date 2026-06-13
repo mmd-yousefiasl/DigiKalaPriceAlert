@@ -1,4 +1,5 @@
-﻿using Domain.Models.Identity;
+﻿using Domain.Models.GeneralInfo;
+using Domain.Models.Identity;
 using Domain.Models.SubscriptionPlans;
 using Domain.Models.Users;
 using Domain.Statics;
@@ -72,6 +73,15 @@ namespace Data.Context
 
             modelBuilder.Entity<UserRoleMapping>().HasData(adminUserRoleMapping);
 
+            #endregion
+
+            #region EmailData
+            EmailData emailData = new EmailData()
+            {
+                Id = 1,
+            };
+
+            modelBuilder.Entity<EmailData>().HasData(emailData);
             #endregion
         }
     }

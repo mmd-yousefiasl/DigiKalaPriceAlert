@@ -37,6 +37,9 @@ namespace Web
             services.AddScoped<IPermissionService, PermissionService>();
             services.AddScoped<IContactUsFormService, ContactUsFormService>();
             services.AddScoped<INewsLetterService, NewsLetterService>();
+            services.AddScoped<ISentLetterService, SentLetterService>();
+            services.AddScoped<ISendEmailService, SendEmailService>();
+            services.AddScoped<IEmailDataService, EmailDataService>();
         }
     }
 }
