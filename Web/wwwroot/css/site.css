@@ -24,6 +24,173 @@
     }
 }
 
+.discount-sec-size {
+    height: 24px;
+}
+
+.first-rm {
+    margin-right: 40px;
+}
+
+.second-rm {
+    margin-right: 80px;
+}
+
+.not-found-text {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin-top: 20px;
+    margin-bottom: 50px;
+}
+
 .cursor-pointer {
     cursor: pointer;
+}
+
+.red-active {
+    fill: #f87171;
+}
+
+    .red-active path {
+        fill: #f87171 !important;
+    }
+
+.display-hidden {
+    display: none;
+}
+
+/* HTML: <div class="loader-custom"></div> */
+/* Container that covers the entire screen and blurs the background */
+.loader-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    backdrop-filter: blur(8px); /* Blurs the background */
+    background-color: rgba(0, 0, 0, 0.2); /* Optional: semi-transparent overlay */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999; /* Ensure it's on top */
+}
+
+    /* Loader animation */
+    .loader-overlay div {
+        width: 50px;
+        aspect-ratio: 1;
+        display: grid;
+        -webkit-mask: conic-gradient(from 15deg, #0000, #000);
+        animation: l26 1s infinite steps(12);
+        background: #000; /* Add a background color to make the mask visible */
+    }
+
+
+        .loader-overlay div,
+        .loader-overlay div:before,
+        .loader-overlay div:after {
+            background: radial-gradient(closest-side at 50% 12.5%, #f03355 96%,#0000) 50% 0/20% 80% repeat-y, radial-gradient(closest-side at 12.5% 50%, #f03355 96%,#0000) 0 50%/80% 20% repeat-x;
+        }
+
+            .loader-overlay div:before,
+            .loader-overlay div:after {
+                content: "";
+                grid-area: 1/1;
+                transform: rotate(30deg);
+            }
+
+            .loader-overlay div:after {
+                transform: rotate(60deg);
+            }
+
+@keyframes l26 {
+    100% {
+        transform: rotate(1turn)
+    }
+}
+
+.disabled-btn {
+    opacity: 50%;
+    cursor: not-allowed;
+}
+
+.editor-preview, span {
+    all: revert; /* or use all: initial for stricter reset */
+    font-family: Vazir;
+    color: #222;
+    line-height: 1.6;
+    padding: 1rem;
+    background: #fff;
+}
+
+    /* Optional: style common CKEditor output elements */
+    .editor-preview h1, .editor-preview h2, .editor-preview p {
+        margin: 0 0 1em;
+    }
+
+    .editor-preview img {
+        max-width: 100%;
+        height: auto;
+    }
+
+    .editor-preview ul, .editor-preview ol {
+        padding-left: 1.5em;
+    }
+
+    .editor-preview h1 {
+        font-size: 2em; /* or try 32px */
+        font-weight: bold;
+        margin: 0 0 0.5em;
+    }
+
+    .editor-preview h2 {
+        font-size: 1.5em;
+        font-weight: bold;
+        margin: 0 0 0.5em;
+    }
+
+    .editor-preview h3 {
+        font-size: 1.2em;
+        font-weight: bold;
+        margin: 0 0 0.5em;
+    }
+
+
+.blockquote.short-link {
+    background: rgba(255, 255, 255, 0.08); /* lighter glass for contrast */
+    border-left: 4px solid var(--color-primary-500); /* blue accent */
+    padding: 14px 18px;
+    border-radius: 10px;
+    backdrop-filter: blur(8px);
+    color: #eaeaea; /* light text */
+    font-size: 1rem;
+    line-height: 1.6;
+    margin: 1rem 0;
+}
+
+/* Label styling */
+.short-link-label {
+    font-weight: 600;
+    color: black; /* soft gray */
+    margin-right: 6px;
+}
+
+/* Anchor styling */
+.short-link-anchor {
+    color: var(--color-primary-500); /* bright cyan for readability */
+    font-weight: 700;
+    text-decoration: none;
+    word-break: break-all; /* prevents overflow on long URLs */
+    transition: color 0.3s ease;
+}
+
+    .short-link-anchor:hover {
+        color: #1abc9c; /* teal hover */
+        text-decoration: underline;
+    }
+
+
+.p-list-heading {
+    display: contents;
 }

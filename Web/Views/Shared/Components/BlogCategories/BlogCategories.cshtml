@@ -1,0 +1,20 @@
+﻿@using Application.Dtos.BlogCategory.ClientSide
+@model List<ClientSideBlogCategoryDto>
+
+@if (Model?.Any() ?? false)
+{
+    <div class="lg:w-3/12 border border-zinc-300 h-fit rounded-2xl p-3 space-y-2">
+        <div>
+            <ul class="submenu space-y-2">
+                @foreach (var item in Model ?? new List<ClientSideBlogCategoryDto>())
+                {
+                    <li>
+                        <button class="menu-toggle flex justify-between w-full py-3 px-4 hover:bg-gray-100 rounded-lg text-zinc-700 text-sm">
+                            <a asp-area="" asp-controller="Blog" asp-action="BlogsList" asp-route-category="@item.Slug">@item.Title</a>
+                        </button>
+                    </li>
+                }
+            </ul>
+        </div>
+    </div>
+}

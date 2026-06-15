@@ -2,6 +2,8 @@
 {
     public class SiteTools
     {
+        public static string SiteUrl { get; set; }
+
         public static string SiteName { get; set; }
 
         public static string BlogFile { get; set; }

@@ -1,0 +1,25 @@
+﻿@using Application.Dtos.Blog.ClientSide
+@model List<ClientSideBlogDto>
+
+@if (Model?.Any() ?? false)
+{
+    <div class="lg:w-3/12 h-fit  order-2 md:order-1">
+        <div class="flex gap-x-2 justify-between items-center mb-4">
+            <div class="h-[1px] w-full bg-gradient-to-r from-white via-zinc-300 to-white">
+            </div>
+            <div class="w-48 min-w-fit text-zinc-700 md:font-yekanBakhBold md:text-lg">
+                مطالب مرتبط
+            </div>
+            <div class="h-[1px] w-full bg-gradient-to-r from-white via-zinc-300 to-white">
+            </div>
+        </div>
+        <div class="border border-zinc-300 rounded-3xl p-3 space-y-8">
+            @foreach (var item in Model ?? new List<ClientSideBlogDto>())
+            {
+                <div class="transition group">
+                    <partial name="_BlogListView" model="@item" />
+                </div>
+            }
+        </div>
+    </div>
+}

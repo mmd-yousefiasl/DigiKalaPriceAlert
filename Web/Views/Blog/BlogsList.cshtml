@@ -1,0 +1,46 @@
+﻿@using Application.Dtos.Blog.ClientSide
+@using Domain.Statics
+@model ClientSideFilterBlogsDto
+
+@{
+    ViewData["Title"] = (!string.IsNullOrWhiteSpace(Model.Category) ? Model.Category : "وبلاگ");
+    if (!string.IsNullOrWhiteSpace(Model.Category))
+    {
+        ViewData["CanonicalOverride"] = (SiteTools.SiteUrl + "blogs/" + Model.Category);
+    }
+}
+
+<main class="mt-0 md:mt-8">
+    <form asp-area="" asp-controller="Blog" asp-action="BlogsList" method="get" id="search-form">
+        <input type="hidden" asp-for="Page" id="Page" />
+    </form>
+    <!-- new blogs slider -->
+    @await Component.InvokeAsync("LatestBlogs")
+    <!-- blogs and category -->
+    <div class="flex flex-col lg:flex-row px-4 md:px-20 mt-10 gap-5 pb-20">
+        <!-- category -->
+        @await Component.InvokeAsync("BlogCategories")
+        <!-- blogs -->
+        <div class="lg:w-9/12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            @if (Model?.Entities?.Any() ?? false)
+            {
+                @foreach (var item in Model.Entities ?? new List<ClientSideBlogDto>())
+                {
+                    <div class="bg-white rounded-3xl border hover:border-zinc-300 transition border-zinc-300 group p-2 md:p-3 hover:drop-shadow-lg">
+                        <partial name="_BlogListView" model="@item" />
+                    </div>
+                }
+            }
+            else
+            {
+                <partial name="_NotFoundPartial" />
+            }
+
+        </div>
+    </div>
+    @if (Model?.Entities?.Any() ?? false)
+    {
+        <!-- pagination -->
+        <partial name="_Paging" model="@Model.GetCurrentPaging()" />
+    }
+</main>

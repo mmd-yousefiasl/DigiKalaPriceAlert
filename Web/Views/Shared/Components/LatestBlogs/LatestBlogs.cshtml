@@ -1,0 +1,31 @@
+﻿@using Application.Dtos.Blog.ClientSide
+@model List<ClientSideBlogDto>
+
+@if (Model?.Any() ?? false)
+{
+    <div class="md:mt-10 px-4 md:px-14">
+        <!-- top blog -->
+        <div class="flex gap-x-4 justify-between items-center mb-7">
+            <div class="h-[1px] w-full bg-gradient-to-r from-white via-zinc-300 to-white">
+            </div>
+            <div class="w-48 min-w-fit text-zinc-700 md:font-yekanBakhBold md:text-lg">
+                جدیدترین مطالب
+            </div>
+            <div class="h-[1px] w-full bg-gradient-to-r from-white via-zinc-300 to-white">
+            </div>
+        </div>
+        <!-- main blog -->
+        <div class="containerPSlider swiper">
+            <div class="newBlogs">
+                <div class="card-wrapper swiper-wrapper pb-10">
+                    @foreach (var item in Model ?? new List<ClientSideBlogDto>())
+                    {
+                        <div class="card swiper-slide bg-white rounded-3xl border hover:border-zinc-300 transition border-zinc-300 group p-2 md:p-3 hover:drop-shadow-lg">
+                            <partial name="_BlogListView" model="@item" />
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+}
