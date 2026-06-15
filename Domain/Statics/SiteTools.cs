@@ -9,5 +9,7 @@
         public static string BlogFile { get; set; }
 
         public static string DefaultImage { get; set; }
+
+        public static string SocialMediaFile { get; set; }
     }
 }

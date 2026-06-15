@@ -3,6 +3,7 @@ using Domain.Models.ContactUs;
 using Domain.Models.Faqs;
 using Domain.Models.GeneralInfo;
 using Domain.Models.Identity;
+using Domain.Models.Media;
 using Domain.Models.NewsLetters;
 using Domain.Models.Products;
 using Domain.Models.SubscriptionPlans;
@@ -52,5 +53,7 @@ namespace Data.Context
         public DbSet<BlogView> BlogViews => Set<BlogView>();
 
         public DbSet<Faq> Faqs => Set<Faq>();
+
+        public DbSet<SocialMedia> SocialMedia => Set<SocialMedia>();
     }
 }

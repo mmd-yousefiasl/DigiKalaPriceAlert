@@ -1,0 +1,18 @@
+﻿@using Application.Dtos.Media.ClientSide
+@using Domain.Statics
+@model List<ClientSideSocialMediaDto>
+
+@if (Model?.Any() ?? false)
+{
+    <p class="text-xs text-zinc-400 pt-6 pb-3 pr-2">
+        شبکه های اجتماعی
+    </p>
+    <div class="grid grid-cols-6">
+        @foreach (var item in Model ?? new List<ClientSideSocialMediaDto>())
+        {
+            <a href="@item.Url">
+                <img src="@SiteTools.SocialMediaFile@item.FileName" alt="@item.Title" loading="lazy" width="40" height="40" />
+            </a>
+        }
+    </div>
+}
