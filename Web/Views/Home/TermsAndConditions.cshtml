@@ -1,0 +1,207 @@
+﻿@{
+    ViewData["Title"] = "شرایط و ظوابط";
+}
+
+@section HeaderReferences {
+    <style>
+        .legal-page {
+            max-width: 1100px;
+            margin: 40px auto;
+            padding: 0 16px;
+            direction: rtl;
+            font-family: Vazir;
+            color: #27272a;
+        }
+
+        .legal-hero {
+            background: #fff;
+            border: 1px solid #e4e4e7;
+            border-radius: 16px;
+            padding: 40px 32px;
+            margin-bottom: 24px;
+            text-align: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,.05);
+        }
+
+        .legal-badge {
+            display: inline-block;
+            background: #fef2f2;
+            color: #ed1945;
+            padding: 6px 14px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 16px;
+        }
+
+        .legal-title {
+            font-size: 32px;
+            font-weight: 800;
+            color: #09090b;
+            margin-bottom: 12px;
+        }
+
+        .legal-desc {
+            color: #71717a;
+            font-size: 14px;
+            line-height: 1.9;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .legal-content {
+            background: #fff;
+            border: 1px solid #e4e4e7;
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 1px 3px rgba(0,0,0,.05);
+        }
+
+        .legal-section {
+            margin-bottom: 32px;
+        }
+
+            .legal-section:last-child {
+                margin-bottom: 0;
+            }
+
+            .legal-section h2 {
+                color: #ed1945;
+                font-size: 20px;
+                font-weight: 700;
+                margin-bottom: 16px;
+                padding-bottom: 10px;
+                border-bottom: 1px solid #f4f4f5;
+            }
+
+            .legal-section p {
+                line-height: 2;
+                color: #52525b;
+                margin-bottom: 12px;
+                font-size: 14px;
+            }
+
+            .legal-section ul {
+                margin: 0;
+                padding-right: 20px;
+            }
+
+            .legal-section li {
+                color: #52525b;
+                line-height: 2;
+                margin-bottom: 8px;
+                font-size: 14px;
+            }
+
+        .legal-update {
+            background: #fef2f2;
+            color: #ed1945;
+            border: 1px solid #fecdd3;
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin-bottom: 24px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        @@media(max-width:768px) {
+            .legal-content,
+            .legal-hero {
+                padding: 24px;
+            }
+
+            .legal-title {
+                font-size: 24px;
+            }
+        }
+    </style>
+}
+
+<main class="legal-page">
+
+    <section class="legal-hero">
+        <div class="legal-badge">
+            قوانین و مقررات استفاده
+        </div>
+
+        <h1 class="legal-title">
+            قوانین و مقررات دیجیتو
+        </h1>
+
+        <p class="legal-desc">
+            استفاده از خدمات دیجیتو به منزله مطالعه، درک و پذیرش کامل قوانین و مقررات این سامانه است.
+        </p>
+    </section>
+
+    <section class="legal-content">
+
+        <div class="legal-update">
+            آخرین بروزرسانی: [تاریخ]
+        </div>
+
+        <div class="legal-section">
+            <h2>۱. معرفی خدمات</h2>
+            <p>
+                دیجیتو یک سامانه هوشمند پایش و مانیتورینگ قیمت محصولات در مارکت‌پلیس دیجی‌کالا است که با هدف اطلاع‌رسانی تغییرات قیمت، وضعیت بای‌باکس و تحلیل روند بازار در اختیار فروشندگان قرار می‌گیرد.
+            </p>
+        </div>
+
+        <div class="legal-section">
+            <h2>۲. شرایط استفاده</h2>
+            <ul>
+                <li>کاربر متعهد می‌شود اطلاعات صحیح و معتبر در اختیار سامانه قرار دهد.</li>
+                <li>استفاده از خدمات دیجیتو صرفاً در چهارچوب قوانین جمهوری اسلامی ایران مجاز است.</li>
+                <li>کاربر مسئول تمامی تصمیمات تجاری، قیمت‌گذاری و اقدامات ناشی از اطلاعات ارائه‌شده توسط سامانه خواهد بود.</li>
+                <li>انتقال حساب کاربری به اشخاص ثالث بدون هماهنگی با دیجیتو مجاز نیست.</li>
+            </ul>
+        </div>
+
+        <div class="legal-section">
+            <h2>۳. محدودیت خدمات</h2>
+            <ul>
+                <li>اطلاعات ارائه‌شده توسط دیجیتو بر اساس داده‌های عمومی قابل دسترس استخراج و پردازش می‌شود.</li>
+                <li>با وجود تلاش برای ارائه اطلاعات دقیق و به‌روز، دیجیتو صحت مطلق، کامل بودن یا بدون وقفه بودن اطلاعات را تضمین نمی‌کند.</li>
+                <li>اختلالات ناشی از اینترنت، سرویس‌های شخص ثالث، تغییرات ساختاری دیجی‌کالا یا محدودیت‌های خارج از کنترل دیجیتو ممکن است باعث تاخیر یا عدم ارائه برخی داده‌ها شود.</li>
+            </ul>
+        </div>
+
+        <div class="legal-section">
+            <h2>۴. مالکیت فکری</h2>
+            <p>
+                کلیه حقوق مادی و معنوی سامانه، نرم‌افزار، الگوریتم‌ها، طراحی، محتوا و برند دیجیتو متعلق به مالک سامانه بوده و هرگونه کپی‌برداری، مهندسی معکوس، بازنشر یا بهره‌برداری تجاری بدون مجوز کتبی ممنوع است.
+            </p>
+        </div>
+
+        <div class="legal-section">
+            <h2>۵. هزینه و اشتراک</h2>
+            <ul>
+                <li>شرایط مالی و تعرفه‌های خدمات در صفحه مربوطه اعلام می‌شود.</li>
+                <li>در صورت ارائه خدمات اشتراکی، کاربر موظف به پرداخت هزینه مطابق پلن انتخابی خواهد بود.</li>
+                <li>دیجیتو حق تغییر تعرفه‌ها را برای دوره‌های آتی محفوظ می‌دارد.</li>
+            </ul>
+        </div>
+
+        <div class="legal-section">
+            <h2>۶. تعلیق یا قطع دسترسی</h2>
+            <p>
+                دیجیتو می‌تواند در صورت مشاهده سوءاستفاده، فعالیت مشکوک، نقض قوانین یا ایجاد اختلال در سامانه، دسترسی کاربر را به صورت موقت یا دائم محدود یا مسدود کند.
+            </p>
+        </div>
+
+        <div class="legal-section">
+            <h2>۷. محدودیت مسئولیت</h2>
+            <p>
+                دیجیتو ابزار کمکی تحلیل و پایش بازار است و مسئولیتی در قبال سود، زیان، کاهش فروش، از دست رفتن بای‌باکس، تصمیمات تجاری یا نتایج حاصل از استفاده کاربران نخواهد داشت.
+            </p>
+        </div>
+
+        <div class="legal-section">
+            <h2>۸. تغییر قوانین</h2>
+            <p>
+                دیجیتو حق بروزرسانی و اصلاح این قوانین را در هر زمان محفوظ می‌داند. ادامه استفاده از خدمات به منزله پذیرش نسخه جدید قوانین خواهد بود.
+            </p>
+        </div>
+
+    </section>
+
+</main>

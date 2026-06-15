@@ -1,0 +1,214 @@
+﻿@{
+    ViewData["Title"] = "سیاست حفظ حریم خصوصی";
+}
+
+@section HeaderReferences {
+    <style>
+        .legal-page {
+            max-width: 1100px;
+            margin: 40px auto;
+            padding: 0 16px;
+            direction: rtl;
+            font-family: Vazir;
+            color: #27272a;
+        }
+
+        .legal-hero {
+            background: #fff;
+            border: 1px solid #e4e4e7;
+            border-radius: 16px;
+            padding: 40px 32px;
+            margin-bottom: 24px;
+            text-align: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,.05);
+        }
+
+        .legal-badge {
+            display: inline-block;
+            background: #fef2f2;
+            color: #ed1945;
+            padding: 6px 14px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 16px;
+        }
+
+        .legal-title {
+            font-size: 32px;
+            font-weight: 800;
+            color: #09090b;
+            margin-bottom: 12px;
+        }
+
+        .legal-desc {
+            color: #71717a;
+            font-size: 14px;
+            line-height: 1.9;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .legal-content {
+            background: #fff;
+            border: 1px solid #e4e4e7;
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 1px 3px rgba(0,0,0,.05);
+        }
+
+        .legal-section {
+            margin-bottom: 32px;
+        }
+
+            .legal-section:last-child {
+                margin-bottom: 0;
+            }
+
+            .legal-section h2 {
+                color: #ed1945;
+                font-size: 20px;
+                font-weight: 700;
+                margin-bottom: 16px;
+                padding-bottom: 10px;
+                border-bottom: 1px solid #f4f4f5;
+            }
+
+            .legal-section p {
+                line-height: 2;
+                color: #52525b;
+                margin-bottom: 12px;
+                font-size: 14px;
+            }
+
+            .legal-section ul {
+                margin: 0;
+                padding-right: 20px;
+            }
+
+            .legal-section li {
+                color: #52525b;
+                line-height: 2;
+                margin-bottom: 8px;
+                font-size: 14px;
+            }
+
+        .legal-update {
+            background: #fef2f2;
+            color: #ed1945;
+            border: 1px solid #fecdd3;
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin-bottom: 24px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        @@media(max-width:768px) {
+            .legal-content,
+            .legal-hero {
+                padding: 24px;
+            }
+
+            .legal-title {
+                font-size: 24px;
+            }
+        }
+    </style>
+}
+
+<main class="legal-page">
+
+    <section class="legal-hero">
+        <div class="legal-badge">
+            سیاست حفظ حریم خصوصی
+        </div>
+
+        <h1 class="legal-title">
+            حریم خصوصی کاربران دیجیتو
+        </h1>
+
+        <p class="legal-desc">
+            نحوه جمع‌آوری، استفاده، نگهداری و محافظت از اطلاعات کاربران در سرویس دیجیتو.
+        </p>
+    </section>
+
+    <section class="legal-content">
+
+        <div class="legal-update">
+            آخرین بروزرسانی: [تاریخ]
+        </div>
+
+        <div class="legal-section">
+            <h2>۱. اطلاعاتی که جمع‌آوری می‌کنیم</h2>
+            <ul>
+                <li>شناسه تلگرام و اطلاعات عمومی حساب تلگرام</li>
+                <li>لینک محصولات یا شناسه‌های DKP ثبت‌شده توسط کاربر</li>
+                <li>تنظیمات پایش، هشدارها و ترجیحات کاربر</li>
+                <li>سوابق استفاده از سرویس</li>
+                <li>اطلاعات فنی شامل IP، نوع مرورگر و اطلاعات دستگاه</li>
+            </ul>
+        </div>
+
+        <div class="legal-section">
+            <h2>۲. نحوه استفاده از اطلاعات</h2>
+            <ul>
+                <li>ارائه خدمات پایش قیمت و مانیتورینگ محصولات</li>
+                <li>ارسال اعلان‌ها، هشدارها و پیام‌های سیستمی</li>
+                <li>بهبود کیفیت خدمات و توسعه قابلیت‌های جدید</li>
+                <li>پشتیبانی و پاسخگویی به کاربران</li>
+                <li>افزایش امنیت و جلوگیری از سوءاستفاده از سرویس</li>
+            </ul>
+        </div>
+
+        <div class="legal-section">
+            <h2>۳. عدم دریافت رمز عبور</h2>
+            <p>
+                دیجیتو برای ارائه خدمات خود نیازی به دریافت رمز عبور پنل فروشندگان دیجی‌کالا یا اطلاعات حساس حساب‌های کاربری شما ندارد و هرگز چنین اطلاعاتی را درخواست نمی‌کند.
+            </p>
+        </div>
+
+        <div class="legal-section">
+            <h2>۴. اشتراک‌گذاری اطلاعات</h2>
+            <p>
+                دیجیتو اطلاعات کاربران را به اشخاص ثالث نمی‌فروشد و در اختیار دیگران قرار نمی‌دهد؛ مگر در موارد زیر:
+            </p>
+
+            <ul>
+                <li>الزام قانونی توسط مراجع ذی‌صلاح</li>
+                <li>حفاظت از حقوق قانونی دیجیتو و کاربران</li>
+                <li>ارائه خدمات فنی توسط تامین‌کنندگان زیرساخت در حد نیاز عملیاتی</li>
+            </ul>
+        </div>
+
+        <div class="legal-section">
+            <h2>۵. امنیت اطلاعات</h2>
+            <p>
+                ما از تدابیر متعارف امنیتی برای محافظت از اطلاعات کاربران استفاده می‌کنیم. با این حال هیچ روش انتقال یا ذخیره‌سازی اطلاعات در اینترنت صددرصد ایمن نیست و تضمین مطلق امنیت امکان‌پذیر نیست.
+            </p>
+        </div>
+
+        <div class="legal-section">
+            <h2>۶. نگهداری اطلاعات</h2>
+            <p>
+                اطلاعات کاربران تا زمانی که برای ارائه خدمات مورد نیاز باشد نگهداری می‌شود و پس از آن مطابق الزامات قانونی یا سیاست‌های داخلی حذف یا ناشناس‌سازی خواهد شد.
+            </p>
+        </div>
+
+        <div class="legal-section">
+            <h2>۷. حقوق کاربران</h2>
+            <p>
+                کاربران می‌توانند درخواست مشاهده، اصلاح یا حذف اطلاعات حساب خود را از طریق راه‌های ارتباطی اعلام‌شده در سایت ثبت کنند.
+            </p>
+        </div>
+
+        <div class="legal-section">
+            <h2>۸. ارتباط با ما</h2>
+            <p>
+                در صورت وجود هرگونه سوال، درخواست یا شکایت در خصوص حریم خصوصی می‌توانید از طریق بخش تماس با ما با تیم دیجیتو ارتباط برقرار کنید.
+            </p>
+        </div>
+
+    </section>
+
+</main>

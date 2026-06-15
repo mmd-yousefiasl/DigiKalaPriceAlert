@@ -59,6 +59,22 @@ namespace Web.Controllers
             return View();
         }
 
+        [HttpGet("/privacy-policy")]
+        public IActionResult PrivacyPolicy()
+        {
+            ViewData["NoIndex"] = true;
+
+            return View();
+        }
+
+        [HttpGet("/terms-and-conditions")]
+        public IActionResult TermsAndConditions()
+        {
+            ViewData["NoIndex"] = true;
+
+            return View();
+        }
+
         [HttpPost("/sign-in-news-letters"), ValidateAntiForgeryToken]
         public async Task<IActionResult> SignInNewsLetters(ClientSideSignInNewsLettersDto model)
         {
