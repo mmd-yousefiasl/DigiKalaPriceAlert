@@ -254,3 +254,20 @@ function CustomFillPageId(id) {
 
     ReloadMediaList();
 }
+
+document.addEventListener('DOMContentLoaded', function () {
+    const menu = document.querySelector('.admin-vertical-menu');
+    const activeLink = menu?.querySelector('.active');
+
+    if (menu && activeLink) {
+        const scrollTop =
+            activeLink.offsetTop -
+            (menu.clientHeight / 2) +
+            (activeLink.clientHeight / 2);
+
+        menu.scrollTo({
+            top: scrollTop,
+            behavior: 'smooth'
+        });
+    }
+});
