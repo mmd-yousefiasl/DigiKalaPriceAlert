@@ -36,3 +36,8 @@
 .options-nowrap {
     white-space: nowrap;
 }
+
+.admin-vertical-menu {
+    height: 100%;
+    overflow-x: scroll;
+}
