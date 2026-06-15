@@ -40,6 +40,9 @@ namespace Web
             services.AddScoped<ISentLetterService, SentLetterService>();
             services.AddScoped<ISendEmailService, SendEmailService>();
             services.AddScoped<IEmailDataService, EmailDataService>();
+            services.AddScoped<IBlogService, BlogService>();
+            services.AddScoped<IBlogCategoryService, BlogCategoryService>();
+            services.AddScoped<IBlogViewService, BlogViewService>();
         }
     }
 }

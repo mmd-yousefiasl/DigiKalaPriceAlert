@@ -17,6 +17,10 @@
         public const string DuplicateUniqueNameForRoleError = "نام یکتا برای این نقش قبلاً ثبت شده است";
         public const string ThisEmailAlreadyRegisterdError = "این ایمیل قبلا ثبت شده است";
         public const string RangeError = "حداقل مقدار {0} {1} و حداکثر {2} می باشد";
+        public const string DuplicateSlugError = "عنوان در مرورگر تکراری می باشد";
+        public const string CantDeleteThisRecordError = "نمی‌توان این رکورد را حذف کرد";
+        public const string InvalidFileFormatError = "فرمت فایل نامعتبر است";
+        public const string FileLengthError = "طول فایل بیش از حد مجاز است. (حداکثر 400KB)";
 
         #endregion
 

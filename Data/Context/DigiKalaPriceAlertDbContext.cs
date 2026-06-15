@@ -1,4 +1,5 @@
-﻿using Domain.Models.ContactUs;
+﻿using Domain.Models.Blogs;
+using Domain.Models.ContactUs;
 using Domain.Models.GeneralInfo;
 using Domain.Models.Identity;
 using Domain.Models.NewsLetters;
@@ -44,5 +45,9 @@ namespace Data.Context
         public DbSet<SentLetter> SentLetters => Set<SentLetter>();
 
         public DbSet<EmailData> EmailData => Set<EmailData>();
+
+        public DbSet<Blog> Blogs => Set<Blog>();
+        public DbSet<BlogCategory> BlogCategories => Set<BlogCategory>();
+        public DbSet<BlogView> BlogViews => Set<BlogView>();
     }
 }

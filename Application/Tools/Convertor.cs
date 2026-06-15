@@ -6,6 +6,11 @@ namespace Application.Tools
 {
     public static class Convertor
     {
+        public static long CalculateKB(this int mb)
+        {
+            return mb * 1024;
+        }
+
         public static string GetDate(this DateTime value)
         {
             PersianCalendar pc = new PersianCalendar();

@@ -365,3 +365,4 @@ FodyWeavers.xsd
 /Data/Migrations/
 /API/appsettings.json
 /Web/appsettings.json
+/Web/wwwroot/files/
