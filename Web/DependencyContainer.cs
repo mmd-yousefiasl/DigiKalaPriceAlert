@@ -43,6 +43,7 @@ namespace Web
             services.AddScoped<IBlogService, BlogService>();
             services.AddScoped<IBlogCategoryService, BlogCategoryService>();
             services.AddScoped<IBlogViewService, BlogViewService>();
+            services.AddScoped<IFaqService, FaqService>();
         }
     }
 }

@@ -56,6 +56,11 @@
                         </a>
                     </li>
                     <li>
+                        <a asp-area="" asp-controller="Faq" asp-action="Faq" class="py-3 px-4 hover:bg-gray-100 rounded-lg block">
+                            سوالات متداول
+                        </a>
+                    </li>
+                    <li>
                         <a permission="AdminPanel" asp-area="Admin" asp-controller="Home" asp-action="Index" class="py-3 px-4 hover:bg-gray-100 rounded-lg block">
                             پنل ادمین
                         </a>
@@ -159,6 +164,16 @@
                         after:bg-primary-500 after:scale-x-0 after:origin-right after:transition-transform after:duration-300
                         group-hover:after:scale-x-100">
                         تماس با ما
+                    </div>
+                </a>
+            </li>
+            <li>
+                <a asp-area="" asp-controller="Faq" asp-action="Faq" class="pt-1 flex gap-x-2 items-center group relative">
+                    <div class="relative text-zinc-600 text-sm group-hover:text-primary-500 transition pb-2
+                        after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-[2px]
+                        after:bg-primary-500 after:scale-x-0 after:origin-right after:transition-transform after:duration-300
+                        group-hover:after:scale-x-100">
+                        سوالات متداول
                     </div>
                 </a>
             </li>

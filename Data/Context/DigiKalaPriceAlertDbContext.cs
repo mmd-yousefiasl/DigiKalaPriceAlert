@@ -1,5 +1,6 @@
 ﻿using Domain.Models.Blogs;
 using Domain.Models.ContactUs;
+using Domain.Models.Faqs;
 using Domain.Models.GeneralInfo;
 using Domain.Models.Identity;
 using Domain.Models.NewsLetters;
@@ -49,5 +50,7 @@ namespace Data.Context
         public DbSet<Blog> Blogs => Set<Blog>();
         public DbSet<BlogCategory> BlogCategories => Set<BlogCategory>();
         public DbSet<BlogView> BlogViews => Set<BlogView>();
+
+        public DbSet<Faq> Faqs => Set<Faq>();
     }
 }
