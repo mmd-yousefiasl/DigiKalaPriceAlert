@@ -75,8 +75,8 @@
                                 <tr>
                                     <th>#</th>
                                     <th>تاریخ</th>
-                                    <th>نام و نام خانوادگی / نام فروشگاه</th>
-                                    <th>شماره موبایل یا آیدی تلگرام</th>
+                                    <th>نام و نام خانوادگی</th>
+                                    <th>شماره موبایل</th>
                                     <th>موضوع پیام</th>
                                     <th>آیپی</th>
                                     <th>وضعیت</th>
@@ -100,15 +100,15 @@
                                                     @if (item.UserId > 0)
                                                     {
                                                         <a asp-area="Admin" asp-controller="User" asp-action="UpdateUser" asp-route-id="@item.UserId">
-                                                            @item.Name
+                                                            @item.FullName
                                                         </a>
                                                     }
                                                     else
                                                     {
-                                                        @item.Name
+                                                        @item.FullName
                                                     }
                                                 </td>
-                                                <td>@item.MobileOrId</td>
+                                                <td>@item.Mobile</td>
                                                 <td>@item.Subject.GetDisplayName()</td>
                                                 <td>@item.UserIP</td>
                                                 <td>

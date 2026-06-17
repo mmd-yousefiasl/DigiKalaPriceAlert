@@ -4,8 +4,8 @@ namespace Domain.Models.ContactUs
 {
     public class ContactUsFrom : AuditBaseEntity<int>
     {
-        public string Name { get; set; }
-        public string MobileOrId { get; set; }
+        public string FullName { get; set; }
+        public string Mobile { get; set; }
         public ContactUsFormSubjectEnum Subject { get; set; }
         public string Message { get; set; }
         public bool IsRead { get; set; } = false;

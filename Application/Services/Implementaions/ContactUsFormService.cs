@@ -32,10 +32,10 @@ namespace Application.Services.Implementaions
 
             var contactUs = new ContactUsFrom()
             {
-                Name = dto.Name,
+                FullName = dto.FullName,
                 Subject = dto.Subject,
                 Message = dto.Message,
-                MobileOrId = dto.MobileOrId,
+                Mobile = dto.Mobile,
                 UserIP = _httpContextAccessor.HttpContext.GetUserIP()
             };
 
@@ -58,8 +58,8 @@ namespace Application.Services.Implementaions
 
             if (!string.IsNullOrWhiteSpace(filter.Search))
             {
-                conditions.Add(n => n.Name.Contains(filter.Search) ||
-                n.MobileOrId.Contains(filter.Search) ||
+                conditions.Add(n => n.FullName.Contains(filter.Search) ||
+                n.Mobile.Contains(filter.Search) ||
                 n.Message.Contains(filter.Search) ||
                 n.UserIP.Contains(filter.Search));
             }
@@ -86,9 +86,9 @@ namespace Application.Services.Implementaions
             {
                 Id = n.Id,
                 CreatedDate = n.CreatedDate,
-                Name = n.Name,
+                FullName = n.FullName,
                 Message = n.Message,
-                MobileOrId = n.MobileOrId,
+                Mobile = n.Mobile,
                 UserId = n.UserId,
                 UserIP = n.UserIP,
                 Subject = n.Subject,

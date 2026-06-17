@@ -14,10 +14,10 @@ namespace Data.Context.Configurations.ContactUs
 
             builder.HasKey(cuf => cuf.Id);
 
-            builder.Property(cuf => cuf.Name)
+            builder.Property(cuf => cuf.FullName)
                 .HasMaxLength(100);
 
-            builder.Property(cuf => cuf.MobileOrId)
+            builder.Property(cuf => cuf.Mobile)
              .HasMaxLength(100);
 
             builder.Property(cuf => cuf.Message)
