@@ -15,8 +15,6 @@ namespace Domain.Models.Users
 
         #region Relations
         public ICollection<UserProductMapping>? Products { get; set; }
-        public int SubscriptionPlanId { get; set; }
-        public SubscriptionPlan SubscriptionPlan { get; set; }
 
         public ICollection<UserRoleMapping>? UserRoleMapping { get; set; }
         public ICollection<BalanceTransaction>? Transactions { get; set; }

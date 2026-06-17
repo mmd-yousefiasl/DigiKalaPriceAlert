@@ -286,83 +286,85 @@
 }
 
 <main class="digito-wrapper">
-    
+
     <section class="digito-hero">
         <div class="digito-badge">
             <span class="digito-badge-dot"></span>
             تعرفه‌های شفاف، بدون هزینه‌های پنهان
         </div>
         <h1 class="digito-hero-title">
-            خرید اشتراک ربات دیجی‌کالا؛ سرمایه‌گذاری روی <span class="highlight">حفظ بای‌باکس</span>
+            خرید اشتراک؛ سرمایه‌گذاری روی <span class="highlight">حفظ بای‌باکس</span>
         </h1>
         <p class="digito-hero-desc">
-            از دست دادن بای‌باکس حتی برای یک روز، ده‌ها برابر حق اشتراک ما به شما ضرر می‌زند. با روزی تنها ۳۳ هزار تومان، یک دستیار خستگی‌ناپذیر استخدام کنید که شبانه‌روز مراقب قیمت‌هاست.
+            از دست دادن بای‌باکس حتی برای یک روز، ده‌ها برابر حق اشتراک ما به شما ضرر می‌زند. با روزی تنها ۳۳ هزار تومان، دستیار هوشمندی استخدام کنید که شبانه‌روز مراقب قیمت‌هاست و تغییرات را فورا پیامک می‌کند.
         </p>
     </section>
 
     <section class="digito-pricing-grid">
-        
+
         <div class="digito-pricing-card">
-            <h3 class="digito-plan-name">پلن استارتر (رایگان)</h3>
-            <p class="digito-plan-desc">مناسب برای شروع و تست هوشمندی ربات.</p>
-            
+            <h3 class="digito-plan-name">پلن تست (۷ روزه)</h3>
+            <p class="digito-plan-desc">مناسب برای بررسی و تست سرعت سیستم پایش قیمت.</p>
+
             <div class="digito-plan-price">
                 <span class="digito-price-amount">۰</span>
-                <span class="digito-price-currency">همیشه رایگان</span>
+                <span class="digito-price-currency">اعتبار: ۷ روز</span>
             </div>
-            
+
             <ul class="digito-features-list">
-                <li><span class="digito-icon-check">✔️</span> پایش همزمان <b>حداکثر ۵ کالا</b></li>
-                <li><span class="digito-icon-check">✔️</span> بررسی کالا <b>هر ۳۰ دقیقه</b></li>
-                <li><span class="digito-icon-check">✔️</span> افزودن کالا با ارسال لینک در ربات</li>
-                <li><span class="digito-icon-check">✔️</span> دریافت هشدار متنی در تلگرام</li>
-                <li class="digito-feature-disabled"><span class="digito-icon-cross">✖️</span> گزارش دوره‌ای وضعیت رقبا</li>
-                <li class="digito-feature-disabled"><span class="digito-icon-cross">✖️</span> پشتیبانی انسانی اختصاصی</li>
+                <li><span class="digito-icon-check">✔️</span> پایش همزمان <b>حداکثر ۲ کالا</b></li>
+                <li><span class="digito-icon-check">✔️</span> بررسی مستمر <b>هر ۱۵ دقیقه</b></li>
+                <li><span class="digito-icon-check">✔️</span> ارسال هشدار سریع پیامکی به محض تغییر قیمت</li>
+                <li><span class="digito-icon-check">✔️</span> حاوی لینک مستقیم محصول در پنل سایت</li>
+                <li><span class="digito-icon-check">✔️</span> مدیریت و افزودن آسان کالاها در پنل کاربری</li>
+                <li class="digito-feature-disabled"><span class="digito-icon-cross">✖️</span> گزارش روزانه نوسانات بازار</li>
+                <li class="digito-feature-disabled"><span class="digito-icon-cross">✖️</span> پشتیبانی اختصاصی و اولویت ارتقا</li>
             </ul>
-            
-            <a href="https://t.me/DigitoBot" target="_blank" class="digito-btn digito-btn-secondary">شروع تست رایگان</a>
+
+            <a asp-area="UserPanel" asp-controller="Subscription" asp-action="Purchase" asp-route-planId="1" class="digito-btn digito-btn-secondary">شروع تست ۷ روزه</a>
         </div>
 
         <div class="digito-pricing-card popular">
             <div class="digito-popular-badge">محبوب‌ترین انتخاب</div>
-            <h3 class="digito-plan-name">پلن رشد (ماهانه)</h3>
-            <p class="digito-plan-desc">ویژه فروشندگانی که می‌خواهند بای‌باکس را تصاحب کنند.</p>
-            
+            <h3 class="digito-plan-name">اشتراک ۹۰ روزه (۳ ماهه)</h3>
+            <p class="digito-plan-desc">بهترین انتخاب برای کاهش هزینه‌ها و تمرکز کامل بر فروش.</p>
+
             <div class="digito-plan-price">
-                <span class="digito-price-amount">۹۹۰,۰۰۰</span>
-                <span class="digito-price-currency">تومان / ماهانه</span>
+                <span class="digito-price-amount">۲,۶۷۵,۰۰۰</span>
+                <span class="digito-price-currency">تومان / ۹۰ روز اعتبار</span>
             </div>
-            
+
             <ul class="digito-features-list">
-                <li><span class="digito-icon-check">✔️</span> پایش همزمان <b>تا ۳۰۰ کالا</b></li>
-                <li><span class="digito-icon-check">✔️</span> بررسی مستمر <b>هر ۱۵ دقیقه</b></li>
-                <li><span class="digito-icon-check">✔️</span> ارسال هشدار سریع به محض تشخیص تغییر</li>
-                <li><span class="digito-icon-check">✔️</span> دسته‌بندی و مدیریت کالاها در ربات</li>
-                <li><span class="digito-icon-check">✔️</span> گزارش متنی روزانه از نوسانات قیمت</li>
-                <li><span class="digito-icon-check">✔️</span> پشتیبانی اختصاصی تلگرامی</li>
+                <li><span class="digito-icon-check">✔️</span> پایش همزمان <b>تا ۲۰ کالا</b> (هر ۱۵ دقیقه)</li>
+                <li><span class="digito-icon-check">✔️</span> <b>تخفیف ویژه در خرید سه ماهه</b></li>
+                <li><span class="digito-icon-check">✔️</span> ارسال آنی پیامک هشدار تغییر قیمت کالا</li>
+                <li><span class="digito-icon-check">✔️</span> لینک مستقیم ورود به صفحه کالا جهت اصلاح سریع قیمت</li>
+                <li><span class="digito-icon-check">✔️</span> مصونیت از افزایش قیمت تعرفه در طول دوره</li>
+                <li><span class="digito-icon-check">✔️</span> اولویت بالا در پردازش کالاها و دریافت آپدیت‌ها</li>
             </ul>
-            
-            <a href="https://t.me/DigitoBot" target="_blank" class="digito-btn digito-btn-primary">خرید اشتراک یک ماهه</a>
+
+            <a asp-area="UserPanel" asp-controller="Subscription" asp-action="Purchase" asp-route-planId="3" class="digito-btn digito-btn-primary">خرید اشتراک ۹۰ روزه</a>
         </div>
 
         <div class="digito-pricing-card">
-            <h3 class="digito-plan-name">پلن حرفه‌ای (۳ ماهه)</h3>
-            <p class="digito-plan-desc">بهترین انتخاب برای کاهش هزینه‌ها و تمرکز کامل بر فروش.</p>
-            
+            <h3 class="digito-plan-name">اشتراک ۳۰ روزه (ماهانه)</h3>
+            <p class="digito-plan-desc">ویژه فروشندگانی که می‌خواهند بای‌باکس را تصاحب کنند.</p>
+
             <div class="digito-plan-price">
-                <span class="digito-price-amount">۲,۶۵۰,۰۰۰</span>
-                <span class="digito-price-currency">تومان / ۳ ماهه</span>
+                <span class="digito-price-amount">۹۹۰,۰۰۰</span>
+                <span class="digito-price-currency">تومان / ۳۰ روز اعتبار</span>
             </div>
-            
+
             <ul class="digito-features-list">
-                <li><span class="digito-icon-check">✔️</span> <b>۱۰٪ تخفیف (صرفه‌جویی ۳۰۰ هزار تومانی)</b></li>
-                <li><span class="digito-icon-check">✔️</span> تمام امکانات پلن حرفه‌ای</li>
-                <li><span class="digito-icon-check">✔️</span> پایش همزمان تا ۳۰۰ کالا (بررسی هر ۱۵ دقیقه)</li>
-                <li><span class="digito-icon-check">✔️</span> مصونیت از افزایش قیمت اشتراک در ۳ ماه</li>
-                <li><span class="digito-icon-check">✔️</span> اولویت بالا در دریافت آپدیت‌های جدید ربات</li>
+                <li><span class="digito-icon-check">✔️</span> پایش همزمان <b>تا ۲۰ کالا</b></li>
+                <li><span class="digito-icon-check">✔️</span> بررسی مستمر <b>هر ۱۵ دقیقه</b></li>
+                <li><span class="digito-icon-check">✔️</span> ارسال فوری پیامک در صورت تغییر قیمت رقیب</li>
+                <li><span class="digito-icon-check">✔️</span> همراه با لینک مستقیم هدایت به پنل محصول</li>
+                <li><span class="digito-icon-check">✔️</span> گزارش متنی روزانه از نوسانات و وضعیت رقبا</li>
+                <li><span class="digito-icon-check">✔️</span> پشتیبانی اختصاصی از طریق تیکت سایت</li>
             </ul>
-            
-            <a href="https://t.me/DigitoBot" target="_blank" class="digito-btn digito-btn-outline">خرید اشتراک ۳ ماهه</a>
+
+            <a asp-area="UserPanel" asp-controller="Subscription" asp-action="Purchase" asp-route-planId="2" class="digito-btn digito-btn-outline">خرید اشتراک ۳۰ روزه</a>
         </div>
 
     </section>
@@ -371,12 +373,12 @@
         <div class="digito-roi-content">
             <h3 class="digito-roi-title">آیا ۱ میلیون تومان در ماه هزینه زیادی است؟</h3>
             <p class="digito-roi-desc">
-                تصور کنید روزانه فقط ۵ فروش را به خاطر تغییر قیمت رقیبتان از دست بدهید. با میانگین سود ۵۰ هزار تومان روی هر کالا، شما روزانه ۲۵۰ هزار تومان (ماهیانه ۷.۵ میلیون تومان) از دست می‌دهید! ربات دیجیتو با <b>تنها روزی ۳۳ هزار تومان</b> جلوی این ضرر را گرفته و فروش شما را تضمین می‌کند. این یک هزینه نیست، راه‌حل نجات کسب‌وکار شما در دیجی‌کالاست.
+                تصور کنید روزانه فقط ۵ فروش را به خاطر تغییر قیمت رقیبتان از دست بدهید. با میانگین سود ۵۰ هزار تومان روی هر کالا، شما روزانه ۲۵۰ هزار تومان از دست می‌دهید! سیستم هوشمند ما با <b>ارسال آنی پیامک هشدار و لینک مستقیم کالا</b>، جلوی این ضرر را گرفته و فروش شما را تضمین می‌کند. این یک هزینه نیست، راه‌حل نجات کسب‌وکار شماست.
             </p>
         </div>
         <div style="flex-shrink: 0; min-width: 200px;">
-            <a href="https://t.me/DigitoBot" target="_blank" class="digito-btn digito-btn-primary" style="padding: 16px 24px; font-size: 16px;">
-                جلوی ضرر را بگیر!
+            <a asp-area="UserPanel" asp-controller="Subscription" asp-action="Purchase" asp-route-planId="1" class="digito-btn digito-btn-primary" style="padding: 16px 24px; font-size: 16px;">
+                شروع تست ۷ روزه!
             </a>
         </div>
     </section>

@@ -1,6 +1,5 @@
 ﻿using Application.Dtos.DigiKala;
 using Application.Services.Interfaces;
-using Application.Tools;
 using Domain.Shared;
 using Microsoft.Extensions.Logging;
 using System.Text.Json;
@@ -88,7 +87,7 @@ namespace Application.Services.Implementaions
                 // اگر عنوان "بدون عنوان" باشد یا ساختار جی‌سان نامعتبر باشد، کالا یافت نشده است
                 if (title == "بدون عنوان" && price == 0 && string.IsNullOrEmpty(imageUrl))
                 {
-                    return Result.Failure<DigiKalaProductResultDto>(BotMessages.ProductNotFoundError);
+                    return Result.Failure<DigiKalaProductResultDto>(Messages.OperationFailedError);
                 }
 
                 // لاگ زدن وضعیت محصولات ناموجود یا بدون تنوع فعال
@@ -105,21 +104,21 @@ namespace Application.Services.Implementaions
                 _logger.LogError(ex, "Error processing optimized product details from DigiKala Proxy for DKP: {DkpId}", digiKalaId);
             }
 
-            return Result.Failure<DigiKalaProductResultDto>(BotMessages.ProductNotFoundError);
+            return Result.Failure<DigiKalaProductResultDto>(Messages.OperationFailedError);
         }
         #endregion
 
         public Result<string> ExtractProductIdFromUrl(string url)
         {
             if (string.IsNullOrWhiteSpace(url))
-                return Result.Failure<string>(BotMessages.InvalidLinkError);
+                return Result.Failure<string>(Messages.OperationFailedError);
 
             var match = Regex.Match(url, @"dkp-(\d+)", RegexOptions.IgnoreCase);
             if (match.Success) return match.Groups[1].Value;
 
             if (long.TryParse(url.Trim(), out _)) return url.Trim();
 
-            return Result.Failure<string>(BotMessages.InvalidLinkError);
+            return Result.Failure<string>(Messages.OperationFailedError);
         }
 
         public async Task<Result<DigiKalaProductResultDto>> GetProductDetailsAsync(string digiKalaId)

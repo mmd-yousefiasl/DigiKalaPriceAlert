@@ -11,13 +11,29 @@ namespace Data.Context
     {
         public static void Seed(this ModelBuilder modelBuilder)
         {
-            #region Free Subscription Plan
+            #region Subscription Plans
             modelBuilder.Entity<SubscriptionPlan>().HasData(new SubscriptionPlan()
             {
                 Id = 1,
-                Name = "پلن رایگان",
-                OrderPrice = 0,
-                MaximumProductCount = 3,
+                Name = "تست 7 روزه",
+                Price = 0,
+                DurationInDays = 7,
+            });
+
+            modelBuilder.Entity<SubscriptionPlan>().HasData(new SubscriptionPlan()
+            {
+                Id = 2,
+                Name = "ماهانه",
+                Price = 990000,
+                DurationInDays = 30,
+            });
+
+            modelBuilder.Entity<SubscriptionPlan>().HasData(new SubscriptionPlan()
+            {
+                Id = 3,
+                Name = "۳ ماهه",
+                Price = 2675000,
+                DurationInDays = 90,
             });
             #endregion
 
@@ -55,7 +71,6 @@ namespace Data.Context
                 FirstName = null,
                 LastName = null,
                 ChatId = null,
-                SubscriptionPlanId = 1,
                 Username = null
             };
 

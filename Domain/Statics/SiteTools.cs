@@ -14,6 +14,8 @@
 
         public static string PaymentLogo { get; set; }
 
+        public static int MaximumProductCount { get; set; }
+
         #region Payment
 
         public static string PaymentRequestURL { get; set; }

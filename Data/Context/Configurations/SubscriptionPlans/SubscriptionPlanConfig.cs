@@ -8,7 +8,7 @@ namespace Data.Context.Configurations.SubscriptionPlans
     {
         public void Configure(EntityTypeBuilder<SubscriptionPlan> builder)
         {
-            builder.ToTable("SubscriptionPlan");
+            builder.ToTable("SubscriptionPlans");
 
             builder.HasKey(sp => sp.Id);
 
@@ -16,12 +16,9 @@ namespace Data.Context.Configurations.SubscriptionPlans
                 .IsRequired()
                 .HasMaxLength(200);
 
-            builder.Property(sp => sp.DisplayPrice)
-                .HasColumnType("numeric(18,0)");
-
-            builder.Property(sp => sp.OrderPrice)
-                .IsRequired()
-               .HasColumnType("numeric(18,0)");
+            builder.Property(sp => sp.Price)
+                .HasColumnType("numeric(18,0)")
+                .IsRequired();
         }
     }
 }

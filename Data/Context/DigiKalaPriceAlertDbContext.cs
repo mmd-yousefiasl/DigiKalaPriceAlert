@@ -35,7 +35,6 @@ namespace Data.Context
 
 
         public DbSet<SubscriptionPlan> SubscriptionPlans => Set<SubscriptionPlan>();
-        public DbSet<SubscriptionPlanFeature> SubscriptionPlanFeatures => Set<SubscriptionPlanFeature>();
 
         public DbSet<Permission> Permissions => Set<Permission>();
         public DbSet<Role> Roles => Set<Role>();

@@ -43,10 +43,6 @@ namespace Data.Context.Configurations.Users
             builder.Property(u => u.LastName)
                 .HasMaxLength(150)
                 .IsRequired(false);
-
-            builder.HasOne(u => u.SubscriptionPlan)
-                .WithMany(sp => sp.Users)
-                .HasForeignKey(u => u.SubscriptionPlanId);
         }
     }
 }
