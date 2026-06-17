@@ -104,7 +104,7 @@ namespace Application.Services.Implementaions
             if (!string.IsNullOrWhiteSpace(filter.Search))
             {
                 conditions.Add(n => n.Mobile.Contains(filter.Search) || n.FirstName.Contains(filter.Search) ||
-                n.LastName.Contains(filter.Search) || n.Username.Contains(filter.Search));
+                n.LastName.Contains(filter.Search));
             }
 
             if (filter.IsUserBanned is not null)
@@ -125,7 +125,6 @@ namespace Application.Services.Implementaions
             {
                 Id = n.Id,
                 Mobile = n.Mobile,
-                Username = n.Username,
                 FirstName = n.FirstName,
                 LastName = n.LastName,
                 IsUserBanned = n.IsUserBanned
@@ -249,12 +248,10 @@ namespace Application.Services.Implementaions
                 .Select(u => new AdminSideUserDetailsDto()
                 {
                     Id = u.Id,
-                    ChatId = u.ChatId,
                     FirstName = u.FirstName,
                     LastName = u.LastName,
                     IsUserBanned = u.IsUserBanned,
                     Mobile = u.Mobile,
-                    Username = u.Username,
                     SubscriptionEndDate = u.SubscriptionEndDate,
                     Balance = u.Balance,
                     UserRoles = u.UserRoleMapping.Where(urm => urm.UserId == u.Id)
@@ -282,12 +279,10 @@ namespace Application.Services.Implementaions
                 .Where(u => u.Id == userId)
                 .Select(u => new ClientSideUserDetailsDto()
                 {
-                    ChatId = u.ChatId,
                     FirstName = u.FirstName,
                     LastName = u.LastName,
                     IsUserBanned = u.IsUserBanned,
                     Mobile = u.Mobile,
-                    Username = u.Username,
                     SubscriptionEndDate = u.SubscriptionEndDate,
                     Balance = u.Balance,
                     UserRoles = u.UserRoleMapping.Where(urm => urm.UserId == u.Id)

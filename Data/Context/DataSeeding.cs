@@ -69,9 +69,7 @@ namespace Data.Context
                 Id = 1,
                 Mobile = "09962144266",
                 FirstName = null,
-                LastName = null,
-                ChatId = null,
-                Username = null
+                LastName = null
             };
 
             modelBuilder.Entity<User>().HasData(AdminUser);

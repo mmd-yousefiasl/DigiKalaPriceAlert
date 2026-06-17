@@ -1,12 +1,8 @@
-﻿using Domain.Models.SubscriptionPlans;
-
-namespace Domain.Models.Users
+﻿namespace Domain.Models.Users
 {
     public class User : AuditBaseEntity<int>
     {
         public string Mobile { get; set; }
-        public long? ChatId { get; set; }
-        public string? Username { get; set; }
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
         public DateTime? SubscriptionEndDate { get; set; }

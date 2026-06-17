@@ -21,20 +21,8 @@ namespace Data.Context.Configurations.Users
                 .IsUnique()
                 .HasFilter("\"IsDeleted\" = 'false'");
 
-            builder.Property(u => u.ChatId)
-                .HasMaxLength(100)
-                .IsRequired(false);
-
-            builder.HasIndex(u => u.ChatId)
-                .IsUnique()
-                .HasFilter("\"ChatId\" IS NOT NULL");
-
             builder.Property(u => u.Balance)
                 .HasColumnType("numeric(18,0)");
-
-            builder.Property(u => u.Username)
-                .HasMaxLength(100)
-                .IsRequired(false);
 
             builder.Property(u => u.FirstName)
                 .HasMaxLength(150)
