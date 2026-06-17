@@ -1,4 +1,6 @@
-﻿namespace Domain.Models.Users
+﻿using Domain.Models.Identity;
+
+namespace Domain.Models.Users
 {
     public class UserRoleMapping
     {
@@ -8,6 +10,7 @@
         #region Relations
 
         public User User { get; set; }
+        public Role Role { get; set; }
 
         #endregion
     }

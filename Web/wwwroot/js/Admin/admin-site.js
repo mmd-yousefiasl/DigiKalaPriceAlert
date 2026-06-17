@@ -271,3 +271,18 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 });
+
+function toggleRow(id, rowElement) {
+    var element = document.getElementById(id);
+    var icon = rowElement.querySelector('.toggle-icon');
+
+    if (element.style.maxHeight === "0px" || element.style.maxHeight === "") {
+        // باز کردن سطر (محاسبه خودکار ارتفاع متن)
+        element.style.maxHeight = element.scrollHeight + "px";
+        if (icon) icon.style.transform = "rotate(180deg)";
+    } else {
+        // بستن سطر
+        element.style.maxHeight = "0px";
+        if (icon) icon.style.transform = "rotate(0deg)";
+    }
+}

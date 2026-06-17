@@ -18,7 +18,8 @@ namespace Data.Context.Configurations.Users
                 .IsRequired();
 
             builder.HasIndex(u => u.Mobile)
-                .IsUnique();
+                .IsUnique()
+                .HasFilter("\"IsDeleted\" = 'false'");
 
             builder.Property(u => u.ChatId)
                 .HasMaxLength(100)
@@ -27,6 +28,9 @@ namespace Data.Context.Configurations.Users
             builder.HasIndex(u => u.ChatId)
                 .IsUnique()
                 .HasFilter("\"ChatId\" IS NOT NULL");
+
+            builder.Property(u => u.Balance)
+                .HasColumnType("numeric(18,0)");
 
             builder.Property(u => u.Username)
                 .HasMaxLength(100)

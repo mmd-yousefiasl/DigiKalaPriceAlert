@@ -11,38 +11,52 @@ namespace Application.Tools
             return mb * 1024;
         }
 
+        private static readonly string[] PersianMonthNames =
+                { "فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور", "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند" };
+
         public static string GetDate(this DateTime value)
         {
+            // تبدیل زمان به وقت محلی ایران با منطق اشتراکی
+            DateTime localTime = value.NormalizeToIranTimeZone();
+
             PersianCalendar pc = new PersianCalendar();
+            int day = pc.GetDayOfMonth(localTime);
+            int month = pc.GetMonth(localTime);
+            int year = pc.GetYear(localTime);
 
-            int day = pc.GetDayOfMonth(value);
-            int month = pc.GetMonth(value);
-            int year = pc.GetYear(value);
-
-            string[] persianMonthNames = {
-"فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور",
-"مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"};
-
-            string persianDate = $"{day} {persianMonthNames[month - 1]} {year}";
-            return persianDate;
+            return $"{day} {PersianMonthNames[month - 1]} {year}";
         }
 
         public static string GetDateTime(this DateTime value)
         {
+            // تبدیل زمان به وقت محلی ایران با منطق اشتراکی
+            DateTime localTime = value.NormalizeToIranTimeZone();
+
             PersianCalendar pc = new PersianCalendar();
+            int day = pc.GetDayOfMonth(localTime);
+            int month = pc.GetMonth(localTime);
+            int year = pc.GetYear(localTime);
+            int hour = pc.GetHour(localTime);
+            int minute = pc.GetMinute(localTime);
 
-            int day = pc.GetDayOfMonth(value);
-            int month = pc.GetMonth(value);
-            int year = pc.GetYear(value);
-            int hour = pc.GetHour(value);
-            int minute = pc.GetMinute(value);
+            return $"{day} {PersianMonthNames[month - 1]} {year} {hour:D2}:{minute:D2}";
+        }
 
-            string[] persianMonthNames = {
-"فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور",
-"مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"};
+        private static DateTime NormalizeToIranTimeZone(this DateTime value)
+        {
+            if (value.Kind != DateTimeKind.Utc && value.Kind != DateTimeKind.Unspecified)
+                return value;
 
-            string persianDateTime = $"{day} {persianMonthNames[month - 1]} {year} {hour:D2}:{minute:D2}";
-            return persianDateTime;
+            try
+            {
+                TimeZoneInfo winZone = TimeZoneInfo.FindSystemTimeZoneById("Iran Standard Time");
+                return TimeZoneInfo.ConvertTimeFromUtc(value, winZone);
+            }
+            catch (TimeZoneNotFoundException)
+            {
+                TimeZoneInfo linuxZone = TimeZoneInfo.FindSystemTimeZoneById("Asia/Tehran");
+                return TimeZoneInfo.ConvertTime(value, linuxZone);
+            }
         }
 
         public static string GetDisplayName(this Enum value)
@@ -58,6 +72,16 @@ namespace Application.Tools
             {
                 return value.ToString();
             }
+        }
+
+        public static string ToTomanFormat(this decimal value)
+        {
+            return value.ToString("#,0");
+        }
+
+        public static string ToToman(this decimal value)
+        {
+            return value.ToString("#,0 تومان");
         }
     }
 }

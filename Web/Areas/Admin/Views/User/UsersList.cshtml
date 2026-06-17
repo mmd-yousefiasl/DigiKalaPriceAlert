@@ -102,6 +102,10 @@
                                                     <form permission="DeleteUser" class="btn btn-outline-secondary btn-sm" method="post" onclick="ConfirmDelete(this)" asp-route-id="@item.Id" asp-area="Admin" asp-controller="User" asp-action="DeleteUser" title="حذف">
                                                         <i class="mdi mdi-delete"></i>
                                                     </form>
+
+                                                    <a permission="UserDetails" asp-area="Admin" asp-controller="User" asp-action="UserDetails" asp-route-id="@item.Id" class="btn btn-outline-secondary btn-sm edit" title="ویرایش">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
                                                 </td>
                                             </tr>
                                         }

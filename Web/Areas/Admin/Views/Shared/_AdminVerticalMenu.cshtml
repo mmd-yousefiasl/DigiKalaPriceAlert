@@ -2,9 +2,7 @@
 
     <div data-simplebar class="h-100">
 
-        <!--- Sidemenu -->
         <div id="sidebar-menu" class="admin-vertical-menu">
-            <!-- Left Menu Start -->
             <ul class="metismenu list-unstyled" id="side-menu">
                 <li>
                     <a asp-area="" asp-controller="Home" asp-action="Index" class="waves-effect">
@@ -100,49 +98,7 @@
                     </ul>
                 </li>
 
-                <li class="menu-title">مدیریت محصولات</li>
-
-                <li permission="ManageProductCategories">
-                    <a href="javascript: void(0);" class="has-arrow waves-effect">
-                        <i class="mdi mdi-format-list-bulleted"></i>
-                        <span>دسته بندی ها</span>
-                    </a>
-                    <ul class="sub-menu" aria-expanded="false">
-                        <li permission="ProductCategoriesList"><a asp-area="Admin" asp-controller="ProductCategory" asp-action="ProductCategoriesList">لیست دسته بندی ها</a></li>
-                        <li permission="CreateNewProductCategory"><a asp-area="Admin" asp-controller="ProductCategory" asp-action="CreateNewProductCategory">افزودن دسته بندی جدید</a></li>
-                    </ul>
-                </li>
-
-                <li permission="ManageProductBrands">
-                    <a href="javascript: void(0);" class="has-arrow waves-effect">
-                        <i class="mdi mdi-format-list-bulleted"></i>
-                        <span>برند ها</span>
-                    </a>
-                    <ul class="sub-menu" aria-expanded="false">
-                        <li permission="ProductBrandsList"><a asp-area="Admin" asp-controller="ProductBrand" asp-action="ProductBrandsList">لیست برند ها</a></li>
-                        <li permission="CreateNewProductBrand"><a asp-area="Admin" asp-controller="ProductBrand" asp-action="CreateNewProductBrand">افزودن برند جدید</a></li>
-                    </ul>
-                </li>
-
-                <li permission="ManageProducts">
-                    <a href="javascript: void(0);" class="has-arrow waves-effect">
-                        <i class="mdi mdi-cube-outline"></i>
-                        <span>محصولات</span>
-                    </a>
-                    <ul class="sub-menu" aria-expanded="false">
-                        <li permission="ProductsList"><a asp-area="Admin" asp-controller="Product" asp-action="ProductsList">لیست محصولات</a></li>
-                        <li permission="CreateNewProduct"><a asp-area="Admin" asp-controller="Product" asp-action="CreateNewProduct">افزودن محصول جدید</a></li>
-                    </ul>
-                </li>
-
-                <li permission="ManageProductReviews">
-                    <a asp-area="Admin" asp-controller="ProductReview" asp-action="ProductReviewsList" class="waves-effect">
-                        <i class="mdi mdi-comment-multiple-outline"></i>
-                        <span>نظرات محصولات</span>
-                    </a>
-                </li>
-
-                @*                 <li permission="ManageCoupons">
+                <li permission="ManageCoupons">
                     <a href="javascript: void(0);" class="has-arrow waves-effect">
                         <i class="mdi mdi-ticket-percent"></i>
                         <span>کدهای تخفیف</span>
@@ -151,42 +107,9 @@
                         <li permission="CouponsList"><a asp-area="Admin" asp-controller="Coupon" asp-action="CouponsList">لیست کد های تخفیف</a></li>
                         <li permission="CreateNewCoupon"><a asp-area="Admin" asp-controller="Coupon" asp-action="CreateNewCoupon">افزودن کد تخفیف جدید</a></li>
                     </ul>
-                </li> *@
+                </li>
 
                 <li class="menu-title">اطلاعات سایت</li>
-
-                <li permission="ManageShippingOptions">
-                    <a href="javascript: void(0);" class="has-arrow waves-effect">
-                        <i class="mdi mdi-format-list-bulleted"></i>
-                        <span>گزینه های ارسال</span>
-                    </a>
-                    <ul class="sub-menu" aria-expanded="false">
-                        <li permission="ShippingOptionsList"><a asp-area="Admin" asp-controller="ShippingOption" asp-action="ShippingOptionsList">لیست گزینه های ارسال</a></li>
-                        <li permission="CreateNewShippingOption"><a asp-area="Admin" asp-controller="ShippingOption" asp-action="CreateNewShippingOption">افزودن گزینه ارسال جدید</a></li>
-                    </ul>
-                </li>
-
-                <li permission="ManageSlider">
-                    <a href="javascript: void(0);" class="has-arrow waves-effect">
-                        <i class="mdi mdi-image-multiple-outline"></i>
-                        <span>لغزنده ها</span>
-                    </a>
-                    <ul class="sub-menu" aria-expanded="false">
-                        <li permission="SlidersList"><a asp-area="Admin" asp-controller="Slider" asp-action="SlidersList">لیست لغزنده ها</a></li>
-                        <li permission="CreateNewSlider"><a asp-area="Admin" asp-controller="Slider" asp-action="CreateNewSlider">افزودن لغزنده جدید</a></li>
-                    </ul>
-                </li>
-
-                <li permission="ManageBanners">
-                    <a href="javascript: void(0);" class="has-arrow waves-effect">
-                        <i class="mdi mdi-image-multiple-outline"></i>
-                        <span>بنر ها</span>
-                    </a>
-                    <ul class="sub-menu" aria-expanded="false">
-                        <li permission="BannersList"><a asp-area="Admin" asp-controller="Banner" asp-action="BannersList">لیست بنر ها</a></li>
-                        <li permission="CreateNewBanner"><a asp-area="Admin" asp-controller="Banner" asp-action="CreateNewBanner">افزودن بنر جدید</a></li>
-                    </ul>
-                </li>
 
                 <li permission="ManageFaqs">
                     <a href="javascript: void(0);" class="has-arrow waves-effect">
@@ -196,17 +119,6 @@
                     <ul class="sub-menu" aria-expanded="false">
                         <li permission="FaqsList"><a asp-area="Admin" asp-controller="Faq" asp-action="FaqsList">لیست سوالات متداول</a></li>
                         <li permission="CreateNewFaq"><a asp-area="Admin" asp-controller="Faq" asp-action="CreateNewFaq">افزودن سوال متداول جدید</a></li>
-                    </ul>
-                </li>
-
-                <li permission="ManageOurFeatures">
-                    <a href="javascript: void(0);" class="has-arrow waves-effect">
-                        <i class="mdi mdi-playlist-star"></i>
-                        <span>ویژگی های ما</span>
-                    </a>
-                    <ul class="sub-menu" aria-expanded="false">
-                        <li permission="OurFeaturesList"><a asp-area="Admin" asp-controller="OurFeature" asp-action="OurFeaturesList">لیست ویژگی های ما</a></li>
-                        <li permission="CreateNewOurFeature"><a asp-area="Admin" asp-controller="OurFeature" asp-action="CreateNewOurFeature">افزودن ویژگی جدید</a></li>
                     </ul>
                 </li>
 
@@ -264,6 +176,5 @@
                 </li>
             </ul>
         </div>
-        <!-- Sidebar -->
     </div>
 </div>

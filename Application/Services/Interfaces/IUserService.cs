@@ -41,5 +41,7 @@ namespace Application.Services.Interfaces
         Task<Result<AdminSideUpdateUserDto>> AdminSideGetUserForUpdate(int id);
 
         Task<Result> AdminSideUpdateUser(AdminSideUpdateUserDto model);
+
+        Task<Result<AdminSideUserDetailsDto>> AdminSideGetUserDetails(int id);
     }
 }

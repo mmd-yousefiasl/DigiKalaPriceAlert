@@ -116,5 +116,24 @@ namespace Web.Areas.Admin.Controllers
 
             return RedirectToAction(nameof(UsersList));
         }
+
+        [Permission("UserDetails")]
+        [HttpGet("/admin/user-details")]
+        public async Task<IActionResult> UserDetails(int id)
+        {
+            if (id < 1)
+            {
+                TempData[TemporaryErrorMessage] = Messages.OperationFailedError;
+                return RedirectToAction(nameof(UsersList));
+            }
+            var result = await _userService.AdminSideGetUserDetails(id);
+            if (result.IsFailure)
+            {
+                TempData[TemporaryErrorMessage] = result.Message;
+                return RedirectToAction(nameof(UsersList));
+            }
+
+            return View(result.Value);
+        }
     }
 }

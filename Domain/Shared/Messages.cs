@@ -21,6 +21,7 @@
         public const string CantDeleteThisRecordError = "نمی‌توان این رکورد را حذف کرد";
         public const string InvalidFileFormatError = "فرمت فایل نامعتبر است";
         public const string FileLengthError = "طول فایل بیش از حد مجاز است. (حداکثر 400KB)";
+        public const string UserBalnaceCantBeLessThanZeroError = "موجودی کاربر نمی تواند منفی باشد";
 
         #endregion
 
@@ -39,6 +40,7 @@
         #region Message
 
         public const string ProductPriceChangedMessage = "کاربر گرامی، قیمت حداقل یکی از محصولات مورد رصد شما تغییر یافته است. جهت مشاهده جزئیات به ربات مراجعه کنید.";
+        public const string EmptyFieldMessage = "وارد نشده";
 
         #endregion
     }

@@ -1,4 +1,6 @@
-﻿namespace Domain.Models.Identity
+﻿using Domain.Models.Users;
+
+namespace Domain.Models.Identity
 {
     public class Role : AuditBaseEntity<int>
     {
@@ -7,6 +9,7 @@
 
         #region Relations
 
+        public ICollection<UserRoleMapping>? UserRoleMapping { get; set; }
         public ICollection<RolePermissionMapping> RolePermissionMapping { get; set; }
 
         #endregion

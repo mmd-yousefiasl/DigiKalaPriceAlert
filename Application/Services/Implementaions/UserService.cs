@@ -1,4 +1,5 @@
-﻿using Application.Dtos.SubscriptionPlans.BotSide;
+﻿using Application.Dtos.Role.AdminSide;
+using Application.Dtos.SubscriptionPlans.BotSide;
 using Application.Dtos.Users.AdminSide;
 using Application.Dtos.Users.BotSide;
 using Application.Dtos.Users.ClientSide;
@@ -450,6 +451,41 @@ namespace Application.Services.Implementaions
             await _context.SaveChangesAsync();
 
             return Result.Success();
+        }
+
+        public async Task<Result<AdminSideUserDetailsDto>> AdminSideGetUserDetails(int id)
+        {
+            if (id < 1)
+                return Result.Failure<AdminSideUserDetailsDto>(Messages.OperationFailedError);
+
+            var user = await _context.Users
+                .AsNoTracking()
+                .Where(u => u.Id == id)
+                .Select(u => new AdminSideUserDetailsDto()
+                {
+                    Id = u.Id,
+                    ChatId = u.ChatId,
+                    FirstName = u.FirstName,
+                    LastName = u.LastName,
+                    IsUserBanned = u.IsUserBanned,
+                    Mobile = u.Mobile,
+                    Username = u.Username,
+                    SubscriptionEndDate = u.SubscriptionEndDate,
+                    SubscriptionPlanId = u.SubscriptionPlanId,
+                    SubscriptionPlanName = u.SubscriptionPlan.Name,
+                    Balance = u.Balance,
+                    UserRoles = u.UserRoleMapping.Where(urm => urm.UserId == u.Id)
+                    .Select(urm => new AdminSideRoleDto()
+                    {
+                        Id = urm.RoleId,
+                        Title = urm.Role.Title,
+                        UniqueName = urm.Role.UniqueName
+                    }).ToList()
+                }).FirstOrDefaultAsync();
+            if (user is null)
+                return Result.Failure<AdminSideUserDetailsDto>(Messages.OperationFailedError);
+
+            return user;
         }
     }
 }
