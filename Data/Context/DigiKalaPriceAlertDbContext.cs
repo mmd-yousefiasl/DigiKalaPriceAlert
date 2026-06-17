@@ -47,6 +47,7 @@ namespace Data.Context
         public DbSet<SentLetter> SentLetters => Set<SentLetter>();
 
         public DbSet<EmailData> EmailData => Set<EmailData>();
+        public DbSet<PaymentData> PaymentData => Set<PaymentData>();
 
         public DbSet<Blog> Blogs => Set<Blog>();
         public DbSet<BlogCategory> BlogCategories => Set<BlogCategory>();

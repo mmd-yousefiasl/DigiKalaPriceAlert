@@ -83,6 +83,16 @@ namespace Data.Context
 
             modelBuilder.Entity<EmailData>().HasData(emailData);
             #endregion
+
+            #region PaymentData
+            PaymentData paymentData = new PaymentData()
+            {
+                Id = 1,
+                IsDeleted = false,
+                PaymentGatewayPin = "sandbox"
+            };
+            modelBuilder.Entity<PaymentData>().HasData(paymentData);
+            #endregion
         }
     }
 }

@@ -50,6 +50,13 @@ namespace Domain.Statics
                 Title = "حذف کاربر",
                 UniqueName = "DeleteUser"
             },
+            new Permission
+            {
+                Id = 28,
+                ParentId = 2,
+                Title = "جزئیات کاربر",
+                UniqueName = "UserDetails"
+            },
             #endregion
 
             #region Role
@@ -175,9 +182,195 @@ namespace Domain.Statics
                 UniqueName = "SendLetter"
             },
             #endregion
+
+            #region PaymentData
+            new Permission
+            {
+                Id = 23,
+                ParentId = 1,
+                Title = "مدیریت اطلاعات درگاه پرداخت",
+                UniqueName = "ManagePaymentData"
+            },
+            new Permission
+            {
+                Id = 24,
+                ParentId = 23,
+                Title = "ویرایش اطلاعات درگاه پرداخت",
+                UniqueName = "UpdatePaymentData"
+            },
+            #endregion
+
+            #region BalanceTransaction
+            new Permission
+            {
+                Id = 25,
+                ParentId = 1,
+                Title = "مدیریت تراکنش ها",
+                UniqueName = "ManageBalanceTransaction"
+            },
+            new Permission
+            {
+                Id = 26,
+                ParentId = 25,
+                Title = "لیست تراکنش ها",
+                UniqueName = "BalanceTransactionsList"
+            },
+            new Permission
+            {
+                Id = 27,
+                ParentId = 25,
+                Title = "افزودن تراکنش جدید",
+                UniqueName = "CreateNewBalanceTransaction"
+            },
+            #endregion
+
+            #region BlogCategory
+            new Permission
+            {
+                Id = 29,
+                ParentId = 1,
+                Title = "مدیریت دسته بندی های مقالات",
+                UniqueName = "ManageBlogCategories"
+            },
+            new Permission
+            {
+                Id = 30,
+                ParentId = 29,
+                Title = "لیست دسته بندی ها",
+                UniqueName = "BlogCategoriesList"
+            },
+            new Permission
+            {
+                Id = 31,
+                ParentId = 29,
+                Title = "افزودن دسته بندی جدید",
+                UniqueName = "CreateNewBlogCategory"
+            },
+            new Permission
+            {
+                Id = 32,
+                ParentId = 29,
+                Title = "ویرایش دسته بندی",
+                UniqueName = "UpdateBlogCategory"
+            },
+            new Permission
+            {
+                Id = 33,
+                ParentId = 29,
+                Title = "حذف دسته بندی",
+                UniqueName = "DeleteBlogCategory"
+            },
+            #endregion
+
+            #region Blog
+            new Permission
+            {
+                Id = 34,
+                ParentId = 1,
+                Title = "مدیریت مقاله ها",
+                UniqueName = "ManageBlogs"
+            },
+            new Permission
+            {
+                Id = 35,
+                ParentId = 34,
+                Title = "لیست مقاله ها",
+                UniqueName = "BlogsList"
+            },
+            new Permission
+            {
+                Id = 36,
+                ParentId = 34,
+                Title = "افزودن مقاله جدید",
+                UniqueName = "CreateNewBlog"
+            },
+            new Permission
+            {
+                Id = 37,
+                ParentId = 34,
+                Title = "ویرایش مقاله",
+                UniqueName = "UpdateBlog"
+            },
+            new Permission
+            {
+                Id = 38,
+                ParentId = 34,
+                Title = "حذف مقاله",
+                UniqueName = "DeleteBlog"
+            },
+            #endregion
+
+            #region Faq
+            new Permission
+            {
+                Id = 39,
+                ParentId = 1,
+                Title = "مدیریت سوالات متداول",
+                UniqueName = "ManageFaqs"
+            },
+            new Permission
+            {
+                Id = 40,
+                ParentId = 39,
+                Title = "لیست سوالات متداول",
+                UniqueName = "FaqsList"
+            },
+            new Permission
+            {
+                Id = 41,
+                ParentId = 39,
+                Title = "افزودن سوال متداول جدید",
+                UniqueName = "CreateNewFaq"
+            },
+            new Permission
+            {
+                Id = 42,
+                ParentId = 39,
+                Title = "ویرایش سوال متداول",
+                UniqueName = "UpdateFaq"
+            },
+            new Permission
+            {
+                Id = 43,
+                ParentId = 39,
+                Title = "حذف سوال متداول",
+                UniqueName = "DeleteFaq"
+            },
+            #endregion
+
+            #region Media
+            new Permission
+            {
+                Id = 44,
+                ParentId = 1,
+                Title = "مدیریت رسانه ها",
+                UniqueName = "ManageMedia"
+            },
+            new Permission
+            {
+                Id = 45,
+                ParentId = 44,
+                Title = "لیست رسانه ها",
+                UniqueName = "MediaList"
+            },
+            new Permission
+            {
+                Id = 46,
+                ParentId = 44,
+                Title = "افزودن رسانه جدید",
+                UniqueName = "CreateNewMedia"
+            },
+            new Permission
+            {
+                Id = 47,
+                ParentId = 44,
+                Title = "حذف رسانه",
+                UniqueName = "DeleteMedia"
+            },
+            #endregion
         };
 
-        //Last used id ==> 22
+        //Last used id ==> 47
         public static List<Permission> Permissions = _permissions;
     }
 }

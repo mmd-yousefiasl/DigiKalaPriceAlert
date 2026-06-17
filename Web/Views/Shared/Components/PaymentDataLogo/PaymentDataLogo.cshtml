@@ -1,0 +1,10 @@
+﻿@using Application.Dtos.PaymentData
+@using Domain.Statics
+@model ClientSidePaymentDataLogoDto
+
+@if (Model is not null && Model.FileName is not null && Model.Url is not null)
+{
+    <a href="@Model.Url" target="_blank">
+        <img class="h-fit max-w-20 md:max-w-28" src="@SiteTools.PaymentLogo@Model.FileName" alt="@SiteTools.SiteName">
+    </a>
+}

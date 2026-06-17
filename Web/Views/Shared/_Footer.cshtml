@@ -242,7 +242,7 @@
         </div>
         <div class="md:w-4/12 flex justify-center gap-x-7">
             <img class="h-fit max-w-20 md:max-w-28" src="/assets/image/service/symbol-02.png" alt="نماد اعتماد">
-            <img class="h-fit max-w-20 md:max-w-28" src="/assets/image/service/zarinPal.png" alt="زرین پال">
+            @await Component.InvokeAsync("PaymentDataLogo")
         </div>
         <div class="md:w-4/12">
             <partial name="_SignInNewsLetters" model="@(new ClientSideSignInNewsLettersDto())" />

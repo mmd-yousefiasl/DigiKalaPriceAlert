@@ -46,6 +46,8 @@ namespace Web
             services.AddScoped<IFaqService, FaqService>();
             services.AddScoped<ISocialMediaService, SocialMediaService>();
             services.AddScoped<IBalanceTransactionService, BalanceTransactionService>();
+            services.AddScoped<IPaymentDataService, PaymentDataService>();
+            services.AddScoped<IPaymentService, PaymentService>();
         }
     }
 }
