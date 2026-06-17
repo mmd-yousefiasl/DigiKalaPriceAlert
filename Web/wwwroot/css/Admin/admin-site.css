@@ -52,3 +52,21 @@
     transition: max-height 0.3s ease-out;
     background-color: #f8f9fa;
 }
+
+/* انیمیشن باز شدن توضیحات */
+.desc-collapse {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.25s ease-out;
+}
+/* استایل اختصاصی کارت‌های موبایل برای تم مونوکروم */
+.tr-card {
+    border: 1px solid #e9ecef;
+    border-right: 4px solid #000000;
+    border-radius: 4px;
+    background: #ffffff;
+}
+
+    .tr-card.failed {
+        border-right-color: #dee2e6;
+    }

@@ -102,7 +102,7 @@
                                         {
                                             counter++;
 
-                                            <tr onclick="toggleRow('desc-div-@counter', this)" class="cursor-pointer">
+                                            <tr onclick="toggleRow('desc-div-@counter')" class="cursor-pointer">
                                                 <th scope="row">@counter</th>
                                                 <td>@item.CreatedDate.GetDateTime()</td>
                                                 <td>@item.Amount.ToToman()</td>

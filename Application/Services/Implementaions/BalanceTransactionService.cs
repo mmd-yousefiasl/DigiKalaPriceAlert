@@ -1,4 +1,5 @@
 ﻿using Application.Dtos.BalanceTransaction.AdminSide;
+using Application.Dtos.BalanceTransaction.ClientSide;
 using Application.Services.Interfaces;
 using Application.Tools;
 using Data.Context;
@@ -91,6 +92,57 @@ namespace Application.Services.Implementaions
             await filter.Paging(query.Select(n => new AdminSideBalanceTransactionDto()
             {
                 Id = n.Id,
+                Amount = n.Amount,
+                Description = n.Description,
+                IsSuccess = n.IsSuccess,
+                TransId = n.TransId,
+                Type = n.Type,
+                CreatedDate = n.CreatedDate,
+            }));
+
+            return filter;
+        }
+
+        public async Task<Result<ClientSideFilterBalanceTransactionsDto>> ClientSideFilterTransactions(ClientSideFilterBalanceTransactionsDto filter)
+        {
+
+            if (filter is null)
+                return Result.Failure<ClientSideFilterBalanceTransactionsDto>(Messages.OperationFailedError);
+
+            var userId = _httpContextAccessor.HttpContext.User.GetUserId();
+            if (userId < 1)
+                return Result.Failure<ClientSideFilterBalanceTransactionsDto>(Messages.OperationFailedError);
+
+            var conditions = Filter.GenerateConditions<BalanceTransaction>();
+
+            conditions.Add(n => n.UserId == userId);
+
+            if (!string.IsNullOrWhiteSpace(filter.Search))
+            {
+                conditions.Add(n => n.TransId.Contains(filter.Search) ||
+                n.Description.Contains(filter.Search));
+            }
+
+            if (filter.Type is not null)
+            {
+                conditions.Add(n => n.Type == filter.Type);
+            }
+
+            if (filter.IsSuccess is not null)
+            {
+                conditions.Add(n => n.IsSuccess == filter.IsSuccess);
+            }
+
+            IQueryable<BalanceTransaction> query = _context.BalanceTransactions;
+            query = query.OrderByDescending(n => n.Id);
+
+            foreach (var item in conditions ?? new FilterConditions<BalanceTransaction>())
+            {
+                query = query.Where(item);
+            }
+
+            await filter.Paging(query.Select(n => new ClientSideBalanceTransactionDto()
+            {
                 Amount = n.Amount,
                 Description = n.Description,
                 IsSuccess = n.IsSuccess,

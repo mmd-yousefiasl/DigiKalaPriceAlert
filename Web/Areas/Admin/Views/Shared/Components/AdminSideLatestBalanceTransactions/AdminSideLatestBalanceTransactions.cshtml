@@ -30,7 +30,7 @@
                             foreach (var item in Model.Entities ?? new List<AdminSideBalanceTransactionDto>())
                             {
                                 counter++;
-                                <tr onclick="toggleRow('desc-div-@counter', this)" class="cursor-pointer">
+                                <tr onclick="toggleRow('desc-div-@counter')" class="cursor-pointer">
                                     <td class="text-center">
                                         <i class="mdi mdi-chevron-down font-size-16 text-muted toggle-icon"></i>
                                     </td>

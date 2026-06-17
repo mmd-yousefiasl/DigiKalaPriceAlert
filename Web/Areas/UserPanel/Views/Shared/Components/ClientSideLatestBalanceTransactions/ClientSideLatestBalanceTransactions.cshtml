@@ -1,0 +1,99 @@
+﻿@using Application.Dtos.BalanceTransaction.ClientSide
+@using Application.Tools
+@model ClientSideFilterBalanceTransactionsDto
+
+@if (Model?.Entities?.Any() ?? false)
+{
+    int counter = 0;
+
+    <div class="card border border-dark d-none d-md-block shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover table-centered mb-0 font-size-13">
+                    <thead class="table-light text-dark">
+                        <tr>
+                            <th style="width: 50px;" class="text-center">#</th>
+                            <th>تاریخ ثبت</th>
+                            <th>مبلغ تراکنش</th>
+                            <th>نوع</th>
+                            <th>وضعیت</th>
+                            <th>کد پیگیری</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Entities)
+                        {
+                            counter++;
+                            <tr onclick="toggleRow('desktop-desc-@counter')" class="cursor-pointer">
+                                <td class="text-center text-muted">@counter</td>
+                                <td class="text-muted">@item.CreatedDate.GetDateTime()</td>
+                                <td class="fw-bold text-dark">@item.Amount.ToToman()</td>
+                                <td><span class="badge bg-light text-dark border px-2 py-1">@item.Type.GetDisplayName()</span></td>
+                                <td>
+                                    <span class="badge @(item.IsSuccess ? "bg-dark" : "bg-soft-danger text-danger") px-2 py-1">
+                                        @(item.IsSuccess ? "موفق" : "ناموفق")
+                                    </span>
+                                </td>
+                                <td class="fw-medium text-dark" dir="ltr">@(string.IsNullOrEmpty(item.TransId) ? "—" : item.TransId)</td>
+                            </tr>
+                            <tr>
+                                <td colspan="6" class="p-0 border-0">
+                                    <div id="desktop-desc-@counter" class="desc-collapse" style="background-color: #fafafa;">
+                                        <div class="p-3 border-top border-bottom font-size-13 text-dark">
+                                            <i class="mdi mdi-text-align-right me-1 text-muted"></i> <b>توضیحات:</b> @(string.IsNullOrEmpty(item.Description) ? "توضیحاتی ثبت نشده." : item.Description)
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-block d-md-none">
+        @{
+            counter = 0;
+        }
+        @foreach (var item in Model.Entities)
+        {
+            counter++;
+            <div class="tr-card mb-2 p-3 shadow-sm"
+                 style="border: 1px solid #e9ecef; border-right: 4px solid @(item.IsSuccess ? "#000000" : "#dee2e6"); border-radius: 4px; background: #ffffff;"
+                 onclick="toggleRow('mobile-desc-@counter')">
+
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="fw-bold font-size-14 text-dark">@item.Amount.ToToman()</span>
+                    <span class="badge @(item.IsSuccess ? "bg-dark" : "bg-soft-danger text-danger") font-size-11 px-2 py-1">
+                        @(item.IsSuccess ? "موفق" : "ناموفق")
+                    </span>
+                </div>
+
+                <div class="d-flex justify-content-between text-muted font-size-12">
+                    <span><i class="mdi mdi-tag-outline me-1"></i> @item.Type.GetDisplayName()</span>
+                    <span dir="ltr">@item.CreatedDate.GetDateTime()</span>
+                </div>
+
+                <div class="d-flex justify-content-between text-muted font-size-11 border-top pt-2 mt-2">
+                    <span>کد پیگیری: <b class="text-dark">@(string.IsNullOrEmpty(item.TransId) ? "—" : item.TransId)</b></span>
+                    <span class="text-dark fw-medium">مشاهده توضیحات <i class="mdi mdi-chevron-down"></i></span>
+                </div>
+
+                <div id="mobile-desc-@counter" class="desc-collapse">
+                    <div class="pt-3 mt-2 border-top font-size-12 text-dark lh-base">
+                        @(string.IsNullOrEmpty(item.Description) ? "توضیحاتی ثبت نشده است." : item.Description)
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <div class="card border border-dark">
+        <div class="card-body p-0">
+            <partial name="_NotFoundPartial" />
+        </div>
+    </div>
+}

@@ -8,6 +8,7 @@ using Application.Tools;
 using Data.Context;
 using Domain.Models.Users;
 using Domain.Shared;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Services.Implementaions
@@ -17,14 +18,17 @@ namespace Application.Services.Implementaions
         #region Fields
         private protected DigiKalaPriceAlertDbContext _context;
         private readonly IUserValidationService _userValidationService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         #endregion
 
         #region Ctor
         public UserService(DigiKalaPriceAlertDbContext context,
-            IUserValidationService userValidationService)
+            IUserValidationService userValidationService,
+            IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
             _userValidationService = userValidationService;
+            _httpContextAccessor = httpContextAccessor;
         }
         #endregion
 
@@ -484,6 +488,41 @@ namespace Application.Services.Implementaions
                 }).FirstOrDefaultAsync();
             if (user is null)
                 return Result.Failure<AdminSideUserDetailsDto>(Messages.OperationFailedError);
+
+            return user;
+        }
+
+        public async Task<Result<ClientSideUserDetailsDto>> ClientSideGetUserDetails()
+        {
+            var userId = _httpContextAccessor.HttpContext.User.GetUserId();
+            if (userId < 1)
+                return Result.Failure<ClientSideUserDetailsDto>(Messages.OperationFailedError);
+
+            var user = await _context.Users
+                .AsNoTracking()
+                .Where(u => u.Id == userId)
+                .Select(u => new ClientSideUserDetailsDto()
+                {
+                    ChatId = u.ChatId,
+                    FirstName = u.FirstName,
+                    LastName = u.LastName,
+                    IsUserBanned = u.IsUserBanned,
+                    Mobile = u.Mobile,
+                    Username = u.Username,
+                    SubscriptionEndDate = u.SubscriptionEndDate,
+                    SubscriptionPlanId = u.SubscriptionPlanId,
+                    SubscriptionPlanName = u.SubscriptionPlan.Name,
+                    Balance = u.Balance,
+                    UserRoles = u.UserRoleMapping.Where(urm => urm.UserId == u.Id)
+                    .Select(urm => new AdminSideRoleDto()
+                    {
+                        Id = urm.RoleId,
+                        Title = urm.Role.Title,
+                        UniqueName = urm.Role.UniqueName
+                    }).ToList()
+                }).FirstOrDefaultAsync();
+            if (user is null)
+                return Result.Failure<ClientSideUserDetailsDto>(Messages.OperationFailedError);
 
             return user;
         }

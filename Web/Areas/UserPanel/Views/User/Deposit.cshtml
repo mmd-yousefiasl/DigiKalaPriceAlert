@@ -1,0 +1,180 @@
+﻿@{
+    ViewData["Title"] = "افزایش موجودی کیف پول";
+}
+
+<div class="container-fluid">
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="page-title-box">
+                <h4>مالی و اشتراک</h4>
+                <ol class="breadcrumb m-0">
+                    <li class="breadcrumb-item">
+                        <a asp-area="Admin" asp-controller="Home" asp-action="Index">داشبورد</a>
+                    </li>
+                    <li class="breadcrumb-item active">@ViewData["Title"]</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-xl-5 col-lg-7 col-md-9">
+
+            <div class="card border border-dark mt-3" style="border-top: 4px solid #000000 !important;">
+                <div class="card-body p-4">
+
+                    <div class="text-center mb-4 pb-3 border-bottom">
+                        <div class="avatar-md mx-auto bg-light text-dark rounded-circle d-flex align-items-center justify-content-center mb-2" style="width: 56px; height: 56px;">
+                            <i class="mdi mdi-wallet-plus font-size-24"></i>
+                        </div>
+                        <h5 class="text-dark fw-bold font-size-16 mb-1">شارژ حساب کاربری</h5>
+                        <p class="text-muted font-size-12 mb-0">مبلغ مورد نظر خود را جهت انتقال به درگاه پرداخت امن وارد کنید.</p>
+                    </div>
+
+                    <form asp-action="RedirectToPaymentGateway" method="post">
+
+                        <!-- تغییر تگ اینپوت به text و افزودن inputmode برای باز شدن کیبورد عددی در موبایل -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold text-dark font-size-13">مبلغ افزایش موجودی (تومان)</label>
+                            <div class="input-group">
+                                <input type="text"
+                                       id="amount-input"
+                                       class="form-control form-control-lg text-center fw-bold text-dark border-dark"
+                                       placeholder="۰"
+                                       required
+                                       inputmode="numeric"
+                                       style="font-size: 22px; letter-spacing: 1px;" />
+                                <span class="input-group-text bg-dark text-white border-dark font-size-13 px-3">تومان</span>
+                            </div>
+                            <!-- یک اینپوت مخفی برای ارسال عدد خام و بدون ویرگول به سمت بک‌اند اس‌پی‌دات‌نت -->
+                            <input type="hidden" id="amount-hidden" name="Amount" required />
+
+                            <div class="form-text text-muted font-size-11 mt-1 text-start" id="amount-words">
+                                <i class="mdi mdi-calculator-variant me-1"></i> به حروف: صفر تومان
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label text-muted font-size-12 mb-2">یا یکی از مبالغ پیشنهادی زیر را انتخاب کنید:</label>
+                            <div class="row g-2">
+                                <div class="col-4">
+                                    <button type="button" class="btn btn-outline-dark w-100 py-2 font-size-13 fw-medium preset-btn" data-amount="50000">
+                                        ۵۰,۰۰۰
+                                    </button>
+                                </div>
+                                <div class="col-4">
+                                    <button type="button" class="btn btn-outline-dark w-100 py-2 font-size-13 fw-medium preset-btn" data-amount="100000">
+                                        ۱۰۰,۰۰۰
+                                    </button>
+                                </div>
+                                <div class="col-4">
+                                    <button type="button" class="btn btn-outline-dark w-100 py-2 font-size-13 fw-medium preset-btn" data-amount="200000">
+                                        ۲۰۰,۰۰۰
+                                    </button>
+                                </div>
+                                <div class="col-4">
+                                    <button type="button" class="btn btn-outline-dark w-100 py-2 font-size-13 fw-medium preset-btn" data-amount="500000">
+                                        ۵۰۰,۰۰۰
+                                    </button>
+                                </div>
+                                <div class="col-4">
+                                    <button type="button" class="btn btn-outline-dark w-100 py-2 font-size-13 fw-medium preset-btn" data-amount="1000000">
+                                        ۱,۰۰۰,۰۰۰
+                                    </button>
+                                </div>
+                                <div class="col-4">
+                                    <button type="button" class="btn btn-outline-dark w-100 py-2 font-size-13 fw-medium preset-btn" data-amount="2000000">
+                                        ۲,۰۰۰,۰۰۰
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-dark btn-lg w-100 py-2 font-size-15 fw-bold waves-effect waves-light">
+                                <i class="mdi mdi-credit-card-outline font-size-18 me-1 align-middle"></i> تایید و انتقال به درگاه پرداخت
+                            </button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+
+            <div class="text-center mt-3">
+                <p class="text-muted font-size-12">
+                    <i class="mdi mdi-shield-check-outline text-success me-1"></i> پرداخت شما از طریق درگاه‌های رسمی و تحت شبکه شتاب انجام می‌شود.
+                </p>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section FooterReferences {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const amountInput = document.getElementById("amount-input");
+            const amountHidden = document.getElementById("amount-hidden");
+            const presetButtons = document.querySelectorAll(".preset-btn");
+            const amountWords = document.getElementById("amount-words");
+
+            // تبدیل همزمان اعداد انگلیسی/عربی به فارسی برای نمایش شیک
+            const toFaDigit = n => n.toString().replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
+
+            function handleAmountChange(rawNumber) {
+                if (!rawNumber) {
+                    amountInput.value = "";
+                    amountHidden.value = "";
+                    amountWords.innerHTML = `<i class="mdi mdi-calculator-variant me-1"></i> به حروف: صفر تومان`;
+                    return;
+                }
+
+                // ۱. مقدار خام عددی را در اینپوت مخفی برای فرم شارپ سی‌شارپ می‌ریزیم
+                amountHidden.value = rawNumber;
+
+                // ۲. جداکننده ۳ رقم ۳ رقم با اعداد کاملا فارسی برای اینپوت اصلی
+                const formattedNum = new Intl.NumberFormat('en-US').format(rawNumber);
+                amountInput.value = toFaDigit(formattedNum);
+
+                // ۳. آپدیت متن وضعیت پایین فیلد
+                const formattedFa = new Intl.NumberFormat('fa-IR').format(rawNumber);
+                amountWords.innerHTML = `<i class="mdi mdi-check-circle-outline text-muted me-1"></i> مبلغ تایید شده: <b>${formattedFa}</b> تومان`;
+            }
+
+            // ۱. عملکرد دکمه‌های پیشنهادی
+            presetButtons.forEach(button => {
+                button.addEventListener("click", function () {
+                    const amount = this.getAttribute("data-amount");
+
+                    presetButtons.forEach(b => b.classList.remove("active", "btn-dark"));
+                    presetButtons.forEach(b => b.classList.add("btn-outline-dark"));
+
+                    this.classList.remove("btn-outline-dark");
+                    this.classList.add("active", "btn-dark");
+
+                    handleAmountChange(amount);
+                });
+            });
+
+            // ۲. فیلتر کردن کیبورد و ورودی کاربر (فقط اجازه ورود عدد می‌دهد)
+            amountInput.addEventListener("input", function (e) {
+                // ریست کردن استایل دکمه‌های پیشنهادی حین تایپ دستی
+                presetButtons.forEach(b => {
+                    b.classList.remove("active", "btn-dark");
+                    b.classList.add("btn-outline-dark");
+                });
+
+                // تبدیل حروف کیبورد فارسی/عربی به عدد انگلیسی برای پردازش محاسباتی
+                let value = this.value
+                    .replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d))
+                    .replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d));
+
+                // حذف هرگونه کاراکتر غیر عددی (حروف، نشانه‌ها و فضاهای خالی)
+                let cleanValue = value.replace(/\D/g, '');
+
+                handleAmountChange(cleanValue);
+            });
+        });
+    </script>
+}
