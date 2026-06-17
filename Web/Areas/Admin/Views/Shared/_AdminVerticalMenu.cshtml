@@ -74,6 +74,17 @@
                     </a>
                 </li>
 
+                <li permission="ManageCoupons">
+                    <a href="javascript: void(0);" class="has-arrow waves-effect">
+                        <i class="mdi mdi-ticket-percent"></i>
+                        <span>کدهای تخفیف</span>
+                    </a>
+                    <ul class="sub-menu" aria-expanded="false">
+                        <li permission="CouponsList"><a asp-area="Admin" asp-controller="Coupon" asp-action="CouponsList">لیست کد های تخفیف</a></li>
+                        <li permission="CreateNewCoupon"><a asp-area="Admin" asp-controller="Coupon" asp-action="CreateNewCoupon">افزودن کد تخفیف جدید</a></li>
+                    </ul>
+                </li>
+
                 <li class="menu-title">مدیریت مقالات</li>
 
                 <li permission="ManageBlogCategories">
@@ -95,17 +106,6 @@
                     <ul class="sub-menu" aria-expanded="false">
                         <li permission="BlogsList"><a asp-area="Admin" asp-controller="Blog" asp-action="BlogsList">لیست مقالات</a></li>
                         <li permission="CreateNewBlog"><a asp-area="Admin" asp-controller="Blog" asp-action="CreateNewBlog">افزودن مقاله جدید</a></li>
-                    </ul>
-                </li>
-
-                <li permission="ManageCoupons">
-                    <a href="javascript: void(0);" class="has-arrow waves-effect">
-                        <i class="mdi mdi-ticket-percent"></i>
-                        <span>کدهای تخفیف</span>
-                    </a>
-                    <ul class="sub-menu" aria-expanded="false">
-                        <li permission="CouponsList"><a asp-area="Admin" asp-controller="Coupon" asp-action="CouponsList">لیست کد های تخفیف</a></li>
-                        <li permission="CreateNewCoupon"><a asp-area="Admin" asp-controller="Coupon" asp-action="CreateNewCoupon">افزودن کد تخفیف جدید</a></li>
                     </ul>
                 </li>
 
