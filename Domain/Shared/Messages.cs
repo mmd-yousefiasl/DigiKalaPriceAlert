@@ -40,7 +40,6 @@
         #region Message
 
         public const string ProductPriceChangedMessage = "کاربر گرامی، قیمت حداقل یکی از محصولات مورد رصد شما تغییر یافته است. جهت مشاهده جزئیات به ربات مراجعه کنید.";
-        public const string EmptyFieldMessage = "وارد نشده";
 
         #endregion
     }

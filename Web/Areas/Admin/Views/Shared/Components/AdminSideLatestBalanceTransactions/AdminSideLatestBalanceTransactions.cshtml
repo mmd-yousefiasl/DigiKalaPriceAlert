@@ -11,19 +11,19 @@
             </a>
         </h4>
         <div class="table-responsive">
-            @if (Model?.Entities?.Any() ?? false)
-            {
-                <table class="table table-sm table-hover table-centered mb-0 font-size-13">
-                    <thead class="table-light">
-                        <tr>
-                            <th style="width: 40px;"></th>
-                            <th>تاریخ</th>
-                            <th>مقدار</th>
-                            <th>نوع</th>
-                            <th>وضعیت</th>
-                            <th>کد تراکنش</th>
-                        </tr>
-                    </thead>
+            <table class="table table-sm table-hover table-centered mb-0 font-size-13">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width: 40px;"></th>
+                        <th>تاریخ</th>
+                        <th>مقدار</th>
+                        <th>نوع</th>
+                        <th>وضعیت</th>
+                        <th>کد تراکنش</th>
+                    </tr>
+                </thead>
+                @if (Model?.Entities?.Any() ?? false)
+                {
                     <tbody>
                         @{
                             int counter = 0;
@@ -68,12 +68,18 @@
                             }
                         }
                     </tbody>
-                </table>
-            }
-            else
-            {
-                <partial name="_NotFoundPartial" />
-            }
+                }
+                else
+                {
+                    <tbody>
+                        <tr>
+                            <td colspan="100">
+                                <partial name="_NotFoundPartial" />
+                            </td>
+                        </tr>
+                    </tbody>
+                }
+            </table>
         </div>
     </div>
 </div>

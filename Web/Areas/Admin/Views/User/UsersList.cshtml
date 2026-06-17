@@ -53,24 +53,24 @@
         </div>
     </div>
 
-    @if (Model?.Entities?.Any() ?? false)
-    {
-        <div class="row">
-            <div class="col-lg-12">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table mb-0">
-                                <thead>
-                                    <tr>
-                                        <th>#</th>
-                                        <th>موبایل</th>
-                                        <th>نام و نام خانوادگی</th>
-                                        <th>وضعیت حساب کاربری</th>
-                                        <th>آیدی تلگرام</th>
-                                        <th>عملیات</th>
-                                    </tr>
-                                </thead>
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table mb-0">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>موبایل</th>
+                                    <th>نام و نام خانوادگی</th>
+                                    <th>وضعیت حساب کاربری</th>
+                                    <th>آیدی تلگرام</th>
+                                    <th>عملیات</th>
+                                </tr>
+                            </thead>
+                            @if (Model?.Entities?.Any() ?? false)
+                            {
                                 <tbody>
                                     @{
                                         int counter = 0;
@@ -111,18 +111,24 @@
                                         }
                                     }
                                 </tbody>
-                            </table>
-                        </div>
-
+                            }
+                            else
+                            {
+                                <tbody>
+                                    <tr>
+                                        <td colspan="100">
+                                            <partial name="_NotFoundPartial" />
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            }
+                        </table>
                     </div>
+
                 </div>
             </div>
         </div>
+    </div>
 
-        <partial name="_Paging" model="@Model.GetCurrentPaging()" />
-    }
-    else
-    {
-        <partial name="_NotFoundPartial" />
-    }
+    <partial name="_Paging" model="@Model.GetCurrentPaging()" />
 </div>
