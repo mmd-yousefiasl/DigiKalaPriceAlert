@@ -5,6 +5,7 @@ using Domain.Models.GeneralInfo;
 using Domain.Models.Identity;
 using Domain.Models.Media;
 using Domain.Models.NewsLetters;
+using Domain.Models.Orders;
 using Domain.Models.Products;
 using Domain.Models.SubscriptionPlans;
 using Domain.Models.Users;
@@ -35,6 +36,7 @@ namespace Data.Context
 
 
         public DbSet<SubscriptionPlan> SubscriptionPlans => Set<SubscriptionPlan>();
+        public DbSet<UsedFreePlan> UsedFreePlans => Set<UsedFreePlan>();
 
         public DbSet<Permission> Permissions => Set<Permission>();
         public DbSet<Role> Roles => Set<Role>();
@@ -55,5 +57,7 @@ namespace Data.Context
         public DbSet<Faq> Faqs => Set<Faq>();
 
         public DbSet<SocialMedia> SocialMedia => Set<SocialMedia>();
+
+        public DbSet<Order> Orders => Set<Order>();
     }
 }

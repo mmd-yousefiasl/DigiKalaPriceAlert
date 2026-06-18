@@ -29,12 +29,6 @@ namespace Web.Controllers
             return View();
         }
 
-        [HttpGet("/pricing")]
-        public IActionResult Pricing()
-        {
-            return View();
-        }
-
         [HttpGet("/about-us")]
         public IActionResult AboutUs()
         {

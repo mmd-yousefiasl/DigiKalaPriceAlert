@@ -22,6 +22,7 @@
         public const string InvalidFileFormatError = "فرمت فایل نامعتبر است";
         public const string FileLengthError = "طول فایل بیش از حد مجاز است. (حداکثر 400KB)";
         public const string UserBalnaceCantBeLessThanZeroError = "موجودی کاربر نمی تواند منفی باشد";
+        public const string YouAlreadyUsedFreePlanError = "طرح رایگان قبلاً برای این شماره فعال شده است";
 
         #endregion
 
@@ -34,6 +35,7 @@
         public const string ContactUsFormSentSuccessfully = "پیام شما با موفقیت ارسال شد، در صورت نیاز همکاران ما با شما تماس خواهند گرفت";
         public const string ContactUsFormMarkedAsReadSuccessfully = "وضعیت فرم تماس باما به خوانده شده تغییر کرد";
         public const string SignInNewsLettersSuccessfully = "عضویت شما در خبرنامه با موفقیت انجام شد. از همراهی شما سپاسگزاریم";
+        public const string FreePlanActivatedSuccessfully = "طرح رایگان با موفقیت فعال شد";
 
         #endregion
 

@@ -48,6 +48,8 @@ namespace Web
             services.AddScoped<IBalanceTransactionService, BalanceTransactionService>();
             services.AddScoped<IPaymentDataService, PaymentDataService>();
             services.AddScoped<IPaymentService, PaymentService>();
+            services.AddScoped<IUsedFreePlanService, UsedFreePlanService>();
+            services.AddScoped<IOrderService, OrderService>();
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace Domain.Models.Users
+﻿using Domain.Models.Orders;
+
+namespace Domain.Models.Users
 {
     public class User : AuditBaseEntity<int>
     {
@@ -14,6 +16,8 @@
 
         public ICollection<UserRoleMapping>? UserRoleMapping { get; set; }
         public ICollection<BalanceTransaction>? Transactions { get; set; }
+
+        public ICollection<Order>? Orders { get; set; }
         #endregion
     }
 }
