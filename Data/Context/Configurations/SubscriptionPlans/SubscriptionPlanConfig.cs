@@ -14,7 +14,11 @@ namespace Data.Context.Configurations.SubscriptionPlans
 
             builder.Property(sp => sp.Name)
                 .IsRequired()
-                .HasMaxLength(200);
+                .HasMaxLength(50);
+
+            builder.Property(sp => sp.ShortDescription)
+                .IsRequired()
+                .HasMaxLength(150);
 
             builder.Property(sp => sp.Price)
                 .HasColumnType("numeric(18,0)")

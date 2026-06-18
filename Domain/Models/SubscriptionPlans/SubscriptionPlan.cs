@@ -5,11 +5,14 @@ namespace Domain.Models.SubscriptionPlans
     public class SubscriptionPlan : AuditBaseEntity<int>
     {
         public string Name { get; set; }
+        public string ShortDescription { get; set; }
+        public bool IsPopular { get; set; }
         public decimal Price { get; set; }
         public int DurationInDays { get; set; }
 
         #region Relations
         public ICollection<Order>? Orders { get; set; }
+        public ICollection<SubscriptionPlanFeature>? Features { get; set; }
         #endregion
     }
 }
