@@ -50,6 +50,7 @@ namespace Web
             services.AddScoped<IPaymentService, PaymentService>();
             services.AddScoped<IUsedFreePlanService, UsedFreePlanService>();
             services.AddScoped<IOrderService, OrderService>();
+            services.AddScoped<ISubscriptionPlanService, SubscriptionPlanService>();
         }
     }
 }

@@ -1,7 +1,12 @@
-﻿@{
+﻿@using Application.Dtos.Orders.ClientSide
+@using Application.Tools
+@using Domain.Statics
+@model ClientSideInvoiceDto
+
+@{
     ViewData["Title"] = "پیش‌نویس فاکتور خرید";
 
-    bool isFreePlan = false;
+    bool isFree = Model.PlanPrice == 0 ? true : false;
 }
 
 @section HeaderReferences {
@@ -16,6 +21,7 @@
             line-height: 1.6;
             background-color: #fafafa;
             min-height: 80vh;
+            margin: 0px;
         }
 
             .digito-checkout-wrapper *,
@@ -232,24 +238,32 @@
         <div class="checkout-card">
             <h2 class="checkout-title">🧾 صورت‌حساب و تایید نهایی</h2>
 
-            @if (isFreePlan)
+            @if (isFree)
             {
                 <div class="plan-summary-box free-mode">
                     <div class="plan-summary-header">
-                        <span class="plan-summary-title">پلن تست (۷ روزه)</span>
+                        <span class="plan-summary-title">@Model.PlanTitle</span>
                         <span class="plan-summary-badge free-badge">رایگان / هدیه عضویت</span>
                     </div>
-                    <p class="plan-summary-desc">فرصت بی‌نظیر برای ارزیابی دقت ربات و بررسی سرعت پایش و ارسال هشدارهای قیمت بازار.</p>
+                    <p class="plan-summary-desc">@Model.ShortDescription</p>
                 </div>
 
                 <div class="invoice-details">
                     <div class="invoice-row">
                         <span>مدت اعتبار تست:</span>
-                        <strong>۷ روز کامل</strong>
+                        <strong>
+                            @Model.DurationInDays
+                            روز کامل
+                        </strong>
                     </div>
                     <div class="invoice-row">
                         <span>تعداد کالای قابل پایش:</span>
-                        <strong>حداکثر ۲ کالا (بررسی هر ۱۵ دقیقه)</strong>
+                        <strong>
+                            تا
+                            @SiteTools.MaximumProductCount
+                            کالا
+                            (بررسی هر ۱۵ دقیقه)
+                        </strong>
                     </div>
                     <div class="invoice-row total">
                         <span>مبلغ قابل پرداخت:</span>
@@ -261,42 +275,58 @@
             {
                 <div class="plan-summary-box">
                     <div class="plan-summary-header">
-                        <span class="plan-summary-title">اشتراک ۹۰ روزه (۳ ماهه)</span>
-                        <span class="plan-summary-badge">محبوب‌ترین انتخاب</span>
+                        <span class="plan-summary-title">@Model.PlanTitle</span>
+                        @if (Model.IsPopular)
+                        {
+                            <span class="plan-summary-badge">محبوب‌ترین انتخاب</span>
+                        }
                     </div>
-                    <p class="plan-summary-desc">بهترین انتخاب برای کاهش هزینه‌ها و مانیتورینگ مستمر و بی‌وقفه بازار رقابتی دیجی‌کالا.</p>
+                    <p class="plan-summary-desc">@Model.ShortDescription</p>
                 </div>
 
                 <div class="invoice-details">
                     <div class="invoice-row">
                         <span>مدت اعتبار اشتراک:</span>
-                        <strong>۹۰ روز کامل</strong>
+                        <strong>
+                            @Model.DurationInDays
+                            روز کامل
+                        </strong>
                     </div>
                     <div class="invoice-row">
                         <span>تعداد کالای قابل پایش همزمان:</span>
-                        <strong>تا ۲۰ کالا (هر ۱۵ دقیقه)</strong>
+                        <strong>
+                            تا
+                            @SiteTools.MaximumProductCount
+                            کالا
+                            (هر ۱۵ دقیقه)
+                        </strong>
                     </div>
                     <div class="invoice-row">
                         <span>هزینه پایه اشتراک:</span>
-                        <span>۲,۶۷۵,۰۰۰ تومان</span>
+                        <span>@Model.PlanPrice?.ToToman()</span>
                     </div>
                     <div class="invoice-row total">
                         <span>مبلغ قابل پرداخت:</span>
-                        <span class="price">۲,۶۷۵,۰۰۰ <span style="font-size: 13px; font-weight: normal; color: #71717a;">تومان</span></span>
+                        <span class="price">
+                            @Model.PlanPrice?.ToTomanFormat()
+                            <span style="font-size: 13px; font-weight: normal; color: #71717a;">تومان</span>
+                        </span>
                     </div>
                 </div>
             }
 
             <ul class="checkout-features">
-                <li><span style="color: #10b981;">✔️</span> ارسال فوری پیامک به محض تغییر جایگاه شما در بای‌باکس</li>
-                <li><span style="color: #10b981;">✔️</span> حاوی لینک مستقیم اختصاصی هر محصول جهت اصلاح سریع قیمت</li>
+                @foreach (var item in Model.Features ?? new List<string>())
+                {
+                    <li><span style="color: #10b981;">✔️</span>@item</li>
+                }
             </ul>
         </div>
 
         <div>
             <div class="checkout-card">
 
-                @if (isFreePlan)
+                @if (isFree)
                 {
                     <h3 class="checkout-title" style="font-size: 16px; margin-bottom: 20px; border-color: #e4e4e7;">🚀 فعال‌سازی حساب کاربری</h3>
 
@@ -312,31 +342,49 @@
                 }
                 else
                 {
-                    <h3 class="checkout-title" style="font-size: 16px; margin-bottom: 20px;">🔒 پرداخت امن آنلاین</h3>
+                    <h3 class="checkout-title" style="font-size: 16px; margin-bottom: 20px;">🔒 پرداخت و نهایی‌سازی سفارش</h3>
 
-                    <div class="zibal-notice-box">
-                        <div class="zibal-logo-mock">Z</div>
-                        <div class="zibal-text">
-                            <h4>پرداخت از طریق درگاه واسط زی‌بال</h4>
-                            <p>اتصال مستقیم به کلیه کارت‌های عضو شتاب</p>
-                        </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; background-color: #f4f4f5; padding: 12px 16px; border-radius: 12px; margin-bottom: 16px; font-size: 13px;">
+                        <span style="color: #52525b;">موجودی فعلی کیف پول شما:</span>
+                        <strong style="color: #18181b;">@Model.UserBalance.ToTomanFormat() تومان</strong>
                     </div>
 
-                    <form action="#" method="post">
+                    <form asp-action="FinalizePayment" method="post">
+                        @if (Model.UserBalance > 0)
+                        {
+                            <div style="border: 1px solid #e4e4e7; border-radius: 12px; padding: 16px; margin-bottom: 20px; background-color: #fff; display: flex; align-items: flex-start; gap: 12px;">
+                                <input type="checkbox" id="useBalance" name="UseBalance" value="true" style="margin-top: 4px; width: 16px; height: 16px; accent-color: #ed1945; cursor: pointer;" />
+                                <label for="useBalance" style="cursor: pointer; user-select: none;">
+                                    <strong style="font-size: 14px; color: #18181b; display: block; margin-bottom: 2px;">کسر از موجودی کیف پول</strong>
+                                    <span style="font-size: 12px; color: #71717a; display: block; text-align: justify;">
+                                        تمایل دارم مبلغ سفارش از موجودی حسابم کسر شود. (در صورت عدم تکافوی موجودی، مابه‌التفاوت از درگاه بانکی کسر خواهد شد).
+                                    </span>
+                                </label>
+                            </div>
+                        }
+
+                        <div class="zibal-notice-box">
+                            <div class="zibal-logo-mock">Z</div>
+                            <div class="zibal-text">
+                                <h4>پرداخت آنلاین از طریق درگاه زی‌بال</h4>
+                                <p>اتصال مستقیم به کلیه کارت‌های عضو شتاب (در صورت نیاز به پرداخت آنلاین)</p>
+                            </div>
+                        </div>
+
                         <button type="submit" class="btn-checkout-submit">
-                            تایید و اتصال به درگاه پرداخت آنلاین 🚀
+                            تایید نهایی و پردازش فاکتور 🚀
                         </button>
                     </form>
 
                     <p style="color: #71717a; font-size: 11px; text-align: center; margin-top: 16px;">
-                        پس از اتمام تراکنش، اشتراک شما به صورت خودکار تمدید و فعال می‌گردد.
+                        پس از تایید، سیستم موجودی شما را بررسی کرده و در صورت نیاز شما را به درگاه متصل می‌کند.
                     </p>
                 }
 
             </div>
 
             <div style="text-align: center; margin-top: 20px;">
-                <a asp-area="UserPanel" asp-controller="Subscription" asp-action="Pricing" style="color: #71717a; font-size: 13px; text-decoration: none;">
+                <a asp-area="" asp-controller="Subscription" asp-action="Pricing" style="color: #71717a; font-size: 13px; text-decoration: none;">
                     ← انصراف و بازگشت به جدول پلن‌ها
                 </a>
             </div>

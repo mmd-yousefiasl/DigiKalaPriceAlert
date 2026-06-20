@@ -16,7 +16,7 @@ namespace Data.Context
             modelBuilder.Entity<SubscriptionPlan>().HasData(new SubscriptionPlan()
             {
                 Id = 1,
-                Name = "تست 7 روزه",
+                Name = "پلن تست (۷ روزه)",
                 Price = 0,
                 DurationInDays = 7,
                 IsPopular = false,
@@ -26,7 +26,7 @@ namespace Data.Context
             modelBuilder.Entity<SubscriptionPlan>().HasData(new SubscriptionPlan()
             {
                 Id = 2,
-                Name = "ماهانه",
+                Name = "اشتراک ۳۰ روزه (ماهانه)",
                 Price = 990000,
                 DurationInDays = 30,
                 IsPopular = false,
@@ -36,7 +36,7 @@ namespace Data.Context
             modelBuilder.Entity<SubscriptionPlan>().HasData(new SubscriptionPlan()
             {
                 Id = 3,
-                Name = "۳ ماهه",
+                Name = "اشتراک ۹۰ روزه (۳ ماهه)",
                 Price = 2675000,
                 DurationInDays = 90,
                 IsPopular = true,

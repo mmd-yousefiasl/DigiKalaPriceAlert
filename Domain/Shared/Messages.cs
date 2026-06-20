@@ -23,6 +23,8 @@
         public const string FileLengthError = "طول فایل بیش از حد مجاز است. (حداکثر 400KB)";
         public const string UserBalnaceCantBeLessThanZeroError = "موجودی کاربر نمی تواند منفی باشد";
         public const string YouAlreadyUsedFreePlanError = "طرح رایگان قبلاً برای این شماره فعال شده است";
+        public const string InvalidPlanError = "پلن انتخابی معتبر نیست یا غیرفعال شده است";
+        public const string EmptyInvoiceError = "سبد خرید یا فاکتور انتخاب‌شده خالی است. لطفاً ابتدا پلن مورد نظر خود را انتخاب کنید.";
 
         #endregion
 

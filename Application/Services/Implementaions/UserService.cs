@@ -298,5 +298,19 @@ namespace Application.Services.Implementaions
 
             return user;
         }
+
+        public async Task<Result<decimal>> ClientSideGetCurrentUserBalance()
+        {
+            var userId = _httpContextAccessor.HttpContext.User.GetUserId();
+            if (userId < 1) return Result.Failure<decimal>(Messages.OperationFailedError);
+
+            var userBalance = await _context.Users.Where(n => n.Id == userId)
+                .Select(n => n.Balance)
+                .FirstOrDefaultAsync();
+            if (userBalance < 0)
+                return Result.Failure<decimal>(Messages.OperationFailedError);
+
+            return userBalance;
+        }
     }
 }

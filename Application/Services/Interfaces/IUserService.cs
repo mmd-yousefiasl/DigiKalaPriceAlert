@@ -27,5 +27,7 @@ namespace Application.Services.Interfaces
         Task<Result<AdminSideUserDetailsDto>> AdminSideGetUserDetails(int id);
 
         Task<Result<ClientSideUserDetailsDto>> ClientSideGetUserDetails();
+
+        Task<Result<decimal>> ClientSideGetCurrentUserBalance();
     }
 }

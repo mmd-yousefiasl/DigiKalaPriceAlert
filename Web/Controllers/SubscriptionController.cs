@@ -20,15 +20,51 @@ namespace Web.Controllers
 
         [Authorize]
         [HttpGet("/subscription/purchase/{planId}")]
-        public IActionResult Purchase(int planId)
+        public async Task<IActionResult> Purchase(int planId)
         {
             if (planId < 1)
             {
                 TempData[TemporaryErrorMessage] = Messages.OperationFailedError;
-                return RedirectToAction("Index", "Home", new { area = "" });
+                return RedirectToAction(nameof(Pricing));
+            }
+            var result = await _orderService.ClientSideCreateNewPurchase(planId);
+            if (result.IsFailure)
+            {
+                TempData[TemporaryErrorMessage] = result.Message;
+                return RedirectToAction(nameof(Pricing));
             }
 
-            return View();
+            return RedirectToAction(nameof(Invoice), new { id = result.Value });
+        }
+
+        [Authorize]
+        [HttpGet("/subscription/get-invoice")]
+        public async Task<IActionResult> GetInvoice()
+        {
+            var result = await _orderService.ClientSideGetInvoiceId();
+            if (result.IsFailure)
+            {
+                return View();
+            }
+
+            return RedirectToAction(nameof(Invoice), new { id = result.Value });
+        }
+
+        [Authorize]
+        [HttpGet("/subscription/invoice/{id}")]
+        public async Task<IActionResult> Invoice(int id)
+        {
+            if (id < 1)
+            {
+                return RedirectToAction(nameof(GetInvoice));
+            }
+            var result = await _orderService.ClientSideGetInvoice(id);
+            if (result.IsFailure)
+            {
+                return RedirectToAction(nameof(GetInvoice));
+            }
+
+            return View(result.Value);
         }
 
         [HttpGet("/subscription/pricing")]
