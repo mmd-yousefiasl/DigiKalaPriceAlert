@@ -1,4 +1,6 @@
-﻿namespace Domain.Models
+﻿using Microsoft.EntityFrameworkCore;
+
+namespace Domain.Models
 {
     public class BasePaging<T>
     {
@@ -53,16 +55,12 @@
 
         public async Task<BasePaging<T>> Paging(IQueryable<T> queryable)
         {
-            IQueryable<T> queryable2 = queryable;
-            TakeEntity = TakeEntity;
-            int allEntitiesCount = queryable2.Count();
+            int allEntitiesCount = await queryable.CountAsync();
+
             int pageCount = 0;
-            try
+            if (allEntitiesCount > 0)
             {
-                pageCount = Convert.ToInt32(Math.Ceiling((double)allEntitiesCount / (double)TakeEntity));
-            }
-            catch
-            {
+                pageCount = (int)Math.Ceiling((double)allEntitiesCount / TakeEntity);
             }
 
             Page = (Page > pageCount) ? pageCount : Page;
@@ -72,12 +70,14 @@
             }
 
             AllEntitiesCount = allEntitiesCount;
-            HowManyPagesAfterAndBefore = HowManyPagesAfterAndBefore;
+            PageCount = pageCount;
             SkipEntity = (Page - 1) * TakeEntity;
+
             StartPage = (Page - HowManyPagesAfterAndBefore <= 0) ? 1 : (Page - HowManyPagesAfterAndBefore);
             EndPage = (Page + HowManyPagesAfterAndBefore > pageCount) ? pageCount : (Page + HowManyPagesAfterAndBefore);
-            PageCount = pageCount;
-            Entities = await Task.Run(() => queryable2.Skip(SkipEntity).Take(TakeEntity).ToList());
+
+            Entities = await queryable.Skip(SkipEntity).Take(TakeEntity).ToListAsync();
+
             Counter = (Page - 1) * TakeEntity + 1;
 
             return this;

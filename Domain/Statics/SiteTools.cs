@@ -16,6 +16,13 @@
 
         public static int MaximumProductCount { get; set; }
 
+
+        #region Tickets
+        public static int MaxTicketAttachmentLength { get; set; }
+        public static string TicketAttachmentFile { get; set; }
+
+        #endregion
+
         #region Payment
 
         public static string PaymentRequestURL { get; set; }

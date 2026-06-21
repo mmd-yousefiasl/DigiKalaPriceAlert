@@ -42,6 +42,7 @@
         public const string SignInNewsLettersSuccessfully = "عضویت شما در خبرنامه با موفقیت انجام شد. از همراهی شما سپاسگزاریم";
         public const string FreePlanActivatedSuccessfully = "طرح رایگان با موفقیت فعال شد";
         public const string PaymentDoneSuccessfully = "پرداخت با موفقیت انجام شد";
+        public const string TicketClosedSuccessfully = "تیکت با موفقیت بسته شد";
 
         #endregion
 
