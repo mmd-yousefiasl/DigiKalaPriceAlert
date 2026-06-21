@@ -327,5 +327,44 @@ namespace Application.Services.Implementaions
                 }
             });
         }
+
+        public async Task<Result<ClientSideFilterOrdersDto>> ClientSideFilterOrders(ClientSideFilterOrdersDto filter)
+        {
+            if (filter is null)
+                return Result.Failure<ClientSideFilterOrdersDto>(Messages.OperationFailedError);
+
+            var userId = _httpContextAccessor.HttpContext.User.GetUserId();
+            if (userId < 1)
+                return Result.Failure<ClientSideFilterOrdersDto>(Messages.OperationFailedError);
+
+            var conditions = Filter.GenerateConditions<Order>();
+
+            conditions.Add(n => n.UserId == userId);
+            conditions.Add(n => n.Status == OrderStatusEnum.Success);
+
+            if (!string.IsNullOrWhiteSpace(filter.Search))
+            {
+                conditions.Add(n => n.PlanTitle.Contains(filter.Search));
+            }
+
+            IQueryable<Order> query = _context.Orders;
+
+            query = query.OrderByDescending(n => n.Id);
+
+            foreach (var item in conditions ?? new FilterConditions<Order>())
+            {
+                query = query.Where(item);
+            }
+
+            await filter.Paging(query.Select(n => new ClientSideOrderDto()
+            {
+                Id = n.Id,
+                PaidDate = n.PaidDate,
+                PlanPrice = n.PlanPrice,
+                PlanTitle = n.PlanTitle,
+            }));
+
+            return filter;
+        }
     }
 }

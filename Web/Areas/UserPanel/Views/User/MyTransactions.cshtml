@@ -7,18 +7,6 @@
     ViewData["Title"] = "لیست تراکنش‌ها";
 }
 
-<style>
-    .cursor-pointer {
-        cursor: pointer;
-    }
-    /* انیمیشن روان باز شدن بخش توضیحات */
-    .desc-collapse {
-        max-height: 0;
-        overflow: hidden;
-        transition: max-height 0.25s ease-out;
-    }
-</style>
-
 <div class="container-fluid">
 
     <div class="row">
@@ -98,7 +86,7 @@
                                             @(item.IsSuccess ? "موفق" : "ناموفق")
                                         </span>
                                     </td>
-                                    <td class="fw-medium text-dark" dir="ltr">@(string.IsNullOrEmpty(item.TransId) ? "—" : item.TransId)</td>
+                                    <td class="fw-medium text-dark">@(string.IsNullOrEmpty(item.TransId) ? "—" : item.TransId)</td>
                                 </tr>
                                 <tr>
                                     <td colspan="6" class="p-0 border-0">

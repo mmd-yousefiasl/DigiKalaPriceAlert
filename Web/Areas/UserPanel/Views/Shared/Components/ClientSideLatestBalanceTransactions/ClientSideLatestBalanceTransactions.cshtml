@@ -34,7 +34,7 @@
                                         @(item.IsSuccess ? "موفق" : "ناموفق")
                                     </span>
                                 </td>
-                                <td class="fw-medium text-dark" dir="ltr">@(string.IsNullOrEmpty(item.TransId) ? "—" : item.TransId)</td>
+                                <td class="fw-medium text-dark">@(string.IsNullOrEmpty(item.TransId) ? "—" : item.TransId)</td>
                             </tr>
                             <tr>
                                 <td colspan="6" class="p-0 border-0">
@@ -72,7 +72,7 @@
 
                 <div class="d-flex justify-content-between text-muted font-size-12">
                     <span><i class="mdi mdi-tag-outline me-1"></i> @item.Type.GetDisplayName()</span>
-                    <span dir="ltr">@item.CreatedDate.GetDateTime()</span>
+                    <span>@item.CreatedDate.GetDateTime()</span>
                 </div>
 
                 <div class="d-flex justify-content-between text-muted font-size-11 border-top pt-2 mt-2">

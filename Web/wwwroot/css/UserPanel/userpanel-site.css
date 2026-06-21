@@ -1,0 +1,78 @@
+﻿.list-delete-button {
+    cursor: pointer;
+    display: contents;
+}
+
+.spinner {
+    display: none;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #3498db;
+    border-radius: 50%;
+    width: 12px;
+    height: 12px;
+    animation: spin 0.3s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.fs-medium {
+    font-size: medium;
+}
+
+.product-title-list {
+    max-width: 200px;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+}
+
+.options-nowrap {
+    white-space: nowrap;
+}
+
+.admin-vertical-menu {
+    height: 100%;
+    overflow-x: scroll;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.transaction-description {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+    background-color: #f8f9fa;
+}
+
+/* انیمیشن باز شدن توضیحات */
+.desc-collapse {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.25s ease-out;
+}
+/* استایل اختصاصی کارت‌های موبایل برای تم مونوکروم */
+.tr-card {
+    border: 1px solid #e9ecef;
+    border-right: 4px solid #000000;
+    border-radius: 4px;
+    background: #ffffff;
+}
+
+    .tr-card.failed {
+        border-right-color: #dee2e6;
+    }
+
+.desc-collapse {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.25s ease-out;
+}

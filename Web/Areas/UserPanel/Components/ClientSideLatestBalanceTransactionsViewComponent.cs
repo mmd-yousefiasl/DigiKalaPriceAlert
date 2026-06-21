@@ -21,7 +21,7 @@ namespace Web.Areas.UserPanel.Components
         {
             var result = await _balanceTransactionService.ClientSideFilterTransactions(new ClientSideFilterBalanceTransactionsDto()
             {
-                TakeEntity = 50
+                TakeEntity = 15
             });
             if (result.IsFailure)
                 return View("ClientSideLatestBalanceTransactions", new ClientSideFilterBalanceTransactionsDto());

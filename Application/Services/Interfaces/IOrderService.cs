@@ -17,5 +17,7 @@ namespace Application.Services.Interfaces
         Task<Result> ClientSideCheckout(PaymentResultDto dto);
 
         Task<Result<int>> ClientSideVerifyOrder();
+
+        Task<Result<ClientSideFilterOrdersDto>> ClientSideFilterOrders(ClientSideFilterOrdersDto filter);
     }
 }

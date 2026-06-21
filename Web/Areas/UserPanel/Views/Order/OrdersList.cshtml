@@ -1,0 +1,115 @@
+﻿@using Application.Dtos.Orders.ClientSide
+@using Application.Tools
+@model ClientSideFilterOrdersDto
+
+@{
+    ViewData["Title"] = "لیست سفارش ها";
+}
+
+<div class="container-fluid">
+
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="page-title-box">
+                <h4>پنل کاربری</h4>
+                <ol class="breadcrumb m-0">
+                    <li class="breadcrumb-item"><a asp-area="UserPanel" asp-controller="Home" asp-action="Index">صفحه نخست</a></li>
+                    <li class="breadcrumb-item active">@ViewData["Title"]</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <div class="card border border-dark mb-4">
+        <div class="card-body">
+            <form novalidate asp-area="UserPanel" asp-controller="Order" method="get" asp-action="OrdersList" id="search-form">
+                <input type="hidden" asp-for="Page" id="Page" />
+                <div class="row g-3">
+                    <div class="col-12 col-md-4">
+                        <label class="form-label font-size-12 fw-bold text-dark" asp-for="Search"></label>
+                        <input type="text" class="form-control border-dark-subtle font-size-13" asp-for="Search" autocomplete="off" placeholder="عنوان پلن...">
+                    </div>
+                    <div class="col-12 text-start mt-3">
+                        <button class="btn btn-dark btn-sm px-4 font-size-13" type="submit">
+                            <i class="mdi mdi-magnify me-1"></i> جستجو
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @if (Model?.Entities?.Any() ?? false)
+    {
+        int counter = 0;
+
+        <div class="card border border-dark d-none d-md-block shadow-sm">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover table-centered mb-0 font-size-13">
+                        <thead class="table-light text-dark">
+                            <tr>
+                                <th style="width: 50px;" class="text-center">#</th>
+                                <th>شماره سفارش</th>
+                                <th>تاریخ پرداخت</th>
+                                <th>پلن انتخابی</th>
+                                <th>قیمت پرداختی</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.Entities)
+                            {
+                                counter++;
+                                <tr>
+                                    <td class="text-center text-muted">@counter</td>
+                                    <td class="text-muted">#@item.Id</td>
+                                    <td class="text-muted">@item.PaidDate?.GetDateTime()</td>
+                                    <td class="fw-medium text-dark">@item.PlanTitle</td>
+                                    <td class="fw-bold text-dark">@item.PlanPrice?.ToToman()</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-block d-md-none">
+            @{
+                counter = 0;
+            }
+            @foreach (var item in Model.Entities)
+            {
+                counter++;
+                <div class="mb-2 p-3 shadow-sm"
+                     style="border: 1px solid #e9ecef; border-right: 4px solid; border-radius: 4px; background: #ffffff;">
+
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="fw-bold font-size-14 text-dark">@item.PlanPrice?.ToToman()</span>
+                        <span class="badge bg-dark font-size-11 px-2 py-1">
+                            #@item.Id
+                        </span>
+                    </div>
+
+                    <div class="d-flex justify-content-between text-muted font-size-12">
+                        <span><i class="mdi mdi-tag-outline me-1"></i> @item.PlanTitle</span>
+                        <span>@item.PaidDate?.GetDateTime()</span>
+                    </div>
+                </div>
+            }
+
+        </div>
+    }
+    else
+    {
+        <div class="card border border-dark">
+            <div class="card-body p-0">
+                <partial name="_NotFoundPartial" />
+            </div>
+        </div>
+    }
+
+    <div class="mt-3">
+        <partial name="_Paging" model="@Model.GetCurrentPaging()" />
+    </div>
+</div>
