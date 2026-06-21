@@ -26,6 +26,17 @@
                         <span>سفارش ها</span>
                     </a>
                 </li>
+
+                <li>
+                    <a href="javascript: void(0);" class="has-arrow waves-effect">
+                        <i class="mdi mdi-comment-question-outline"></i>
+                        <span>تیکت</span>
+                    </a>
+                    <ul class="sub-menu" aria-expanded="false">
+                        <li><a asp-area="UserPanel" asp-controller="Ticket" asp-action="TicketsList">لیست تیکت‌های پشتیبانی</a></li>
+                        <li><a asp-area="UserPanel" asp-controller="Ticket" asp-action="CreateNewTicket">ثبت تیکت جدید</a></li>
+                    </ul>
+                </li>
             </ul>
         </div>
     </div>

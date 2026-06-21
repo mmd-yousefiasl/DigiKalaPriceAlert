@@ -58,6 +58,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="SensitiveFiles\" />
     <Folder Include="wwwroot\adminAssets\fonts\fontawesome\css\" />
     <Folder Include="wwwroot\adminAssets\fonts\fontawesome\js\" />
     <Folder Include="wwwroot\adminAssets\fonts\fontawesome\less\" />

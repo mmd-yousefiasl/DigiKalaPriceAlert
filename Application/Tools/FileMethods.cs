@@ -50,6 +50,14 @@ namespace Application.Tools
             }
         }
 
+
+        public static string GetSensitiveFilePath(this string fileName, string subFolder)
+        {
+            if (string.IsNullOrEmpty(fileName)) return string.Empty;
+
+            return Directory.GetCurrentDirectory() + "/SensitiveFiles" + subFolder + "/" + fileName;
+        }
+
         public static void RemoveFileFromServer(this string name, string path)
         {
             string fileAddress = Directory.GetCurrentDirectory() + "/wwwroot" + path + name;

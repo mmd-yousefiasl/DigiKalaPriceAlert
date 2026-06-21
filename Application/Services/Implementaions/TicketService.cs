@@ -68,36 +68,52 @@ namespace Application.Services.Implementaions
 
             ticket.Messages.Add(ticketMessage);
 
-            using var transaction = await _context.Database.BeginTransactionAsync();
+            int createdTicketId = 0;
+
+            var strategy = _context.Database.CreateExecutionStrategy();
 
             try
             {
-                if (dto.Attachment is not null && fileName is not null)
+                await strategy.ExecuteAsync(async () =>
                 {
-                    dto.Attachment.UploadSensitiveFileToServer(fileName, SiteTools.TicketAttachmentFile);
-                }
+                    using var transaction = await _context.Database.BeginTransactionAsync();
 
-                _context.Tickets.Add(ticket);
-                await _context.SaveChangesAsync();
+                    try
+                    {
+                        if (dto.Attachment is not null && fileName is not null)
+                        {
+                            dto.Attachment.UploadSensitiveFileToServer(fileName, SiteTools.TicketAttachmentFile);
+                        }
 
-                await transaction.CommitAsync();
+                        _context.Tickets.Add(ticket);
+                        await _context.SaveChangesAsync();
 
-                return ticket.Id;
+                        await transaction.CommitAsync();
+
+                        createdTicketId = ticket.Id;
+                    }
+                    catch (Exception)
+                    {
+                        await transaction.RollbackAsync();
+
+                        if (dto.Attachment is not null && fileName is not null)
+                        {
+                            fileName.RemoveSensitiveFileFromServer(SiteTools.TicketAttachmentFile);
+                        }
+
+                        throw;
+                    }
+                });
             }
             catch (Exception)
             {
-                await transaction.RollbackAsync();
-
-                if (dto.Attachment is not null && fileName is not null)
-                {
-                    fileName.RemoveSensitiveFileFromServer(SiteTools.TicketAttachmentFile);
-                }
-
                 return Result.Failure<int>(Messages.OperationFailedError);
             }
+
+            return createdTicketId;
         }
 
-        public async Task<Result<ClientSideFilterTicketsDto>> ClientSideGetUserTickets(ClientSideFilterTicketsDto filter)
+        public async Task<Result<ClientSideFilterTicketsDto>> ClientSideFilterTickets(ClientSideFilterTicketsDto filter)
         {
             if (filter is null)
                 return Result.Failure<ClientSideFilterTicketsDto>(Messages.OperationFailedError);
@@ -225,7 +241,8 @@ namespace Application.Services.Implementaions
                 TicketId = dto.TicketId,
                 SenderId = userId,
                 Text = dto.MessageText,
-                IsAdminResponse = false
+                IsAdminResponse = false,
+                CreatedDate = DateTime.UtcNow
             };
 
             string? fileName = null;
@@ -235,43 +252,68 @@ namespace Application.Services.Implementaions
                     return Result.Failure(Messages.InvalidFileFormatError);
 
                 if (dto.Attachment.Length > SiteTools.MaxTicketAttachmentLength.CalculateKB())
-                    return Result.Failure<int>(Messages.MaxLengthError);
+                    return Result.Failure(Messages.MaxLengthError);
 
                 fileName = Guid.NewGuid().ToString("N") + Path.GetExtension(dto.Attachment.FileName);
                 ticketMessage.AttachmentPath = fileName;
             }
 
-            ticket.Status = TicketStatusEnum.Open;
+            ticket.Status = TicketStatusEnum.UserReplied;
             ticket.LastUpdatedDate = DateTime.UtcNow;
 
-            using var transaction = await _context.Database.BeginTransactionAsync();
+            var strategy = _context.Database.CreateExecutionStrategy();
 
             try
             {
-                if (dto.Attachment is not null && fileName is not null)
+                await strategy.ExecuteAsync(async () =>
                 {
-                    dto.Attachment.UploadSensitiveFileToServer(fileName, SiteTools.TicketAttachmentFile);
-                }
+                    using var transaction = await _context.Database.BeginTransactionAsync();
 
-                _context.TicketMessages.Add(ticketMessage);
-                _context.Tickets.Update(ticket);
+                    try
+                    {
+                        if (dto.Attachment is not null && fileName is not null)
+                        {
+                            dto.Attachment.UploadSensitiveFileToServer(fileName, SiteTools.TicketAttachmentFile);
+                        }
 
-                await _context.SaveChangesAsync();
-                await transaction.CommitAsync();
+                        _context.TicketMessages.Add(ticketMessage);
+                        _context.Tickets.Update(ticket);
+
+                        await _context.SaveChangesAsync();
+
+                        await transaction.CommitAsync();
+                    }
+                    catch (Exception)
+                    {
+                        await transaction.RollbackAsync();
+
+                        if (dto.Attachment is not null && fileName is not null)
+                        {
+                            fileName.RemoveSensitiveFileFromServer(SiteTools.TicketAttachmentFile);
+                        }
+
+                        throw;
+                    }
+                });
 
                 return Result.Success();
             }
             catch (Exception)
             {
-                await transaction.RollbackAsync();
-
-                if (dto.Attachment is not null && fileName is not null)
-                {
-                    fileName.RemoveSensitiveFileFromServer(SiteTools.TicketAttachmentFile);
-                }
-
                 return Result.Failure(Messages.OperationFailedError);
             }
+        }
+
+        public async Task<Result> ClientSideCanUserAccessAtachment(string fileName)
+        {
+            var userId = _httpContextAccessor.HttpContext.User.GetUserId();
+            if (userId < 1)
+                return Result.Failure(Messages.OperationFailedError);
+
+            if (await _context.TicketMessages.AnyAsync(n => n.AttachmentPath == fileName && n.SenderId == userId))
+                return Result.Success();
+
+            return Result.Failure(Messages.OperationFailedError);
         }
     }
 }

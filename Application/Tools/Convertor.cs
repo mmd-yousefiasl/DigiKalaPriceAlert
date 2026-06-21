@@ -29,8 +29,17 @@ namespace Application.Tools
 
         public static string GetDateTime(this DateTime value)
         {
-            // تبدیل زمان به وقت محلی ایران با منطق اشتراکی
+            if (value == DateTime.MinValue || value.Year < 622)
+            {
+                return "ثبت نشده";
+            }
+
             DateTime localTime = value.NormalizeToIranTimeZone();
+
+            if (localTime.Year < 622)
+            {
+                return "ثبت نشده";
+            }
 
             PersianCalendar pc = new PersianCalendar();
             int day = pc.GetDayOfMonth(localTime);
@@ -61,17 +70,19 @@ namespace Application.Tools
 
         public static string GetDisplayName(this Enum value)
         {
-            FieldInfo fieldInfo = value.GetType().GetField(value.ToString());
+            if (value == null) return "نامشخص";
 
-            DisplayAttribute attribute = fieldInfo.GetCustomAttribute<DisplayAttribute>();
-            if (attribute != null)
-            {
-                return attribute.Name;
-            }
-            else
-            {
-                return value.ToString();
-            }
+            var type = value.GetType();
+
+            var name = Enum.GetName(type, value);
+            if (name == null) return value.ToString();
+
+            var fieldInfo = type.GetField(name);
+            if (fieldInfo == null) return value.ToString();
+
+            var attribute = fieldInfo.GetCustomAttribute<DisplayAttribute>();
+
+            return attribute != null ? attribute.Name : value.ToString();
         }
 
         public static string ToTomanFormat(this decimal value)
