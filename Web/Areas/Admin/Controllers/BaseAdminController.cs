@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Web.Attributes;
 
 namespace Web.Areas.Admin.Controllers
 {
+    [Authorize]
     [Area("Admin")]
     [Permission("AdminPanel")]
     public class BaseAdminController : Controller

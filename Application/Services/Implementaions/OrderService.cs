@@ -1,4 +1,5 @@
 ﻿using Application.Dtos.BalanceTransaction.ClientSide;
+using Application.Dtos.Orders.AdminSide;
 using Application.Dtos.Orders.ClientSide;
 using Application.Dtos.Payment;
 using Application.Dtos.Users.ClientSide;
@@ -362,6 +363,47 @@ namespace Application.Services.Implementaions
                 PaidDate = n.PaidDate,
                 PlanPrice = n.PlanPrice,
                 PlanTitle = n.PlanTitle,
+            }));
+
+            return filter;
+        }
+
+        public async Task<Result<AdminSideFilterOrdersDto>> AdminSIdeFilterOrders(AdminSideFilterOrdersDto filter)
+        {
+            if (filter is null)
+                return Result.Failure<AdminSideFilterOrdersDto>(Messages.OperationFailedError);
+
+            var conditions = Filter.GenerateConditions<Order>();
+
+            if (!string.IsNullOrWhiteSpace(filter.Search))
+            {
+                conditions.Add(n => n.SubscriptionPlan.Name.Contains(filter.Search) ||
+                n.User.Mobile == filter.Search);
+            }
+
+            if (filter.Status is not null)
+            {
+                conditions.Add(n => n.Status == filter.Status);
+            }
+
+            IQueryable<Order> query = _context.Orders;
+
+            query = query.OrderByDescending(n => n.Id);
+
+            foreach (var item in conditions ?? new FilterConditions<Order>())
+            {
+                query = query.Where(item);
+            }
+
+            await filter.Paging(query.Select(n => new AdminSideOrderDto()
+            {
+                Id = n.Id,
+                UserId = n.UserId,
+                Status = n.Status,
+                PaidDate = n.PaidDate,
+                PlanPrice = n.PlanPrice,
+                PlanTitle = n.SubscriptionPlan.Name,
+                UserMobile = n.User.Mobile
             }));
 
             return filter;

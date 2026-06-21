@@ -1,0 +1,119 @@
+﻿@using Application.Dtos.Orders.AdminSide
+@using Application.Tools
+@using Domain.Enums.Orders
+@model AdminSideFilterOrdersDto
+
+@{
+    ViewData["Title"] = "لیست سفارش ها";
+}
+
+<div class="container-fluid">
+
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="page-title-box">
+                <h4>مدیریت سفارش ها</h4>
+                <ol class="breadcrumb m-0">
+                    <li class="breadcrumb-item">
+                        <a asp-area="Admin" asp-controller="Home" asp-action="Index">صفحه نخست</a>
+                    </li>
+                    <li class="breadcrumb-item active">@ViewData["Title"]</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xl-12">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">جست و جوی سفارش ها</h4>
+                    <form novalidate asp-area="Admin" asp-controller="Order" method="get" asp-action="OrdersList" id="search-form">
+                        <input type="hidden" asp-for="Page" id="Page" />
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label" asp-for="Search"></label>
+                                    <input type="text" class="form-control" asp-for="Search" autocomplete="off">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label" asp-for="Status"></label>
+                                    <select type="text" class="form-control" asp-for="Status" asp-items="Html.GetEnumSelectList<OrderStatusEnum>()">
+                                        <option value="">همه</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary" type="submit">جست و جو</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table mb-0">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>شماره سفارش</th>
+                                    <th>کاربر</th>
+                                    <th>پلن انتخابی</th>
+                                    <th>وضعیت</th>
+                                    <th>تاریخ پرداخت</th>
+                                    <th>مقدار پرداختی</th>
+                                </tr>
+                            </thead>
+                            @if (Model?.Entities?.Any() ?? false)
+                            {
+                                <tbody>
+                                    @{
+                                        int counter = 0;
+
+                                        foreach (var item in Model.Entities ?? new List<AdminSideOrderDto>())
+                                        {
+                                            counter++;
+
+                                            <tr>
+                                                <th scope="row">@counter</th>
+                                                <td>#@item.Id</td>
+                                                <td>
+                                                    <a asp-area="Admin" asp-controller="User" asp-action="UserDetails" asp-route-id="@item.UserId" target="_blank">
+                                                        @item.UserMobile
+                                                    </a>
+                                                </td>
+                                                <td>@item.PlanTitle</td>
+                                                <td>@item.Status.GetDisplayName()</td>
+                                                <td>@item.PaidDate?.GetDateTime()</td>
+                                                <td>@item.PlanPrice?.ToToman()</td>
+                                            </tr>
+                                        }
+                                    }
+                                </tbody>
+                            }
+                            else
+                            {
+                                <tbody>
+                                    <tr>
+                                        <td colspan="100">
+                                            <partial name="_NotFoundPartial" />
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            }
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <partial name="_Paging" model="@Model.GetCurrentPaging()" />
+</div>

@@ -1,4 +1,5 @@
-﻿using Application.Dtos.Orders.ClientSide;
+﻿using Application.Dtos.Orders.AdminSide;
+using Application.Dtos.Orders.ClientSide;
 using Application.Dtos.Payment;
 using Domain.Shared;
 
@@ -19,5 +20,7 @@ namespace Application.Services.Interfaces
         Task<Result<int>> ClientSideVerifyOrder();
 
         Task<Result<ClientSideFilterOrdersDto>> ClientSideFilterOrders(ClientSideFilterOrdersDto filter);
+
+        Task<Result<AdminSideFilterOrdersDto>> AdminSIdeFilterOrders(AdminSideFilterOrdersDto filter);
     }
 }
