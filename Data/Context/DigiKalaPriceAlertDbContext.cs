@@ -8,6 +8,7 @@ using Domain.Models.NewsLetters;
 using Domain.Models.Orders;
 using Domain.Models.Products;
 using Domain.Models.SubscriptionPlans;
+using Domain.Models.Tickets;
 using Domain.Models.Users;
 using Microsoft.EntityFrameworkCore;
 
@@ -60,5 +61,9 @@ namespace Data.Context
         public DbSet<SocialMedia> SocialMedia => Set<SocialMedia>();
 
         public DbSet<Order> Orders => Set<Order>();
+
+        public DbSet<Ticket> Tickets => Set<Ticket>();
+        public DbSet<TicketMessage> TicketMessages => Set<TicketMessage>();
+        public DbSet<TicketHistory> TicketHistories => Set<TicketHistory>();
     }
 }
