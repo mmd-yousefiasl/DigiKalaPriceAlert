@@ -26,11 +26,5 @@ namespace Web.Areas.UserPanel.Controllers
 
             return View(result.Value);
         }
-
-        [HttpGet("/user/deposit")]
-        public IActionResult Deposit()
-        {
-            return View();
-        }
     }
 }

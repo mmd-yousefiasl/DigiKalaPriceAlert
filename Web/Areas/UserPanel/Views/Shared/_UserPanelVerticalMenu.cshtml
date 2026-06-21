@@ -14,14 +14,10 @@
                 <li class="menu-title">منو اصلی </li>
 
                 <li>
-                    <a href="javascript: void(0);" class="has-arrow waves-effect">
+                    <a asp-area="UserPanel" asp-controller="User" asp-action="MyTransactions" class="waves-effect">
                         <i class="fas fa-money-check-alt"></i>
-                        <span>مالی</span>
+                        <span>تراکنش های مالی</span>
                     </a>
-                    <ul class="sub-menu" aria-expanded="false">
-                        <li><a asp-area="UserPanel" asp-controller="User" asp-action="MyTransactions">تراکنش های مالی</a></li>
-                        <li><a asp-area="UserPanel" asp-controller="User" asp-action="Deposit">افزایش موجودی کیف پول</a></li>
-                    </ul>
                 </li>
 
                 <li>
