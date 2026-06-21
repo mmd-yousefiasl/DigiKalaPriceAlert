@@ -7,6 +7,6 @@ namespace Application.Services.Interfaces
     {
         Task<Result<PaymentRequestResultDto>> Request(PaymentRequestDto model);
 
-        Task<Result<VerifyPaymentResultDto>> VerifyPayment(VerifyPaymentDto model);
+        Task<Result<VerifyPaymentResultDto>> VerifyPayment(string transId);
     }
 }

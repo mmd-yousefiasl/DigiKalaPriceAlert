@@ -2,7 +2,7 @@
 {
     public class PaymentRequestResultDto
     {
-        public string Status { get; set; }
-        public string TransId { get; set; }
+        public string message { get; set; }
+        public long trackId { get; set; }
     }
 }

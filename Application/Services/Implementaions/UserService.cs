@@ -4,6 +4,7 @@ using Application.Dtos.Users.ClientSide;
 using Application.Services.Interfaces;
 using Application.Tools;
 using Data.Context;
+using Domain.Enums.Users;
 using Domain.Models.Users;
 using Domain.Shared;
 using Microsoft.AspNetCore.Http;
@@ -299,18 +300,101 @@ namespace Application.Services.Implementaions
             return user;
         }
 
-        public async Task<Result<decimal>> ClientSideGetCurrentUserBalance()
+        public async Task<decimal> ClientSideGetCurrentUserBalance()
         {
             var userId = _httpContextAccessor.HttpContext.User.GetUserId();
-            if (userId < 1) return Result.Failure<decimal>(Messages.OperationFailedError);
+            if (userId < 1)
+                return 0;
 
             var userBalance = await _context.Users.Where(n => n.Id == userId)
                 .Select(n => n.Balance)
                 .FirstOrDefaultAsync();
             if (userBalance < 0)
-                return Result.Failure<decimal>(Messages.OperationFailedError);
+                return 0;
 
             return userBalance;
+        }
+
+        public async Task<Result> ClientSideWithdrawUserOrder(ClientSideWithdrawUserOrderDto dto)
+        {
+            if (dto.Amount < 0) return Result.Failure(Messages.OperationFailedError);
+
+            var userId = _httpContextAccessor.HttpContext.User.GetUserId();
+            if (userId < 1) return Result.Failure(Messages.OperationFailedError);
+
+            var user = await _context.Users.Where(n => n.Id == userId).Include(n => n.Transactions).FirstOrDefaultAsync();
+            if (user is null) return Result.Failure(Messages.OperationFailedError);
+
+            if (user.Balance < dto.Amount) return Result.Failure(Messages.InSufficentBalanceError);
+
+            user.Balance -= dto.Amount;
+            user.Transactions.Add(new BalanceTransaction()
+            {
+                IsSuccess = true,
+                Amount = dto.Amount,
+                TransId = null,
+                Type = BalanceTransactionTypeEnum.Debit,
+                Description = $"کاهش موجودی کیف پول جهت تسویه حساب سفارش #{dto.OrderId}"
+            });
+
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
+
+            return Result.Success();
+        }
+
+        public async Task<Result> ClientSideAddToUserSubscription(int durationInDays)
+        {
+            if (durationInDays < 1)
+                return Result.Failure(Messages.OperationFailedError);
+
+            var userId = _httpContextAccessor.HttpContext.User.GetUserId();
+            if (userId < 1)
+                return Result.Failure(Messages.OperationFailedError);
+
+            var user = await _context.Users.FindAsync(userId);
+            if (user is null)
+                return Result.Failure(Messages.OperationFailedError);
+
+            if (user.SubscriptionEndDate == null || user.SubscriptionEndDate <= DateTime.UtcNow)
+            {
+                user.SubscriptionEndDate = DateTime.UtcNow.AddDays(durationInDays);
+            }
+            else
+            {
+                user.SubscriptionEndDate = user.SubscriptionEndDate.Value.AddDays(durationInDays);
+            }
+
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
+
+            return Result.Success();
+        }
+
+        public async Task<Result> ClientSideAddRefundTransaction(decimal amount)
+        {
+            if (amount < 0) return Result.Failure(Messages.OperationFailedError);
+
+            var userId = _httpContextAccessor.HttpContext.User.GetUserId();
+            if (userId < 1) return Result.Failure(Messages.OperationFailedError);
+
+            var user = await _context.Users.Where(n => n.Id == userId).Include(n => n.Transactions).FirstOrDefaultAsync();
+            if (user is null) return Result.Failure(Messages.OperationFailedError);
+
+            user.Balance += amount;
+            user.Transactions.Add(new BalanceTransaction()
+            {
+                IsSuccess = true,
+                Amount = amount,
+                TransId = null,
+                Type = BalanceTransactionTypeEnum.Credit,
+                Description = Messages.RefundUserBalanceMessage
+            });
+
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
+
+            return Result.Success();
         }
     }
 }

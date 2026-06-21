@@ -1,0 +1,134 @@
+﻿@{
+    ViewData["Title"] = "تراکنش ناموفق";
+}
+
+@section HeaderReferences {
+    <style>
+        .digito-payment-wrapper {
+            color: #27272a;
+            direction: rtl;
+            font-family: 'Vazir';
+            padding: 80px 16px;
+            box-sizing: border-box;
+            line-height: 1.6;
+            background-color: #fafafa;
+            min-height: 85vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+            .digito-payment-wrapper *,
+            .digito-payment-wrapper *::before,
+            .digito-payment-wrapper *::after {
+                box-sizing: inherit;
+                margin: 0;
+                padding: 0;
+            }
+
+        .payment-status-card {
+            background-color: #ffffff;
+            border: 1px solid #e4e4e7;
+            border-radius: 20px;
+            padding: 45px 30px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.03);
+        }
+
+        .status-icon-box.failed {
+            background-color: #fef2f2;
+            color: #ed1945;
+            font-size: 36px;
+            border-color: #fca5a5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin: 0 auto 20px auto;
+            border: 2px solid #fca5a5;
+        }
+
+        .payment-status-card h2.failed-title {
+            color: #ed1945;
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 12px;
+        }
+
+        .payment-status-card p {
+            color: #71717a;
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
+
+        .error-notice-box {
+            background-color: #fff1f2;
+            border: 1px solid #ffe4e6;
+            border-radius: 12px;
+            padding: 14px;
+            color: #9f1239;
+            font-size: 13px;
+            text-align: justify;
+            margin-bottom: 32px;
+        }
+
+        .btn-payment-action.failed-btn {
+            display: inline-block;
+            width: 100%;
+            background-color: #ed1945;
+            color: #ffffff;
+            padding: 14px 24px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: bold;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(237, 25, 69, 0.2);
+        }
+
+            .btn-payment-action.failed-btn:hover {
+                background-color: #d1123a;
+                box-shadow: 0 6px 16px rgba(237, 25, 69, 0.3);
+            }
+
+        .back-to-plans-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: #71717a;
+            font-size: 13px;
+            text-decoration: none;
+        }
+
+            .back-to-plans-link:hover {
+                color: #27272a;
+            }
+    </style>
+}
+
+<main class="digito-payment-wrapper">
+    <div class="payment-status-card">
+        <div class="status-icon-box failed">✕</div>
+
+        <h2 class="failed-title">عملیات پرداخت ناموفق بود!</h2>
+        <p>متاسفانه تراکنش بانکی شما تکمیل نشد یا توسط کاربر لغو گردید.</p>
+
+        <div class="error-notice-box">
+            ⚠️ <strong>علت احتمالی:</strong>
+            @(TempData["ErrorMessage"] ?? "انصراف از پرداخت، عدم تکافوی موجودی یا اختلال در سوییچ شبکه بانکی.")
+        </div>
+
+        <a asp-area="" asp-controller="Subscription" asp-action="GetInvoice" class="btn-payment-action failed-btn">
+            🔄 تلاش مجدد و بررسی فاکتور
+        </a>
+
+        <div>
+            <a asp-area="" asp-controller="Subscription" asp-action="Pricing" class="back-to-plans-link">
+                ← بازگشت به جدول پلن‌های اشتراک
+            </a>
+        </div>
+    </div>
+</main>

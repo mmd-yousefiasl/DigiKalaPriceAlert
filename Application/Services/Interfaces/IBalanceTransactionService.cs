@@ -11,5 +11,9 @@ namespace Application.Services.Interfaces
         Task<Result> AdminSideCreateNewTransaction(AdminSideCreateNewBalanceTransactionDto model);
 
         Task<Result<ClientSideFilterBalanceTransactionsDto>> ClientSideFilterTransactions(ClientSideFilterBalanceTransactionsDto filter);
+
+        Task<Result> ClientSideAddUnVerifiedTransaction(ClientSideCreateNewTransactionDto model);
+
+        Task<Result> ClientSideVerifyTransaction(string transId);
     }
 }

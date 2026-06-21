@@ -7,6 +7,7 @@ using Domain.Enums.Users;
 using Domain.Models.Users;
 using Domain.Shared;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 
 namespace Application.Services.Implementaions
 {
@@ -152,6 +153,49 @@ namespace Application.Services.Implementaions
             }));
 
             return filter;
+        }
+
+        public async Task<Result> ClientSideAddUnVerifiedTransaction(ClientSideCreateNewTransactionDto model)
+        {
+            if (model is null) return Result.Failure(Messages.OperationFailedError);
+
+            var userId = _httpContextAccessor.HttpContext.User.GetUserId();
+            if (userId < 1) return Result.Failure(Messages.OperationFailedError);
+
+            var transaction = new BalanceTransaction()
+            {
+                Amount = model.Amount,
+                Type = model.Type,
+                Description = model.Description,
+                IsSuccess = model.IsSuccess,
+                TransId = model.TransId,
+                UserId = userId
+            };
+
+            _context.BalanceTransactions.Add(transaction);
+            await _context.SaveChangesAsync();
+
+            return Result.Success();
+        }
+
+        public async Task<Result> ClientSideVerifyTransaction(string transId)
+        {
+            var transaction = await _context.BalanceTransactions
+                .Include(n => n.User)
+                .FirstOrDefaultAsync(n => n.TransId == transId);
+
+            if (transaction is null)
+                return Result.Failure(Messages.OperationFailedError);
+
+            if (transaction.IsSuccess)
+                return Result.Success(Messages.TransactionAlreadyVerified);
+
+            transaction.IsSuccess = true;
+            transaction.User.Balance += transaction.Amount;
+
+            await _context.SaveChangesAsync();
+
+            return Result.Success();
         }
     }
 }

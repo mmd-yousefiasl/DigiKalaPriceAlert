@@ -28,6 +28,12 @@ namespace Application.Services.Interfaces
 
         Task<Result<ClientSideUserDetailsDto>> ClientSideGetUserDetails();
 
-        Task<Result<decimal>> ClientSideGetCurrentUserBalance();
+        Task<decimal> ClientSideGetCurrentUserBalance();
+
+        Task<Result> ClientSideWithdrawUserOrder(ClientSideWithdrawUserOrderDto dto);
+
+        Task<Result> ClientSideAddToUserSubscription(int durationInDays);
+
+        Task<Result> ClientSideAddRefundTransaction(decimal amount);
     }
 }

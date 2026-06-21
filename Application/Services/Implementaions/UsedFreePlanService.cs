@@ -24,8 +24,16 @@ namespace Application.Services.Implementaions
         }
         #endregion
 
-        public async Task<Result> ClientSideCanUserGetFreePlan(string mobile)
+        public async Task<Result> ClientSideCanUserGetFreePlan()
         {
+            var userId = _httpContextAccessor.HttpContext.User.GetUserId();
+            if (userId < 1)
+                return Result.Failure(Messages.OperationFailedError);
+
+            var mobile = await _context.Users.AsNoTracking()
+                .Where(n => n.Id == userId)
+                .Select(n => n.Mobile)
+                .FirstOrDefaultAsync();
             if (string.IsNullOrWhiteSpace(mobile))
                 return Result.Failure(Messages.OperationFailedError);
 
@@ -35,13 +43,17 @@ namespace Application.Services.Implementaions
             return Result.Success(Messages.FreePlanActivatedSuccessfully);
         }
 
-        public async Task<Result> ClientSideCreateNewUsedFreePlan(string mobile)
+        public async Task<Result> ClientSideCreateNewUsedFreePlan()
         {
-            if (string.IsNullOrWhiteSpace(mobile))
-                return Result.Failure(Messages.OperationFailedError);
-
             var userId = _httpContextAccessor.HttpContext.User.GetUserId();
             if (userId < 1)
+                return Result.Failure(Messages.OperationFailedError);
+
+            var mobile = await _context.Users.AsNoTracking()
+                .Where(n => n.Id == userId)
+                .Select(n => n.Mobile)
+                .FirstOrDefaultAsync();
+            if (string.IsNullOrWhiteSpace(mobile))
                 return Result.Failure(Messages.OperationFailedError);
 
             if (await _context.UsedFreePlans.AnyAsync(n => n.Mobile == mobile))

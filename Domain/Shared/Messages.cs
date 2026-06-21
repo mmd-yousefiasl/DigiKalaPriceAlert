@@ -25,6 +25,9 @@
         public const string YouAlreadyUsedFreePlanError = "طرح رایگان قبلاً برای این شماره فعال شده است";
         public const string InvalidPlanError = "پلن انتخابی معتبر نیست یا غیرفعال شده است";
         public const string EmptyInvoiceError = "سبد خرید یا فاکتور انتخاب‌شده خالی است. لطفاً ابتدا پلن مورد نظر خود را انتخاب کنید.";
+        public const string PaymentFailedError = "پرداخت با شکست مواجه شد";
+        public const string TransactionAlreadyVerified = "تراکنش قبلاً تأیید شده است";
+        public const string InSufficentBalanceError = "موجودی کافی برای انجام تراکنش وجود ندارد";
 
         #endregion
 
@@ -38,12 +41,15 @@
         public const string ContactUsFormMarkedAsReadSuccessfully = "وضعیت فرم تماس باما به خوانده شده تغییر کرد";
         public const string SignInNewsLettersSuccessfully = "عضویت شما در خبرنامه با موفقیت انجام شد. از همراهی شما سپاسگزاریم";
         public const string FreePlanActivatedSuccessfully = "طرح رایگان با موفقیت فعال شد";
+        public const string PaymentDoneSuccessfully = "پرداخت با موفقیت انجام شد";
 
         #endregion
 
         #region Message
 
         public const string ProductPriceChangedMessage = "کاربر گرامی، قیمت حداقل یکی از محصولات مورد رصد شما تغییر یافته است. جهت مشاهده جزئیات به ربات مراجعه کنید.";
+        public const string IncreaseUserBalanceMessage = "افزایش موجودی کیف پول از طریق درگاه پرداخت به منظور پردازش سفارش";
+        public const string RefundUserBalanceMessage = "بازگشت وجه سبد خرید به کیف پول به دلیل خطا در پردازش سفارش.";
 
         #endregion
     }

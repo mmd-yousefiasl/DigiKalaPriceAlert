@@ -334,7 +334,7 @@
                         برای شروع استفاده از سیستم پایش قیمت دیجیتو نیازی به پرداخت وجه نیست. با کلیک روی دکمه زیر، اشتراک تست ۷ روزه فوراً روی حساب شما اعمال شده و به صفحه مدیریت کالاها منتقل می‌شوید.
                     </p>
 
-                    <form action="#" method="post">
+                    <form asp-area="" asp-controller="Subscription" asp-action="Checkout" method="post">
                         <button type="submit" class="btn-checkout-submit btn-free">
                             فعال‌سازی رایگان اشتراک تست 🎉
                         </button>
@@ -349,7 +349,7 @@
                         <strong style="color: #18181b;">@Model.UserBalance.ToTomanFormat() تومان</strong>
                     </div>
 
-                    <form asp-action="FinalizePayment" method="post">
+                    <form asp-area="" asp-controller="Subscription" asp-action="Checkout" method="post" onsubmit="submitAnimation()">
                         @if (Model.UserBalance > 0)
                         {
                             <div style="border: 1px solid #e4e4e7; border-radius: 12px; padding: 16px; margin-bottom: 20px; background-color: #fff; display: flex; align-items: flex-start; gap: 12px;">
@@ -371,7 +371,7 @@
                             </div>
                         </div>
 
-                        <button type="submit" class="btn-checkout-submit">
+                        <button type="submit" class="btn-checkout-submit btn-submit">
                             تایید نهایی و پردازش فاکتور 🚀
                         </button>
                     </form>

@@ -8,7 +8,7 @@ namespace Application.Dtos.Payment
     {
         [Display(Name = "کد تراکنش")]
         [Required(ErrorMessage = Messages.RequiredError)]
-        public string transid { get; set; }
+        public long trackId { get; set; }
 
         [Display(Name = "وضعیت تراکنش")]
         [Required(ErrorMessage = Messages.RequiredError)]

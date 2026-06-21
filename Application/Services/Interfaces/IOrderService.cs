@@ -1,4 +1,5 @@
 ﻿using Application.Dtos.Orders.ClientSide;
+using Application.Dtos.Payment;
 using Domain.Shared;
 
 namespace Application.Services.Interfaces
@@ -10,5 +11,11 @@ namespace Application.Services.Interfaces
         Task<Result<ClientSideInvoiceDto>> ClientSideGetInvoice(int orderId);
 
         Task<Result<int>> ClientSideGetInvoiceId();
+
+        Task<Result<ClientSideProceedToCheckoutDto>> ClientSideProceedToCheckout(bool useBalance);
+
+        Task<Result> ClientSideCheckout(PaymentResultDto dto);
+
+        Task<Result<int>> ClientSideVerifyOrder();
     }
 }

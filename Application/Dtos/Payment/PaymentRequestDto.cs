@@ -2,7 +2,7 @@
 {
     public class PaymentRequestDto
     {
-        public long Amount { get; set; }
+        public decimal Amount { get; set; }
         public string CallBackUrl { get; set; }
     }
 }

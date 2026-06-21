@@ -1,5 +1,8 @@
-﻿using Application.Services.Interfaces;
+﻿using Application.Dtos.Payment;
+using Application.Services.Interfaces;
+using Domain.Enums.Payment;
 using Domain.Shared;
+using Domain.Statics;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -67,9 +70,69 @@ namespace Web.Controllers
             return View(result.Value);
         }
 
+        [Authorize]
+        [HttpPost("/subscription/checkout")]
+        public async Task<IActionResult> Checkout(bool useBalance)
+        {
+            var result = await _orderService.ClientSideProceedToCheckout(useBalance);
+            if (result.IsFailure)
+            {
+                TempData[TemporaryErrorMessage] = result.Message;
+                return RedirectToAction(nameof(GetInvoice));
+            }
+            if (result.Value.IsDone)
+                return RedirectToAction(nameof(VerifyOrder));
+
+            return Redirect(SiteTools.StartPaymentURL + result.Value.TransId);
+        }
+
+        [AllowAnonymous]
+        [HttpGet("/subscription/payment-result")]
+        public async Task<IActionResult> PaymentResult(PaymentResultDto model)
+        {
+            if (!ModelState.IsValid || model.status != PaymentResultStatusEnum.PaidButNotVerified)
+            {
+                TempData[TemporaryErrorMessage] = Messages.PaymentFailedError;
+                return RedirectToAction(nameof(PaymentFailed));
+            }
+            var result = await _orderService.ClientSideCheckout(model);
+            if (result.IsFailure)
+            {
+                return RedirectToAction(nameof(PaymentFailed));
+            }
+
+            return RedirectToAction(nameof(VerifyOrder));
+        }
+
+        [HttpGet("/subscription/verify-order")]
+        public async Task<IActionResult> VerifyOrder()
+        {
+            ViewData["NoIndex"] = true;
+            var result = await _orderService.ClientSideVerifyOrder();
+            if (result.IsFailure) return RedirectToAction(nameof(PaymentFailed));
+
+            return RedirectToAction(nameof(PaymentSuccess), new { orderId = result.Value });
+        }
+
         [HttpGet("/subscription/pricing")]
         public IActionResult Pricing()
         {
+            return View();
+        }
+
+        [Authorize]
+        [HttpGet("/subscription/payment/success")]
+        public IActionResult PaymentSuccess(int orderId)
+        {
+            ViewData["NoIndex"] = true;
+            return View(orderId);
+        }
+
+        [Authorize]
+        [HttpGet("/subscription/payment/failed")]
+        public IActionResult PaymentFailed()
+        {
+            ViewData["NoIndex"] = true;
             return View();
         }
     }

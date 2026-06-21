@@ -6,11 +6,16 @@ namespace Domain.Enums.Payment
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum VerifyPaymentResultStatusEnum
     {
-        [Display(Name = "خطا")]
+        [Display(Name = "خطا در تایید تراکنش")]
         Error = 0,
-        [Display(Name = "موفق")]
-        Success = 1,
-        [Display(Name = "تراکنش قبلا وریفای و پرداخت شده است")]
-        AlreadyVerified = 2
+
+        [Display(Name = "تراکنش با موفقیت تایید شد")]
+        Success = 100,
+
+        [Display(Name = "تراکنش قبلاً تایید شده است")]
+        AlreadyVerified = 201,
+
+        [Display(Name = "سفارش پرداخت نشده یا ناموفق بوده است")]
+        OrderFailedOrUnpaid = 202
     }
 }

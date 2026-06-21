@@ -28,9 +28,9 @@ namespace Application.Services.Implementaions
 
             var requestData = new
             {
-                pin = pinResult.Value,
+                merchant = pinResult.Value,
                 amount = model.Amount,
-                callback = model.CallBackUrl
+                callbackUrl = model.CallBackUrl
             };
 
             using var client = new HttpClient();
@@ -55,18 +55,17 @@ namespace Application.Services.Implementaions
             }
         }
 
-        public async Task<Result<VerifyPaymentResultDto>> VerifyPayment(VerifyPaymentDto model)
+        public async Task<Result<VerifyPaymentResultDto>> VerifyPayment(string transId)
         {
-            if (model is null) return Result.Failure<VerifyPaymentResultDto>(Messages.OperationFailedError);
+            if (string.IsNullOrWhiteSpace(transId)) return Result.Failure<VerifyPaymentResultDto>(Messages.OperationFailedError);
 
             var pinResult = await _paymentDataService.GetPin();
             if (pinResult.IsFailure) return Result.Failure<VerifyPaymentResultDto>(pinResult.Message);
 
             var requestData = new
             {
-                pin = pinResult.Value,
-                amount = model.Amount,
-                transid = model.TransId
+                merchant = pinResult.Value,
+                trackId = transId
             };
 
             using var client = new HttpClient();
