@@ -1,0 +1,194 @@
+﻿@using Application.Dtos.Tickets.AdminSide
+@using Application.Tools
+@using Domain.Enums.Tickets
+@model AdminSideFilterTicketsDto
+
+@{
+    ViewData["Title"] = "لیست تیکت‌های پشتیبانی";
+}
+
+<div class="container-fluid">
+
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="page-title-box">
+                <h4>مدیریت تیکت های پشتیبانی</h4>
+                <ol class="breadcrumb m-0">
+                    <li class="breadcrumb-item"><a asp-area="Admin" asp-controller="Home" asp-action="Index">صفحه نخست</a></li>
+                    <li class="breadcrumb-item active">@ViewData["Title"]</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <div class="card border border-dark mb-4">
+        <div class="card-body">
+            <form novalidate asp-area="Admin" asp-controller="Ticket" method="get" asp-action="TicketsList" id="search-form">
+                <input type="hidden" asp-for="Page" id="Page" />
+                <div class="row g-3">
+                    <div class="col-12 col-md-3">
+                        <label class="form-label font-size-12 fw-bold text-dark" asp-for="Search"></label>
+                        <input type="text" class="form-control border-dark-subtle font-size-13" asp-for="Search" autocomplete="off" placeholder="عنوان تیکت...">
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <label class="form-label font-size-12 fw-bold text-dark" asp-for="Category"></label>
+                        <select class="form-control form-select border-dark-subtle font-size-13" asp-for="Category" asp-items="@Html.GetEnumSelectList<TicketCategoryEnum>()">
+                            <option value="">همه دسته‌ها</option>
+                        </select>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <label class="form-label font-size-12 fw-bold text-dark" asp-for="Priority"></label>
+                        <select class="form-control form-select border-dark-subtle font-size-13" asp-for="Priority" asp-items="@Html.GetEnumSelectList<TicketPriorityEnum>()">
+                            <option value="">همه اولویت‌ها</option>
+                        </select>
+                    </div>
+                    <div class="col-12 col-md-3">
+                        <label class="form-label font-size-12 fw-bold text-dark" asp-for="Status"></label>
+                        <select class="form-control form-select border-dark-subtle font-size-13" asp-for="Status" asp-items="@Html.GetEnumSelectList<TicketStatusEnum>()">
+                            <option value="">همه وضعیت‌ها</option>
+                        </select>
+                    </div>
+                    <div class="col-12 d-flex justify-content-between align-items-center mt-3">
+                        <button class="btn btn-dark btn-sm px-4 font-size-13" type="submit">
+                            <i class="mdi mdi-magnify me-1"></i> جستجو و فیلتر
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @if (Model?.Entities?.Any() ?? false)
+    {
+        int counter = 0;
+
+        <div class="card border border-dark d-none d-md-block shadow-sm">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover table-centered mb-0 font-size-13">
+                        <thead class="table-light text-dark">
+                            <tr>
+                                <th style="width: 50px;" class="text-center">#</th>
+                                <th>عنوان تیکت</th>
+                                <th>دسته بندی</th>
+                                <th>اولویت</th>
+                                <th>وضعیت</th>
+                                <th>آخرین بروزرسانی</th>
+                                <th class="text-center" style="width: 100px;">عملیات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.Entities)
+                            {
+                                counter++;
+
+                                string badgeClass = item.Status switch
+                                {
+                                    TicketStatusEnum.Open => "bg-dark",
+                                    TicketStatusEnum.Pending => "bg-soft-warning text-warning",
+                                    TicketStatusEnum.Answered => "bg-soft-success text-success",
+                                    TicketStatusEnum.UserReplied => "bg-soft-primary text-primary",
+                                    TicketStatusEnum.Closed => "bg-light text-muted border",
+                                    _ => "bg-light text-dark"
+                                };
+
+                                <tr>
+                                    <td class="text-center text-muted">@item.Id</td>
+                                    <td class="fw-bold text-dark">
+                                        <a asp-area="Admin" asp-controller="Ticket" asp-action="TicketDetails" asp-route-id="@item.Id" class="text-dark decoration-none">@item.Title</a>
+                                    </td>
+                                    <td><span class="badge bg-light text-dark border px-2 py-1">@item.Category.GetDisplayName()</span></td>
+                                    <td>
+                                        @switch (item.Priority)
+                                        {
+                                            case TicketPriorityEnum.High:
+                                                <span class="badge bg-soft-danger text-danger px-2 py-1">فوری</span>
+                                                break;
+                                            case TicketPriorityEnum.Medium:
+                                                <span class="badge bg-soft-warning text-warning px-2 py-1">متوسط</span>
+                                                break;
+                                            default:
+                                                <span class="badge bg-light text-dark border px-2 py-1">کم</span>
+                                                break;
+                                        }
+                                    </td>
+                                    <td>
+                                        <span class="badge @badgeClass px-2 py-1">@item.Status.GetDisplayName()</span>
+                                    </td>
+                                    <td class="text-muted">@item.LastUpdatedDate.GetDateTime()</td>
+                                    <td class="text-center">
+                                        <a permission="TicketDetails" asp-area="Admin" asp-controller="Ticket" asp-action="TicketDetails" asp-route-id="@item.Id" class="btn btn-dark btn-sm font-size-12 py-1 px-2">
+                                            مشاهده
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-block d-md-none">
+            @foreach (var item in Model.Entities)
+            {
+                string badgeClass = item.Status switch
+                {
+                    TicketStatusEnum.Open => "bg-dark",
+                    TicketStatusEnum.Pending => "bg-soft-warning text-warning",
+                    TicketStatusEnum.Answered => "bg-soft-success text-success",
+                    TicketStatusEnum.UserReplied => "bg-soft-primary text-primary",
+                    TicketStatusEnum.Closed => "bg-light text-muted border",
+                    _ => "bg-light text-dark"
+                };
+
+                string borderMobileColor = item.Status switch
+                {
+                    TicketStatusEnum.Open => "#000000",
+                    TicketStatusEnum.Pending => "#f1c40f",
+                    TicketStatusEnum.Answered => "#2a9d8f",
+                    TicketStatusEnum.UserReplied => "#3498db",
+                    TicketStatusEnum.Closed => "#dee2e6",
+                    _ => "#dee2e6"
+                };
+
+                <div class="mb-2 p-3 shadow-sm cursor-pointer"
+                     style="border: 1px solid #e9ecef; border-right: 4px solid @borderMobileColor; border-radius: 4px; background: #ffffff;"
+                     onclick="window.location.href='/admin/ticket-details?id=@item.Id'" permission="TicketDetails">
+
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="fw-bold font-size-14 text-dark">@item.Title</span>
+                        <span class="badge @badgeClass px-2 py-1">@item.Status.GetDisplayName()</span>
+                    </div>
+
+                    <div class="d-flex justify-content-between text-muted font-size-12 mb-2">
+                        <span><i class="mdi mdi-folder-outline me-1"></i> @item.Category.GetDisplayName()</span>
+                        <span>
+                            اولویت:
+                            <b class="@(item.Priority == TicketPriorityEnum.High ? "text-danger" : "text-dark")">
+                                @item.Priority.GetDisplayName()
+                            </b>
+                        </span>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center text-muted font-size-11 border-top pt-2 mt-2">
+                        <span>شماره تیکت: <b class="text-dark">#@item.Id</b></span>
+                        <span>@item.LastUpdatedDate.GetDateTime() <i class="mdi mdi-clock-outline ms-1"></i></span>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="card border border-dark">
+            <div class="card-body p-0">
+                <partial name="_NotFoundPartial" />
+            </div>
+        </div>
+    }
+
+    <div class="mt-3">
+        <partial name="_Paging" model="@Model.GetCurrentPaging()" />
+    </div>
+</div>

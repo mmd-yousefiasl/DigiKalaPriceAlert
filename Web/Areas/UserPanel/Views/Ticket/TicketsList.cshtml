@@ -98,7 +98,7 @@
                                 <tr>
                                     <td class="text-center text-muted">@item.Id</td>
                                     <td class="fw-bold text-dark">
-                                        <a href="/user/ticket/@item.Id" class="text-dark decoration-none">@item.Title</a>
+                                        <a asp-area="UserPanel" asp-controller="Ticket" asp-action="TicketDetails" asp-route-id="@item.Id" class="text-dark decoration-none">@item.Title</a>
                                     </td>
                                     <td><span class="badge bg-light text-dark border px-2 py-1">@item.Category.GetDisplayName()</span></td>
                                     <td>

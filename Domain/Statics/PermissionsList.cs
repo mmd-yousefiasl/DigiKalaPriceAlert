@@ -368,9 +368,40 @@ namespace Domain.Statics
                 UniqueName = "DeleteMedia"
             },
             #endregion
+
+            #region Ticket
+            new Permission
+            {
+                Id = 48,
+                ParentId = 1,
+                Title = "مدیریت تیکت های پشتیبانی",
+                UniqueName = "ManageTickets"
+            },
+            new Permission
+            {
+                Id = 49,
+                ParentId = 48,
+                Title = "لیست تیکت های پشتیبانی",
+                UniqueName = "TicketsList"
+            },
+            new Permission
+            {
+                Id = 50,
+                ParentId = 48,
+                Title = "جزئیات تیکت پشتیبانی",
+                UniqueName = "TicketDetails"
+            },
+            new Permission
+            {
+                Id = 51,
+                ParentId = 48,
+                Title = "بستن تیکت پشتیبانی",
+                UniqueName = "CloseTicket"
+            },
+            #endregion
         };
 
-        //Last used id ==> 47
+        //Last used id ==> 51
         public static List<Permission> Permissions = _permissions;
     }
 }

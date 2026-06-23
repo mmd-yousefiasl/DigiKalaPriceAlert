@@ -151,7 +151,7 @@ namespace Application.Services.Implementaions
             {
                 query = query.Where(item);
             }
-            query = query.OrderByDescending(n => n.Id);
+            query = query.OrderByDescending(n => n.LastUpdatedDate);
 
             await filter.Paging(query.Select(n => new ClientSideTicketDto()
             {
@@ -311,7 +311,7 @@ namespace Application.Services.Implementaions
             if (userId < 1)
                 return Result.Failure(Messages.OperationFailedError);
 
-            if (await _context.TicketMessages.AnyAsync(n => n.AttachmentPath == fileName && n.SenderId == userId))
+            if (await _context.TicketMessages.AnyAsync(n => n.AttachmentPath == fileName && n.Ticket.UserId == userId))
                 return Result.Success();
 
             return Result.Failure(Messages.OperationFailedError);
@@ -350,7 +350,7 @@ namespace Application.Services.Implementaions
             {
                 query = query.Where(item);
             }
-            query = query.OrderByDescending(n => n.Id);
+            query = query.OrderByDescending(n => n.LastUpdatedDate);
 
             await filter.Paging(query.Select(n => new AdminSideTicketDto()
             {
@@ -368,13 +368,9 @@ namespace Application.Services.Implementaions
 
         public async Task<Result<AdminSideTicketDetailsDto>> AdminSideGetTicketDetails(int ticketId)
         {
-            var userId = _httpContextAccessor.HttpContext.User.GetUserId();
-            if (userId < 1)
-                return Result.Failure<AdminSideTicketDetailsDto>(Messages.OperationFailedError);
-
             var ticket = await _context.Tickets
                 .AsNoTracking()
-                .Where(n => n.Id == ticketId && n.UserId == userId)
+                .Where(n => n.Id == ticketId)
                 .Select(n => new AdminSideTicketDetailsDto()
                 {
                     Id = n.Id,
@@ -427,7 +423,7 @@ namespace Application.Services.Implementaions
                 return Result.Failure(Messages.OperationFailedError);
 
             var ticket = await _context.Tickets
-                .FirstOrDefaultAsync(t => t.Id == dto.TicketId && t.UserId == userId);
+                .FirstOrDefaultAsync(t => t.Id == dto.TicketId);
 
             if (ticket is null)
                 return Result.Failure(Messages.OperationFailedError);
@@ -437,8 +433,8 @@ namespace Application.Services.Implementaions
                 TicketId = dto.TicketId,
                 SenderId = userId,
                 Text = dto.MessageText,
-                IsAdminResponse = false,
-                CreatedDate = DateTime.UtcNow
+                IsAdminResponse = true,
+                CreatedDate = DateTime.UtcNow,
             };
 
             string? fileName = null;
@@ -454,7 +450,7 @@ namespace Application.Services.Implementaions
                 ticketMessage.AttachmentPath = fileName;
             }
 
-            ticket.Status = TicketStatusEnum.UserReplied;
+            ticket.Status = TicketStatusEnum.Answered;
             ticket.LastUpdatedDate = DateTime.UtcNow;
 
             var strategy = _context.Database.CreateExecutionStrategy();
