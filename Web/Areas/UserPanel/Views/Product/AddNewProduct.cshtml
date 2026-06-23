@@ -1,0 +1,72 @@
+﻿<div class="container-fluid">
+    <div class="row align-items-center mb-4">
+        <div class="col-12">
+            <h4 class="page-title mb-0 fw-bold font-size-18 text-dark">
+                <i class="mdi mdi-plus-circle-outline text-primary me-2"></i> افزودن محصول جدید به دیده‌بان
+            </h4>
+            <p class="text-muted font-size-13 mb-0 mt-1">لینک یا شناسه محصول را وارد کنید تا سیستم مانیتورینگ قیمت را آغاز کند.</p>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6">
+            <div class="card shadow-sm border-0 rounded-3">
+                <div class="card-body p-4">
+
+                    <form asp-area="UserPanel" asp-controller="Product" asp-action="AddProduct" method="post">
+
+                        <div class="form-group mb-4">
+                            <label for="ProductIdentifier" class="form-label fw-bold text-dark font-size-13 mb-2">
+                                لینک محصول یا شناسه کالا (DKP ID)
+                            </label>
+
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0 text-muted">
+                                    <i class="mdi mdi-link-variant font-size-18"></i>
+                                </span>
+                                <input type="text"
+                                       id="ProductIdentifier"
+                                       name="ProductIdentifier"
+                                       class="form-control font-size-14 py-2 border-start-0"
+                                       placeholder="مثلا: https://www.digikala.com/... یا dkp-12345"
+                                       required
+                                       autocomplete="off" />
+                            </div>
+
+                            <div class="form-text text-muted font-size-11 mt-2 d-flex align-items-start">
+                                <i class="mdi mdi-information-outline text-info me-1 font-size-14"></i>
+                                <span>شما می‌توانید لینک کامل صفحه محصول یا صرفاً شناسه عددی آن را وارد کنید. سیستم به صورت خودکار اطلاعات را استخراج خواهد کرد.</span>
+                            </div>
+                        </div>
+
+                        <div class="d-flex flex-column flex-sm-row gap-2 pt-2 border-top border-light">
+                            <button type="submit" class="btn btn-primary btn-md px-4 py-2 flex-grow-1 font-size-13 rounded-2 shadow-sm">
+                                <i class="mdi mdi-magnify-plus me-1 align-middle font-size-16"></i>
+                                <span class="align-middle">بررسی و شروع مانیتورینگ</span>
+                            </button>
+
+                            <a asp-area="UserPanel" asp-controller="Product" asp-action="WatchList" class="btn btn-outline-secondary btn-md px-4 py-2 font-size-13 rounded-2">
+                                انصراف
+                            </a>
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+
+            <div class="card bg-soft-primary border-0 rounded-3 mt-3">
+                <div class="card-body p-3 d-flex align-items-center">
+                    <div class="avatar-sm bg-primary rounded-circle d-flex align-items-center justify-content-center text-white me-3" style="width: 40px; height: 40px; min-width: 40px;">
+                        <i class="mdi mdi-robot-outline font-size-20"></i>
+                    </div>
+                    <div>
+                        <h6 class="font-size-13 text-dark fw-bold mb-1">مکانیزم هوشمند ربات WishTracker</h6>
+                        <p class="text-muted font-size-11 mb-0">به محض کاهش قیمت، ربات تلگرام پروژه تغییرات را به صورت آنی به شما اعلان خواهد کرد.</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

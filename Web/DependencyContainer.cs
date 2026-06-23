@@ -52,6 +52,7 @@ namespace Web
             services.AddScoped<IOrderService, OrderService>();
             services.AddScoped<ISubscriptionPlanService, SubscriptionPlanService>();
             services.AddScoped<ITicketService, TicketService>();
+            services.AddScoped<IProductService, ProductService>();
         }
     }
 }

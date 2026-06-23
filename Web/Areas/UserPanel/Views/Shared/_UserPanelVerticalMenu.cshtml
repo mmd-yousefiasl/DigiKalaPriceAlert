@@ -37,6 +37,17 @@
                         <li><a asp-area="UserPanel" asp-controller="Ticket" asp-action="CreateNewTicket">ثبت تیکت جدید</a></li>
                     </ul>
                 </li>
+
+                <li>
+                    <a href="javascript: void(0);" class="has-arrow waves-effect">
+                        <i class="mdi mdi-format-list-bulleted"></i>
+                        <span>محصولات</span>
+                    </a>
+                    <ul class="sub-menu" aria-expanded="false">
+                        <li><a asp-area="UserPanel" asp-controller="Product" asp-action="ProductsList">لیست محصولات در حال رصد</a></li>
+                        <li><a asp-area="UserPanel" asp-controller="Product" asp-action="AddNewProduct">افزودن محصول</a></li>
+                    </ul>
+                </li>
             </ul>
         </div>
     </div>

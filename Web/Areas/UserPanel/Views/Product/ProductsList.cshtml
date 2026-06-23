@@ -1,0 +1,133 @@
+﻿@if (3 > 2)
+{
+    <div class="container-fluid">
+        <div class="row align-items-center mb-4">
+            <div class="col-12">
+                <h4 class="page-title mb-0 fw-bold font-size-18 text-dark">
+                    <i class="mdi mdi-eye-outline text-primary me-2"></i> لیست دیده‌بان من (WishList)
+                </h4>
+                <p class="text-muted font-size-13 mb-0 mt-1">محصولاتی که برای مانیتورینگ قیمت نشان کرده‌اید.</p>
+            </div>
+        </div>
+
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+
+            <div class="col">
+                <div class="card h-100 shadow-sm border-0 rounded-3 position-relative overflow-hidden">
+                    <button type="button" class="btn btn-sm btn-light text-danger position-absolute top-0 end-0 m-2 rounded-circle shadow-sm" style="z-index: 10;" title="حذف از لیست">
+                        <i class="mdi mdi-trash-can-outline font-size-16"></i>
+                    </button>
+
+                    <a href="/products/details/1" class="bg-light d-flex align-items-center justify-content-center p-3 d-block" style="height: 200px;">
+                        <img src="https://picsum.photos/200/200?random=1" class="img-fluid rounded-2 object-fit-contain h-100" alt="نام محصول هاردکد">
+                    </a>
+
+                    <div class="card-body d-flex flex-column p-3">
+                        <span class="badge bg-soft-success text-success font-size-11 align-self-start mb-2 px-2 py-1 rounded">در حال مانیتور</span>
+
+                        <a href="/products/details/1" class="text-decoration-none">
+                            <h5 class="font-size-14 text-dark fw-bold mb-2 text-truncate" title="گوشی موبایل سامسونگ مدل Galaxy S24 Ultra">
+                                گوشی موبایل سامسونگ مدل Galaxy S24 Ultra
+                            </h5>
+                        </a>
+
+                        <div class="mt-auto pt-3 border-top border-light">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="text-muted font-size-12">قیمت فعلی:</span>
+                                <span class="text-primary fw-extrabold font-size-15">۶۲,۵۰۰,۰۰۰ <span class="font-size-11 text-muted">تومان</span></span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="text-muted font-size-11">آخرین تغییر قیمت:</span>
+                                <span class="text-muted font-size-11 fw-bold">۲ ساعت قبل</span>
+                            </div>
+
+                            <div class="row g-2">
+                                <div class="col-8">
+                                    <a href="#" class="btn btn-primary btn-sm w-100 py-2 font-size-12 rounded-2">
+                                        <i class="mdi mdi-chart-bell-curve-cumulative me-1"></i> نمودار قیمت
+                                    </a>
+                                </div>
+                                <div class="col-4">
+                                    <a href="#" target="_blank" class="btn btn-outline-secondary btn-sm w-100 py-2 rounded-2" title="مشاهده در سایت منبع">
+                                        <i class="mdi mdi-open-in-new"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="card h-100 shadow-sm border-0 rounded-3 position-relative overflow-hidden">
+                    <button type="button" class="btn btn-sm btn-light text-danger position-absolute top-0 end-0 m-2 rounded-circle shadow-sm" style="z-index: 10;" title="حذف از لیست">
+                        <i class="mdi mdi-trash-can-outline font-size-16"></i>
+                    </button>
+
+                    <a href="/products/details/2" class="bg-light d-flex align-items-center justify-content-center p-3 d-block" style="height: 200px;">
+                        <img src="https://picsum.photos/200/200?random=2" class="img-fluid rounded-2 object-fit-contain h-100" alt="نام محصول">
+                    </a>
+
+                    <div class="card-body d-flex flex-column p-3">
+                        <span class="badge bg-soft-danger text-danger font-size-11 align-self-start mb-2 px-2 py-1 rounded">توقف مانیتور</span>
+
+                        <a href="/products/details/2" class="text-decoration-none">
+                            <h5 class="font-size-14 text-dark fw-bold mb-2 text-truncate" title="لپ تاپ ایسوس مدل ROG Strix G16">
+                                لپ تاپ ۱۵.۶ اینچی ایسوس مدل ROG Strix G16
+                            </h5>
+                        </a>
+
+                        <div class="mt-auto pt-3 border-top border-light">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="text-muted font-size-12">قیمت فعلی:</span>
+                                <span class="text-dark fw-extrabold font-size-15">۸۹,۹۰۰,۰۰۰ <span class="font-size-11 text-muted">تومان</span></span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="text-muted font-size-11">آخرین تغییر قیمت:</span>
+                                <span class="text-muted font-size-11 fw-bold">دیروز</span>
+                            </div>
+
+                            <div class="row g-2">
+                                <div class="col-8">
+                                    <a href="#" class="btn btn-primary btn-sm w-100 py-2 font-size-12 rounded-2">
+                                        <i class="mdi mdi-chart-bell-curve-cumulative me-1"></i> نمودار قیمت
+                                    </a>
+                                </div>
+                                <div class="col-4">
+                                    <a href="#" target="_blank" class="btn btn-outline-secondary btn-sm w-100 py-2 rounded-2" title="مشاهده در سایت منبع">
+                                        <i class="mdi mdi-open-in-new"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+}
+else
+{
+    <div class="container-fluid">
+        <div class="row justify-content-center align-items-center" style="min-height: 70vh;">
+            <div class="col-12 col-md-6 col-lg-4 text-center">
+
+                <div class="avatar-md mx-auto mb-4 bg-soft-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 100px; height: 100px;">
+                    <i class="mdi mdi-eye-off-outline text-primary" style="font-size: 48px;"></i>
+                </div>
+
+                <h3 class="font-size-18 text-dark fw-bold mb-2">لیست دیده‌بان شما خالی است!</h3>
+                <p class="text-muted font-size-13 mb-4 mx-auto" style="max-width: 320px; line-height: 1.6;">
+                    در حال حاضر هیچ محصولی را برای مانیتورینگ و رصد قیمت اضافه نکرده‌اید. با اضافه کردن اولین محصول، تغییرات قیمت به شما اطلاع‌رسانی می‌شود.
+                </p>
+
+                <a href="/products/add" class="btn btn-primary btn-md px-4 py-2 font-size-13 rounded-3 shadow-sm transition-all">
+                    <i class="mdi mdi-plus-circle-outline me-1 align-middle font-size-16"></i>
+                    <span class="align-middle">افزودن محصول جدید به دیده‌بان</span>
+                </a>
+
+            </div>
+        </div>
+    </div>
+}
