@@ -51,6 +51,11 @@
         public const string ProductPriceChangedMessage = "کاربر گرامی، قیمت حداقل یکی از محصولات مورد رصد شما تغییر یافته است. جهت مشاهده جزئیات به ربات مراجعه کنید.";
         public const string IncreaseUserBalanceMessage = "افزایش موجودی کیف پول از طریق درگاه پرداخت به منظور پردازش سفارش";
         public const string RefundUserBalanceMessage = "بازگشت وجه سبد خرید به کیف پول به دلیل خطا در پردازش سفارش.";
+        public const string NewTicketCreatedByUser = "تیکت جدید توسط کاربر ایجاد شد";
+        public const string TicketClosedByUser = "تیکت توسط کاربر بسته شد";
+        public const string NewMessageSentByUser = "پیام جدید تیکت توسط کاربر ارسال شد";
+        public const string TicketClosedByAdmin = "تیکت توسط ادمین بسته شد";
+        public const string NewMessageSentByAdmin = "پیام جدید تیکت توسط ادمین ارسال شد";
 
         #endregion
     }

@@ -1,4 +1,5 @@
-﻿using Application.Dtos.Tickets.AdminSide;
+﻿using Application.Dtos.Tickets;
+using Application.Dtos.Tickets.AdminSide;
 using Application.Dtos.Tickets.ClientSide;
 using Application.Services.Interfaces;
 using Application.Tools;
@@ -111,6 +112,12 @@ namespace Application.Services.Implementaions
                 return Result.Failure<int>(Messages.OperationFailedError);
             }
 
+            await CreateNewTicketHistory(new CreateTicketHistoryDto
+            {
+                TicketId = createdTicketId,
+                Description = Messages.NewTicketCreatedByUser
+            });
+
             return createdTicketId;
         }
 
@@ -147,7 +154,7 @@ namespace Application.Services.Implementaions
 
             IQueryable<Ticket> query = _context.Tickets;
 
-            foreach (var item in conditions ?? new FilterConditions<Ticket>())
+            foreach (var item in conditions)
             {
                 query = query.Where(item);
             }
@@ -218,6 +225,13 @@ namespace Application.Services.Implementaions
 
             _context.Tickets.Update(ticket);
             await _context.SaveChangesAsync();
+
+            // Track user closing the ticket
+            await CreateNewTicketHistory(new CreateTicketHistoryDto
+            {
+                TicketId = ticketId,
+                Description = Messages.TicketClosedByUser
+            });
 
             return Result.Success(Messages.TicketClosedSuccessfully);
         }
@@ -295,6 +309,12 @@ namespace Application.Services.Implementaions
 
                         throw;
                     }
+                });
+
+                await CreateNewTicketHistory(new CreateTicketHistoryDto
+                {
+                    TicketId = dto.TicketId,
+                    Description = Messages.NewMessageSentByUser
                 });
 
                 return Result.Success();
@@ -410,6 +430,13 @@ namespace Application.Services.Implementaions
             _context.Update(ticket);
             await _context.SaveChangesAsync();
 
+            // Track admin closing the ticket
+            await CreateNewTicketHistory(new CreateTicketHistoryDto
+            {
+                TicketId = ticketId,
+                Description = Messages.TicketClosedByAdmin
+            });
+
             return Result.Success();
         }
 
@@ -488,12 +515,71 @@ namespace Application.Services.Implementaions
                     }
                 });
 
+                await CreateNewTicketHistory(new CreateTicketHistoryDto
+                {
+                    TicketId = dto.TicketId,
+                    Description = Messages.NewMessageSentByAdmin
+                });
+
                 return Result.Success();
             }
             catch (Exception)
             {
                 return Result.Failure(Messages.OperationFailedError);
             }
+        }
+
+        public async Task CreateNewTicketHistory(CreateTicketHistoryDto dto)
+        {
+            if (dto is null)
+                return;
+
+            var userId = _httpContextAccessor.HttpContext.User.GetUserId();
+            if (userId < 1)
+                return;
+
+            var history = new TicketHistory()
+            {
+                Description = dto.Description,
+                TicketId = dto.TicketId,
+                ActorId = userId
+            };
+
+            _context.TicketHistories.Add(history);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<Result<AdminSideFilterTicketHistoryDto>> AdminSideFilterTicketHistory(AdminSideFilterTicketHistoryDto filter)
+        {
+            if (filter is null)
+                return Result.Failure<AdminSideFilterTicketHistoryDto>(Messages.OperationFailedError);
+
+            var conditions = Filter.GenerateConditions<TicketHistory>();
+
+            conditions.Add(n => n.TicketId == filter.TicketId);
+
+            if (!string.IsNullOrWhiteSpace(filter.Search))
+            {
+                conditions.Add(n => n.Description.Contains(filter.Search));
+            }
+
+            IQueryable<TicketHistory> query = _context.TicketHistories;
+
+            foreach (var item in conditions)
+            {
+                query = query.Where(item);
+            }
+
+            query = query.OrderByDescending(n => n.Id);
+
+            await filter.Paging(query.Select(n => new AdminSideTicketHistoryDto()
+            {
+                Id = n.Id,
+                Description = n.Description,
+                ActorId = n.ActorId
+            }));
+
+            return filter;
         }
     }
 }

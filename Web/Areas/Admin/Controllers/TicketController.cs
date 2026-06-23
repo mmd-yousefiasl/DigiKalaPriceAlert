@@ -111,5 +111,19 @@ namespace Web.Areas.Admin.Controllers
             var fileBytes = await System.IO.File.ReadAllBytesAsync(savePath);
             return File(fileBytes, contentType);
         }
+
+        [Permission("TicketHistory")]
+        [HttpGet("/admin/ticket-history")]
+        public async Task<IActionResult> TicketHistory(AdminSideFilterTicketHistoryDto filter)
+        {
+            var result = await _ticketService.AdminSideFilterTicketHistory(filter);
+            if (result.IsFailure)
+                return View(new AdminSideFilterTicketHistoryDto()
+                {
+                    TicketId = filter.TicketId
+                });
+
+            return View(result.Value);
+        }
     }
 }

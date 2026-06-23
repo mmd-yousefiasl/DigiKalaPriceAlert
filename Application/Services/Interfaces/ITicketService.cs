@@ -1,4 +1,5 @@
-﻿using Application.Dtos.Tickets.AdminSide;
+﻿using Application.Dtos.Tickets;
+using Application.Dtos.Tickets.AdminSide;
 using Application.Dtos.Tickets.ClientSide;
 using Domain.Shared;
 
@@ -25,5 +26,9 @@ namespace Application.Services.Interfaces
         Task<Result> AdminSideCloseTicket(int ticketId);
 
         Task<Result> AdminSideSendNewMessage(AdminSideSendTicketMessageDto dto);
+
+        Task CreateNewTicketHistory(CreateTicketHistoryDto dto);
+
+        Task<Result<AdminSideFilterTicketHistoryDto>> AdminSideFilterTicketHistory(AdminSideFilterTicketHistoryDto filter);
     }
 }
