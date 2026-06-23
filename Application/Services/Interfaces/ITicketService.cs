@@ -1,4 +1,5 @@
-﻿using Application.Dtos.Tickets.ClientSide;
+﻿using Application.Dtos.Tickets.AdminSide;
+using Application.Dtos.Tickets.ClientSide;
 using Domain.Shared;
 
 namespace Application.Services.Interfaces
@@ -16,5 +17,13 @@ namespace Application.Services.Interfaces
         Task<Result> ClientSideSendNewMessage(ClientSideSendTicketMessageDto dto);
 
         Task<Result> ClientSideCanUserAccessAtachment(string fileName);
+
+        Task<Result<AdminSideFilterTicketsDto>> AdminSideFilterTickets(AdminSideFilterTicketsDto filter);
+
+        Task<Result<AdminSideTicketDetailsDto>> AdminSideGetTicketDetails(int ticketId);
+
+        Task<Result> AdminSideCloseTicket(int ticketId);
+
+        Task<Result> AdminSideSendNewMessage(AdminSideSendTicketMessageDto dto);
     }
 }
