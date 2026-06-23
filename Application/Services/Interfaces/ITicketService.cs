@@ -30,5 +30,7 @@ namespace Application.Services.Interfaces
         Task CreateNewTicketHistory(CreateTicketHistoryDto dto);
 
         Task<Result<AdminSideFilterTicketHistoryDto>> AdminSideFilterTicketHistory(AdminSideFilterTicketHistoryDto filter);
+
+        Task<Result> AdminSideUpdateTicketStatus(AdminSideUpdateTicketStatusDto dto);
     }
 }

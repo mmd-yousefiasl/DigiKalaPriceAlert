@@ -282,3 +282,9 @@ function toggleRow(id) {
         element.style.maxHeight = "0px";
     }
 }
+
+function submitFormOnChange(form) {
+    if (form) {
+        form.submit();
+    }
+}

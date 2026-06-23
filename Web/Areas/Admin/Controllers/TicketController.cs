@@ -125,5 +125,21 @@ namespace Web.Areas.Admin.Controllers
 
             return View(result.Value);
         }
+
+        [Permission("UpdateTicketStatus")]
+        [HttpPost("/admin/edit-ticket-status"), ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateTicketStatus(AdminSideUpdateTicketStatusDto dto)
+        {
+            var result = await _ticketService.AdminSideUpdateTicketStatus(dto);
+            if (result.IsFailure)
+            {
+                TempData[TemporaryErrorMessage] = result.Message;
+            }
+            else
+            {
+                TempData[TemporarySuccessMessage] = result.Message;
+            }
+            return RedirectToAction(nameof(TicketDetails), new { id = dto.Id });
+        }
     }
 }

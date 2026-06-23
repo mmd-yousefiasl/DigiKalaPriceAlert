@@ -576,10 +576,35 @@ namespace Application.Services.Implementaions
             {
                 Id = n.Id,
                 Description = n.Description,
-                ActorId = n.ActorId
+                ActorId = n.ActorId,
+                CreatedDate = n.CreatedDate
             }));
 
             return filter;
+        }
+
+        public async Task<Result> AdminSideUpdateTicketStatus(AdminSideUpdateTicketStatusDto dto)
+        {
+            if (dto is null)
+                return Result.Failure(Messages.OperationFailedError);
+
+            var ticket = await _context.Tickets.FindAsync(dto.Id);
+            if (ticket is null)
+                return Result.Failure(Messages.OperationFailedError);
+
+            ticket.Status = dto.Status;
+            ticket.LastUpdatedDate = DateTime.UtcNow;
+
+            _context.Tickets.Update(ticket);
+            await _context.SaveChangesAsync();
+
+            await CreateNewTicketHistory(new CreateTicketHistoryDto()
+            {
+                TicketId = ticket.Id,
+                Description = Messages.TicketStatusUpdatedByAdmin
+            });
+
+            return Result.Success();
         }
     }
 }

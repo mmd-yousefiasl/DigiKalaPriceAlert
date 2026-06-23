@@ -4,5 +4,6 @@
     {
         public string Description { get; set; }
         public int ActorId { get; set; }
+        public DateTime CreatedDate { get; set; }
     }
 }

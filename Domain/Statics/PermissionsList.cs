@@ -405,10 +405,17 @@ namespace Domain.Statics
                 Title = "تاریخچه تیکت",
                 UniqueName = "TicketHistory"
             },
+            new Permission
+            {
+                Id = 53,
+                ParentId = 48,
+                Title = "ویرایش وضعیت تیکت",
+                UniqueName = "UpdateTicketStatus"
+            },
             #endregion
         };
 
-        //Last used id ==> 52
+        //Last used id ==> 53
         public static List<Permission> Permissions = _permissions;
     }
 }

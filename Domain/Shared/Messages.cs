@@ -56,6 +56,7 @@
         public const string NewMessageSentByUser = "پیام جدید تیکت توسط کاربر ارسال شد";
         public const string TicketClosedByAdmin = "تیکت توسط ادمین بسته شد";
         public const string NewMessageSentByAdmin = "پیام جدید تیکت توسط ادمین ارسال شد";
+        public const string TicketStatusUpdatedByAdmin = "وضعیت تیکت توسط ادمین ویرایش شد";
 
         #endregion
     }
