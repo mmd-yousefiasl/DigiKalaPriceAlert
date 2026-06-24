@@ -3,6 +3,7 @@ using Application.Services.Interfaces;
 using Data.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Web.BackgroundServices;
 
 namespace Web
 {
@@ -30,6 +31,7 @@ namespace Web
             #endregion
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddSingleton<ISmsQueue, SmsQueue>();
 
             services.AddHttpClient<IDigiKalaService, DigiKalaService>();
 
@@ -55,6 +57,9 @@ namespace Web
             services.AddScoped<ISubscriptionPlanService, SubscriptionPlanService>();
             services.AddScoped<ITicketService, TicketService>();
             services.AddScoped<IProductService, ProductService>();
+
+            services.AddHostedService<PriceMonitorWorker>();
+            services.AddHostedService<SmsConsumerWorker>();
         }
     }
 }

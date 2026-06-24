@@ -16,6 +16,8 @@
 
         public static int MaximumProductCount { get; set; }
 
+        public static int PriceMonitorBatchSize { get; set; }
+
 
         #region Tickets
         public static int MaxTicketAttachmentLength { get; set; }

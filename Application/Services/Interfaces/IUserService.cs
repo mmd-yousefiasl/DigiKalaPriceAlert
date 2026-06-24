@@ -39,5 +39,9 @@ namespace Application.Services.Interfaces
         Task<Result> ClientSideCanUserAddProduct();
 
         Task<Result> ClientSideIsUserHaveSubscription(int userId);
+
+        Task<Result<List<int>>> ClientSideGetAllEligibleProductIdsAsync(CancellationToken cancellationToken);
+
+        Task<List<string>> ClientSideGetUsersTrackingProduct(ClientSideGetUsersTrackingProductDto dto);
     }
 }

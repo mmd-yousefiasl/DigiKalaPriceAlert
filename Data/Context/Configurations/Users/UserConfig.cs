@@ -13,6 +13,9 @@ namespace Data.Context.Configurations.Users
 
             builder.HasQueryFilter(u => !u.IsDeleted);
 
+            builder.HasIndex(u => u.SubscriptionEndDate)
+                .HasFilter("\"IsDeleted\" = 'false' AND \"SubscriptionEndDate\" IS NOT NULL");
+
             builder.Property(u => u.Mobile)
                 .HasMaxLength(11)
                 .IsRequired();

@@ -1,4 +1,5 @@
 ﻿using Application.Dtos.Products.ClientSide;
+using Domain.Models.Products;
 using Domain.Shared;
 
 namespace Application.Services.Interfaces
@@ -12,5 +13,9 @@ namespace Application.Services.Interfaces
         Task<Result<ClientSideFilterProductsDto>> ClientSideFilterProducts(ClientSideFilterProductsDto filter);
 
         Task<Result> ClientSideDeleteUserProduct(int id);
+
+        Task<List<Product>> GetProductsBatchForMonitoringAsync(ClientSideGetProductsBatchForMonitoringDto dto);
+
+        Task<Result> ClientSideUpdateProductPrices(ClientSideUpdateProductPricesDto dto);
     }
 }

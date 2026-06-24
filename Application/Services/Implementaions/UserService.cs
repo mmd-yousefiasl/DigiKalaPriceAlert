@@ -422,5 +422,33 @@ namespace Application.Services.Implementaions
 
             return Result.Failure(Messages.OperationFailedError);
         }
+
+        public async Task<Result<List<int>>> ClientSideGetAllEligibleProductIdsAsync(CancellationToken cancellationToken)
+        {
+            var now = DateTime.UtcNow;
+
+            var productIds = await _context.UserProductMapping
+                .AsNoTracking()
+                .Where(upm => upm.User.SubscriptionEndDate > now)
+                .Select(upm => upm.ProductId)
+                .Distinct()
+                .ToListAsync(cancellationToken);
+
+            if (productIds.Count == 0)
+                return Result.Failure<List<int>>(Messages.OperationFailedError);
+
+            return Result.Success(productIds);
+        }
+
+        public async Task<List<string>> ClientSideGetUsersTrackingProduct(ClientSideGetUsersTrackingProductDto dto)
+        {
+            var now = DateTime.UtcNow;
+
+            return await _context.UserProductMapping
+                .AsNoTracking()
+                .Where(up => up.ProductId == dto.ProductId && up.User.SubscriptionEndDate > now)
+                .Select(up => up.User.Mobile)
+                .ToListAsync(dto.CancellationToken);
+        }
     }
 }

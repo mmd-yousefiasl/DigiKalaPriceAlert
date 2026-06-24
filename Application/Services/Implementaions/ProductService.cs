@@ -7,6 +7,7 @@ using Domain.Models.Users;
 using Domain.Shared;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace Application.Services.Implementaions
 {
@@ -17,18 +18,21 @@ namespace Application.Services.Implementaions
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IDigiKalaService _digiKalaService;
         private readonly IUserService _userService;
+        private readonly ILogger<IProductService> _logger;
         #endregion
 
         #region Ctor
         public ProductService(DigiKalaPriceAlertDbContext context,
             IHttpContextAccessor httpContextAccessor,
             IDigiKalaService digiKalaService,
-            IUserService userService)
+            IUserService userService,
+            ILogger<IProductService> logger)
         {
             _context = context;
             _httpContextAccessor = httpContextAccessor;
             _digiKalaService = digiKalaService;
             _userService = userService;
+            _logger = logger;
         }
         #endregion
 
@@ -218,6 +222,56 @@ namespace Application.Services.Implementaions
             await _context.SaveChangesAsync();
 
             return Result.Success();
+        }
+
+        public async Task<List<Product>> GetProductsBatchForMonitoringAsync(ClientSideGetProductsBatchForMonitoringDto dto)
+        {
+            return await _context.Products
+                .AsNoTracking()
+                .Where(p => dto.ProductIds.Contains(p.Id))
+                .ToListAsync(dto.CancellationToken);
+        }
+
+        public async Task<Result> ClientSideUpdateProductPrices(ClientSideUpdateProductPricesDto dto)
+        {
+            var strategy = _context.Database.CreateExecutionStrategy();
+
+            return await strategy.ExecuteAsync(async () =>
+            {
+                using var transaction = await _context.Database.BeginTransactionAsync(dto.CancellationToken);
+                try
+                {
+                    var rowsAffected = await _context.Products
+                        .Where(p => p.Id == dto.ProductId)
+                        .ExecuteUpdateAsync(s => s
+                            .SetProperty(p => p.OldPrice, p => p.NewPrice)
+                            .SetProperty(p => p.NewPrice, dto.NewPrice)
+                            .SetProperty(p => p.LastUpdatedDate, DateTime.UtcNow),
+                        dto.CancellationToken);
+
+                    if (rowsAffected == 0)
+                        return Result.Failure(Messages.OperationFailedError);
+
+                    var history = new ProductPriceHistory
+                    {
+                        ProductId = dto.ProductId,
+                        Price = dto.NewPrice,
+                    };
+                    _context.ProductPriceHistory.Add(history);
+
+                    await _context.SaveChangesAsync(dto.CancellationToken);
+
+                    await transaction.CommitAsync(dto.CancellationToken);
+
+                    return Result.Success();
+                }
+                catch (Exception ex)
+                {
+                    await transaction.RollbackAsync(dto.CancellationToken);
+                    _logger.LogError(ex, "Error updating prices for product {ProductId}", dto.ProductId);
+                    throw;
+                }
+            });
         }
     }
 }
