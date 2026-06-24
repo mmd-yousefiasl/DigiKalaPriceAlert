@@ -8,24 +8,28 @@
 
 @section HeaderReferences {
     <style>
-        /* افکت کلی روی کارت هنگام حرکت موس */
+        /* افکت ظریف و مینی‌مال روی کارت‌ها */
         .compact-product-card {
             transition: transform 0.2s, box-shadow 0.2s;
+            border-radius: 4px !important;
         }
 
             .compact-product-card:hover {
-                box-shadow: 0 5px 15px rgba(0,0,0,0.08) !important;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12) !important;
             }
 
-        /* تغییر رنگ عنوان محصول به رنگ اصلی قالب لکسا در حالت هاور */
-        .hover-primary-text:hover {
-            color: #3c4ccf !important;
+        /* هاور عنوان کالا به رنگ مشکی خالص */
+        .hover-dark-text:hover {
+            color: #000000 !important;
+            text-decoration: underline !important;
         }
 
-        /* افکت دکمه حذف */
-        .hover-danger:hover {
-            color: #fff !important;
-            background-color: #f46a6a !important;
+        /* دکمه دایره‌ای مینی‌مال حذف کالا */
+        .hover-danger-btn:hover {
+            color: #ffffff !important;
+            background-color: #000000 !important;
+            border-color: #000000 !important;
         }
 
         /* پدینگ‌های سیستم راست‌چین (RTL) */
@@ -45,36 +49,59 @@
     </style>
 }
 
-@if (Model?.Entities?.Any() ?? false)
-{
-    <form id="search-form" method="get" asp-area="UserPanel" asp-controller="Product" asp-action="ProductsList">
-        <input type="hidden" asp-for="Page" id="Page" />
-    </form>
-
-    <div class="container-fluid">
-        <div class="row mb-3">
-            <div class="col-12 d-flex justify-content-between align-items-center">
-                <div class="page-title-box">
-                    <h4>مدیریت محصولات</h4>
-                    <ol class="breadcrumb m-0">
-                        <li class="breadcrumb-item">
-                            <a asp-area="UserPanel" asp-controller="Home" asp-action="Index">صفحه نخست</a>
-                        </li>
-
-                        <li class="breadcrumb-item active">@ViewData["Title"]</li>
-                    </ol>
-                </div>
-                <a asp-area="UserPanel" asp-controller="Product" asp-action="AddNewProduct" class="btn btn-primary btn-sm rounded-2 px-3">
-                    <i class="mdi mdi-plus-circle-outline me-1"></i> افزودن جدید
-                </a>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="page-title-box">
+                <h4>مدیریت محصولات</h4>
+                <ol class="breadcrumb m-0">
+                    <li class="breadcrumb-item">
+                        <a asp-area="UserPanel" asp-controller="Home" asp-action="Index">صفحه نخست</a>
+                    </li>
+                    <li class="breadcrumb-item active">@ViewData["Title"]</li>
+                </ol>
             </div>
         </div>
+    </div>
 
+    <div class="card border border-dark mb-4">
+        <div class="card-body">
+            <form novalidate asp-area="UserPanel" asp-controller="Product" method="get" asp-action="ProductsList" id="search-form">
+                <input type="hidden" asp-for="Page" id="Page" />
+                <div class="row g-3">
+                    <div class="col-12 col-md-3">
+                        <label class="form-label font-size-12 fw-bold text-dark" asp-for="Search"></label>
+                        <input type="text" class="form-control border-dark-subtle font-size-13" asp-for="Search" autocomplete="off" placeholder="عنوان محصول...">
+                    </div>
+
+                    @*                         <div class="col-6 col-md-3">
+                            <label class="form-label font-size-12 fw-bold text-dark" asp-for="Category"></label>
+                            <select class="form-control form-select border-dark-subtle font-size-13" asp-for="Category" asp-items="@Html.GetEnumSelectList<TicketCategoryEnum>()">
+                                <option value="">همه دسته‌ها</option>
+                            </select>
+                        </div> *@
+
+                    <div class="col-12 d-flex justify-content-between align-items-center mt-3">
+                        <button class="btn btn-dark btn-sm px-4 font-size-13" type="submit">
+                            <i class="mdi mdi-magnify me-1"></i> جستجو و فیلتر
+                        </button>
+                        <a asp-area="UserPanel" asp-controller="Product" asp-action="AddNewProduct" class="btn btn-outline-dark btn-sm px-3 font-size-13">
+                            <i class="mdi mdi-plus me-1"></i> افزودن محصول جدید
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @if (Model?.Entities?.Any() ?? false)
+    {
         <div class="row g-2">
             @foreach (var item in Model.Entities ?? new List<ClientSideProductDto>())
             {
-                <div class="col-12 col-md-6 col-xl-4">
-                    <div class="card mb-0 shadow-sm border-0 rounded-3 position-relative overflow-hidden compact-product-card" style="background: #fff;">
+                <div class="col-12 col-md-6 col-xl-4 product-item-container">
+
+                    <div class="card mb-0 border border-dark shadow-sm position-relative overflow-hidden compact-product-card" style="background: #fff;">
 
                         <form class="delete-product-form position-absolute top-0 end-0 p-2"
                               asp-area="UserPanel"
@@ -84,8 +111,8 @@
                               style="cursor: pointer; z-index: 10;"
                               onclick="ConfirmDelete(this)"
                               title="حذف">
-                            <div class="d-flex align-items-center justify-content-center rounded-circle text-muted hover-danger" style="width: 36px; height: 36px; background: rgba(0,0,0,0.03);">
-                                <i class="mdi mdi-close font-size-16"></i>
+                            <div class="d-flex align-items-center justify-content-center rounded-circle text-muted hover-danger-btn" style="width: 32px; height: 32px; background: rgba(0,0,0,0.03); border: 1px solid #dee2e6;">
+                                <i class="mdi mdi-close font-size-14"></i>
                             </div>
                         </form>
 
@@ -93,21 +120,21 @@
                             <div class="d-flex align-items-center">
 
                                 <a asp-area="UserPanel" asp-controller="Product" asp-action="ProductDetails" asp-route-id="@item.Id"
-                                   class="bg-light rounded-2 d-flex align-items-center justify-content-center p-1 flex-shrink-0 d-block"
-                                   style="width: 65px; height: 65px;">
+                                   class="bg-light border rounded-2 d-flex align-items-center justify-content-center p-1 flex-shrink-0 d-block"
+                                   style="width: 65px; height: 65px; border-color: #dee2e6 !important;">
                                     <img src="@item.ImageUrl" class="img-fluid rounded-2 object-fit-contain h-100" alt="@item.Title">
                                 </a>
 
                                 <div class="flex-grow-1 ms-3 pe-4 overflow-hidden">
 
                                     <a asp-area="UserPanel" asp-controller="Product" asp-action="ProductDetails" asp-route-id="@item.Id" class="text-decoration-none d-block">
-                                        <h5 class="font-size-13 text-dark fw-bold mb-1 text-truncate hover-primary-text" title="@item.Title">
+                                        <h5 class="font-size-13 text-dark fw-bold mb-1 text-truncate hover-dark-text" title="@item.Title">
                                             @item.Title
                                         </h5>
                                     </a>
 
                                     <div class="d-flex align-items-center gap-2 mb-1">
-                                        <span class="badge bg-soft-success text-success font-size-10 px-1.5 py-0.5 rounded">در حال مانیتور</span>
+                                        <span class="badge bg-dark text-white font-size-10 px-2 py-0.5 rounded">در حال مانیتور</span>
                                         <span class="text-muted font-size-11">
                                             <i class="mdi mdi-clock-outline font-size-11 align-middle"></i>
                                             @item.LastUpdatedDate.ToPersianRelativeTime()
@@ -115,7 +142,7 @@
                                     </div>
 
                                     <div class="d-flex align-items-baseline">
-                                        <span class="text-primary fw-extrabold font-size-14">
+                                        <span class="text-dark fw-extrabold font-size-15">
                                             @item.NewPrice.ToTomanFormat()
                                         </span>
                                         <span class="font-size-10 text-muted ms-1">تومان</span>
@@ -126,7 +153,7 @@
 
                             <div class="mt-2.5 pt-2 border-top border-light-subtle">
                                 <a href="@item.Url" target="_blank"
-                                   class="btn btn-soft-secondary btn-sm w-100 py-1.5 rounded-2 font-size-11 d-flex align-items-center justify-content-center gap-1 border-0">
+                                   class="btn btn-outline-dark btn-sm w-100 py-1.5 rounded-2 font-size-11 d-flex align-items-center justify-content-center gap-1">
                                     <i class="mdi mdi-open-in-new font-size-13"></i>
                                     <span>مشاهده کالا در سایت منبع</span>
                                 </a>
@@ -138,32 +165,16 @@
             }
 
         </div>
-        <div class="my-3">
-            <partial name="_Paging" model="@Model.GetCurrentPaging()" />
-        </div>
-    </div>
-
-}
-else
-{
-    <div class="container-fluid">
-        <div class="row justify-content-center align-items-center" style="min-height: 70vh;">
-            <div class="col-12 col-md-6 col-lg-4 text-center">
-
-                <div class="avatar-md mx-auto mb-4 bg-soft-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 100px; height: 100px;">
-                    <i class="mdi mdi-eye-off-outline text-primary" style="font-size: 48px;"></i>
-                </div>
-
-                <h3 class="font-size-18 text-dark fw-bold mb-2">لیست محصولات شما خالی است!</h3>
-                <p class="text-muted font-size-13 mb-4 mx-auto" style="max-width: 320px; line-height: 1.6;">
-                    در حال حاضر هیچ محصولی را برای مانیتورینگ و رصد قیمت اضافه نکرده‌اید. با اضافه کردن اولین محصول، تغییرات قیمت به شما اطلاع‌رسانی می‌شود.
-                </p>
-
-                <a asp-area="UserPanel" asp-controller="Product" asp-action="AddNewProduct" class="btn btn-primary btn-md px-4 py-2 font-size-13 rounded-3 shadow-sm transition-all">
-                    <i class="mdi mdi-plus-circle-outline me-1 align-middle font-size-16"></i>
-                    <span class="align-middle">افزودن محصول جدید</span>
-                </a>
+    }
+    else
+    {
+        <div class="card border border-dark">
+            <div class="card-body p-0">
+                <partial name="_NotFoundPartial" />
             </div>
         </div>
+    }
+    <div class="my-3">
+        <partial name="_Paging" model="@Model.GetCurrentPaging()" />
     </div>
-}
+</div>

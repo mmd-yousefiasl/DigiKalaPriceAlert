@@ -172,6 +172,11 @@ namespace Application.Services.Implementaions
 
             conditions.Add(n => n.Users.Any(u => u.UserId == userId));
 
+            if (!string.IsNullOrWhiteSpace(filter.Search))
+            {
+                conditions.Add(n => n.Title.Contains(filter.Search));
+            }
+
             IQueryable<Product> query = _context.Products;
 
             foreach (var item in conditions)
