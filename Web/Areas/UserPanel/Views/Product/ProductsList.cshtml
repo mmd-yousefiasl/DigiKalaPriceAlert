@@ -46,6 +46,24 @@
         .mt-2\.5 {
             margin-top: 0.65rem !important;
         }
+
+        /* 🎀 استایل مینی‌مال روبان گوشه سمت راست مخصوص تم دارک/قرمز */
+        .unread-ribbon {
+            position: absolute;
+            top: 15px;
+            right: -35px;
+            background-color: #f46a6a;
+            color: #fff;
+            text-align: center;
+            font-size: 9px;
+            font-weight: bold;
+            padding: 4px 0;
+            width: 120px;
+            transform: rotate(45deg);
+            z-index: 5;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            letter-spacing: 0.5px;
+        }
     </style>
 }
 
@@ -69,17 +87,10 @@
             <form novalidate asp-area="UserPanel" asp-controller="Product" method="get" asp-action="ProductsList" id="search-form">
                 <input type="hidden" asp-for="Page" id="Page" />
                 <div class="row g-3">
-                    <div class="col-12 col-md-3">
+                    <div class="col-12 col-md-6">
                         <label class="form-label font-size-12 fw-bold text-dark" asp-for="Search"></label>
                         <input type="text" class="form-control border-dark-subtle font-size-13" asp-for="Search" autocomplete="off" placeholder="عنوان محصول...">
                     </div>
-
-                    @*                         <div class="col-6 col-md-3">
-                            <label class="form-label font-size-12 fw-bold text-dark" asp-for="Category"></label>
-                            <select class="form-control form-select border-dark-subtle font-size-13" asp-for="Category" asp-items="@Html.GetEnumSelectList<TicketCategoryEnum>()">
-                                <option value="">همه دسته‌ها</option>
-                            </select>
-                        </div> *@
 
                     <div class="col-12 d-flex justify-content-between align-items-center mt-3">
                         <button class="btn btn-dark btn-sm px-4 font-size-13" type="submit">
@@ -103,16 +114,18 @@
 
                     <div class="card mb-0 border border-dark shadow-sm position-relative overflow-hidden compact-product-card" style="background: #fff;">
 
+                        <div class="unread-ribbon">نرخ جدید</div>
+
                         <form class="delete-product-form position-absolute top-0 end-0 p-2"
                               asp-area="UserPanel"
                               asp-controller="Product"
                               asp-action="DeleteProduct"
                               asp-route-id="@item.Id"
-                              style="cursor: pointer; z-index: 10;"
+                              style="cursor: pointer; z-index: 10; margin-right: 35px;"
                               onclick="ConfirmDelete(this)"
                               title="حذف">
-                            <div class="d-flex align-items-center justify-content-center rounded-circle text-muted hover-danger-btn" style="width: 32px; height: 32px; background: rgba(0,0,0,0.03); border: 1px solid #dee2e6;">
-                                <i class="mdi mdi-close font-size-14"></i>
+                            <div class="d-flex align-items-center justify-content-center rounded-circle text-muted hover-danger-btn" style="width: 28px; height: 28px; background: rgba(0,0,0,0.03); border: 1px solid #dee2e6;">
+                                <i class="mdi mdi-close font-size-12"></i>
                             </div>
                         </form>
 
@@ -128,7 +141,7 @@
                                 <div class="flex-grow-1 ms-3 pe-4 overflow-hidden">
 
                                     <a asp-area="UserPanel" asp-controller="Product" asp-action="ProductDetails" asp-route-id="@item.Id" class="text-decoration-none d-block">
-                                        <h5 class="font-size-13 text-dark fw-bold mb-1 text-truncate hover-dark-text" title="@item.Title">
+                                        <h5 class="font-size-13 text-dark fw-bold mb-1 text-truncate hover-dark-text" style="max-width: 85%;" title="@item.Title">
                                             @item.Title
                                         </h5>
                                     </a>
@@ -141,12 +154,34 @@
                                         </span>
                                     </div>
 
-                                    <div class="d-flex align-items-baseline">
-                                        <span class="text-dark fw-extrabold font-size-15">
-                                            @item.NewPrice.ToTomanFormat()
-                                        </span>
-                                        <span class="font-size-10 text-muted ms-1">تومان</span>
+                                    <div class="d-flex align-items-center flex-wrap gap-2">
+
+                                        <div class="d-flex align-items-baseline">
+                                            @if (item.NewPrice > 0)
+                                            {
+                                                <span class="text-dark fw-extrabold font-size-15">
+                                                    @item.NewPrice.ToTomanFormat()
+                                                </span>
+                                                <span class="font-size-10 text-muted ms-1">تومان</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-dark fw-extrabold font-size-15">
+                                                    ناموجود
+                                                </span>
+                                            }
+                                        </div>
+
+                                        @if (item.OldPrice > 0)
+                                        {
+                                            <div class="d-flex align-items-baseline opacity-75 ms-auto">
+                                                <span class="text-danger text-decoration-line-through font-size-12 fw-semibold">
+                                                    @item.OldPrice.ToTomanFormat()
+                                                </span>
+                                            </div>
+                                        }
                                     </div>
+
                                 </div>
 
                             </div>

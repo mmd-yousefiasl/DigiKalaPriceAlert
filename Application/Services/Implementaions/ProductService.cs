@@ -193,6 +193,7 @@ namespace Application.Services.Implementaions
                 Title = n.Title,
                 LastUpdatedDate = n.LastUpdatedDate,
                 NewPrice = n.NewPrice,
+                OldPrice = n.OldPrice,
                 Url = n.Url
             }));
 
