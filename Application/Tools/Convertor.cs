@@ -113,5 +113,10 @@ namespace Application.Tools
         {
             return value.ToString("#,0 تومان");
         }
+
+        public static string GetDigiKalaProductUrl(this string digiKalaId)
+        {
+            return "https://www.digikala.com/product/dkp-" + digiKalaId + "/";
+        }
     }
 }

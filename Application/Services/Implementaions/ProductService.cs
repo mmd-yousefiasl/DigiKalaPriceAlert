@@ -91,7 +91,7 @@ namespace Application.Services.Implementaions
                     ImageUrl = digiKala.ImageUrl,
                     OldPrice = 0,
                     NewPrice = digiKala.Price,
-                    Url = dto.Url,
+                    Url = digiKalaId.GetDigiKalaProductUrl(),
                     Users = new List<UserProductMapping>{
                         new UserProductMapping()
                         {
