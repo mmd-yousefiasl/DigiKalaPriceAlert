@@ -7,6 +7,7 @@ using Data.Context;
 using Domain.Enums.Users;
 using Domain.Models.Users;
 using Domain.Shared;
+using Domain.Statics;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
@@ -395,6 +396,31 @@ namespace Application.Services.Implementaions
             await _context.SaveChangesAsync();
 
             return Result.Success();
+        }
+
+        public async Task<Result> ClientSideCanUserAddProduct()
+        {
+            var userId = _httpContextAccessor.HttpContext.User.GetUserId();
+            if (userId < 1)
+                return Result.Failure(Messages.OperationFailedError);
+
+            if (await _context.UserProductMapping.CountAsync(n => n.UserId == userId) >= SiteTools.MaximumProductCount)
+                return Result.Failure(Messages.UserReachedMaximumProductsError);
+
+            return Result.Success();
+        }
+
+        public async Task<Result> ClientSideIsUserHaveSubscription(int userId)
+        {
+            if (userId < 1)
+                return Result.Failure(Messages.OperationFailedError);
+
+            var currentDate = DateTime.UtcNow;
+
+            if (await _context.Users.AnyAsync(n => n.Id == userId && n.SubscriptionEndDate > currentDate))
+                return Result.Success();
+
+            return Result.Failure(Messages.OperationFailedError);
         }
     }
 }

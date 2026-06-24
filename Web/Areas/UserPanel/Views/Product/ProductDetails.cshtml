@@ -1,57 +1,68 @@
-﻿<div class="container-fluid">
-    <!-- هدر صفحه و دکمه بازگشت -->
-    <div class="row align-items-center mb-4">
-        <div class="col-8">
-            <h4 class="page-title mb-0 fw-bold font-size-18 text-dark">
-                <i class="mdi mdi-chart-bell-curve-cumulative text-primary me-2"></i> جزئیات و تاریخچه قیمت محصول
-            </h4>
-        </div>
-        <div class="col-4 text-end">
-            <a href="/user/watchlist" class="btn btn-outline-secondary btn-sm rounded-2">
-                <i class="mdi mdi-arrow-left ms-1"></i> بازگشت به دیده‌بان
-            </a>
+﻿@using Application.Dtos.Products.ClientSide
+@using Application.Tools
+@model ClientSideProductDetailsDto
+
+@{
+    ViewData["Title"] = "جزئیات و تاریخچه قیمت محصول";
+}
+
+<div class="container-fluid">
+
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="page-title-box">
+                <h4>مدیریت محصولات</h4>
+                <ol class="breadcrumb m-0">
+                    <li class="breadcrumb-item">
+                        <a asp-area="UserPanel" asp-controller="Home" asp-action="Index">صفحه نخست</a>
+                    </li>
+
+                    <li class="breadcrumb-item">
+                        <a asp-area="UserPanel" asp-controller="Product" asp-action="ProductsList">لیست محصولات</a>
+                    </li>
+
+                    <li class="breadcrumb-item active">@ViewData["Title"]</li>
+                </ol>
+            </div>
         </div>
     </div>
 
-    <!-- بخش اول: اطلاعات اصلی محصول و قیمت فعلی -->
     <div class="row mb-4">
         <div class="col-12">
             <div class="card shadow-sm border-0 rounded-3 overflow-hidden">
                 <div class="card-body p-4">
                     <div class="row g-4 align-items-center">
-                        <!-- تصویر محصول -->
                         <div class="col-12 col-md-3 text-center">
                             <div class="bg-light p-3 rounded-3 d-inline-block" style="width: 100%; max-width: 200px; height: 200px;">
-                                <img src="https://picsum.photos/200/200?random=1" class="img-fluid h-100 object-fit-contain rounded-2" alt="نام کالا">
+                                <img src="@Model.ImageUrl" class="img-fluid h-100 object-fit-contain rounded-2" alt="نام کالا">
                             </div>
                         </div>
-                        <!-- اطلاعات متنی و وضعیت فعلی -->
                         <div class="col-12 col-md-9">
                             <div class="d-flex flex-wrap gap-2 mb-2">
                                 <span class="badge bg-soft-success text-success px-2 py-1 font-size-11 rounded">در حال مانیتور آنلاین</span>
                                 <span class="badge bg-soft-primary text-primary px-2 py-1 font-size-11 rounded">منبع: دیجی‌کالا</span>
-                                <span class="badge bg-light text-muted px-2 py-1 font-size-11 rounded">شناسه: dkp-1430291</span>
+                                <span class="badge bg-light text-muted px-2 py-1 font-size-11 rounded">شناسه: dkp-@Model.DigiKalaId</span>
                             </div>
 
                             <h4 class="text-dark fw-bold font-size-16 mb-3" style="line-height: 1.6;">
-                                گوشی موبایل سامسونگ مدل Galaxy S24 Ultra دو سیم کارت ظرفیت 256 گیگابایت و رم 12 گیگابایت
+                                @Model.Title
                             </h4>
 
                             <div class="row g-3 mt-2 pt-3 border-top border-light">
                                 <div class="col-6 col-sm-4">
                                     <span class="text-muted font-size-12 d-block mb-1">قیمت فعلی بازار:</span>
                                     <h5 class="text-primary fw-extrabold font-size-18 mb-0">
-                                        ۶۲,۵۰۰,۰۰۰ <span class="font-size-11 text-muted fw-normal">تومان</span>
+                                        @Model.NewPrice.ToTomanFormat() <span class="font-size-11 text-muted fw-normal">تومان</span>
                                     </h5>
                                 </div>
                                 <div class="col-6 col-sm-4">
-                                    <span class="text-muted font-size-12 d-block mb-1">آخرین بررسی سیستم:</span>
+                                    <span class="text-muted font-size-12 d-block mb-1">آخرین تغییر قیمت:</span>
                                     <h5 class="text-dark fw-bold font-size-14 mb-0 mt-1">
-                                        <i class="mdi mdi-clock-check-outline text-success me-1"></i> ۱۵ دقیقه قبل
+                                        <i class="mdi mdi-clock-check-outline text-success me-1"></i> @Model.LastUpdatedDate.ToPersianRelativeTime()
                                     </h5>
                                 </div>
                                 <div class="col-12 col-sm-4 text-sm-end">
-                                    <a href="https://www.digikala.com" target="_blank" class="btn btn-danger btn-md px-3 mt-2 rounded-2 font-size-13">
+                                    <a href="@Model.Url" target="_blank" class="btn btn-danger btn-md px-3 mt-2 rounded-2 font-size-13">
                                         <i class="mdi mdi-open-in-new me-1"></i> مشاهده صفحه اصلی کالا
                                     </a>
                                 </div>
@@ -63,14 +74,13 @@
         </div>
     </div>
 
-    <!-- بخش دوم: گزارش خلاصه و تحلیل قیمت (Full Report) -->
     <div class="row mb-4">
         <div class="col-12 col-sm-6 col-md-4">
             <div class="card bg-soft-success border-0 rounded-3 shadow-sm mb-3">
                 <div class="card-body p-3 d-flex align-items-center justify-content-between">
                     <div>
                         <span class="text-muted font-size-12 d-block mb-1">کمترین قیمت ثبت شده</span>
-                        <h5 class="text-success fw-bold font-size-15 mb-0">۶۱,۲۰۰,۰۰۰ تومان</h5>
+                        <h5 class="text-success fw-bold font-size-15 mb-0">@Model.AllTimeMinPrice?.ToToman()</h5>
                     </div>
                     <div class="avatar-sm bg-success text-white rounded-circle d-flex align-items-center justify-content-center">
                         <i class="mdi mdi-arrow-down-bold font-size-20"></i>
@@ -83,7 +93,7 @@
                 <div class="card-body p-3 d-flex align-items-center justify-content-between">
                     <div>
                         <span class="text-muted font-size-12 d-block mb-1">بیشترین قیمت ثبت شده</span>
-                        <h5 class="text-danger fw-bold font-size-15 mb-0">۶۴,۹۰۰,۰۰۰ تومان</h5>
+                        <h5 class="text-danger fw-bold font-size-15 mb-0">@Model.AllTimeMaxPrice?.ToToman()</h5>
                     </div>
                     <div class="avatar-sm bg-danger text-white rounded-circle d-flex align-items-center justify-content-center">
                         <i class="mdi mdi-arrow-up-bold font-size-20"></i>
@@ -95,8 +105,11 @@
             <div class="card bg-soft-info border-0 rounded-3 shadow-sm mb-3">
                 <div class="card-body p-3 d-flex align-items-center justify-content-between">
                     <div>
-                        <span class="text-muted font-size-12 d-block mb-1">تعداد کل نوسانات رکورد شده</span>
-                        <h5 class="text-info fw-bold font-size-15 mb-0">۱۲ مرتبه تغییر قیمت</h5>
+                        <span class="text-muted font-size-12 d-block mb-1">تعداد کل نوسانات امروز</span>
+                        <h5 class="text-info fw-bold font-size-15 mb-0">
+                            @Model.TodayPriceChangesCount
+                            مرتبه تغییر قیمت
+                        </h5>
                     </div>
                     <div class="avatar-sm bg-info text-white rounded-circle d-flex align-items-center justify-content-center">
                         <i class="mdi mdi-history font-size-20"></i>
@@ -106,7 +119,6 @@
         </div>
     </div>
 
-    <!-- بخش سوم: جدول تاریخچه کامل تغییرات قیمت (Prev Prices) -->
     <div class="row">
         <div class="col-12">
             <div class="card shadow-sm border-0 rounded-3">
@@ -122,44 +134,22 @@
                                 <tr>
                                     <th class="ps-4">ردیف</th>
                                     <th>قیمت ثبت شده</th>
-                                    <th>میزان نوسان</th>
-                                    <th>وضعیت تغییر</th>
                                     <th class="pe-4">تاریخ و ساعت ثبت لاگ</th>
                                 </tr>
                             </thead>
                             <tbody class="font-size-13 text-dark">
-                                <!-- ردیف اول -->
-                                <tr>
-                                    <td class="ps-4 fw-bold text-muted">۱</td>
-                                    <td class="fw-bold">۶۲,۵۰۰,۰۰۰ تومان</td>
-                                    <td class="text-success fw-bold"><i class="mdi mdi-minus font-size-14"></i> بدون تغییر</td>
-                                    <td><span class="badge bg-soft-secondary text-secondary px-2 py-1 rounded">قیمت فعلی</span></td>
-                                    <td class="pe-4 text-muted">امروز - ساعت ۱۶:۳۰</td>
-                                </tr>
-                                <!-- ردیف دوم -->
-                                <tr>
-                                    <td class="ps-4 fw-bold text-muted">۲</td>
-                                    <td class="fw-bold">۶۲,۵۰۰,۰۰۰ تومان</td>
-                                    <td class="text-success fw-bold"><i class="mdi mdi-arrow-down-bold me-1"></i> ۴۰۰,۰۰۰-</td>
-                                    <td><span class="badge bg-soft-success text-success px-2 py-1 rounded"><i class="mdi mdi-trending-down"></i> کاهش قیمت</span></td>
-                                    <td class="pe-4 text-muted">دیروز - ساعت ۱۰:۱۵</td>
-                                </tr>
-                                <!-- ردیف سوم -->
-                                <tr>
-                                    <td class="ps-4 fw-bold text-muted">۳</td>
-                                    <td class="fw-bold">۶۲,۹۰۰,۰۰۰ تومان</td>
-                                    <td class="text-danger fw-bold"><i class="mdi mdi-arrow-up-bold me-1"></i> ۷۰۰,۰۰۰+</td>
-                                    <td><span class="badge bg-soft-danger text-danger px-2 py-1 rounded"><i class="mdi mdi-trending-up"></i> افزایش قیمت</span></td>
-                                    <td class="pe-4 text-muted">۳ روز پیش - ساعت ۲۱:۰۰</td>
-                                </tr>
-                                <!-- ردیف چهارم -->
-                                <tr>
-                                    <td class="ps-4 fw-bold text-muted">۴</td>
-                                    <td class="fw-bold">۶۲,۲۰۰,۰۰۰ تومان</td>
-                                    <td class="text-success fw-bold"><i class="mdi mdi-arrow-down-bold me-1"></i> ۱,۰۰۰,۰۰۰-</td>
-                                    <td><span class="badge bg-soft-success text-success px-2 py-1 rounded"><i class="mdi mdi-trending-down"></i> کاهش شدید</span></td>
-                                    <td class="pe-4 text-muted">۱ تیر ۱۴۰۵ - ساعت ۱۴:۲۰</td>
-                                </tr>
+                                @{
+                                    int counter = 0;
+                                    foreach (var item in Model.History ?? new List<ClientSideProductPriceHistoryDto>())
+                                    {
+                                        counter++;
+                                        <tr>
+                                            <td class="ps-4 fw-bold text-muted">@counter</td>
+                                            <td class="fw-bold">@item.Price.ToToman()</td>
+                                            <td class="pe-4 text-muted">@item.CreatedDate.GetDateTime()</td>
+                                        </tr>
+                                    }
+                                }
                             </tbody>
                         </table>
                     </div>

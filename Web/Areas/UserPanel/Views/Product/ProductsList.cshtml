@@ -1,109 +1,137 @@
-﻿@if (3 > 2)
+﻿@using Application.Dtos.Products.ClientSide
+@using Application.Tools
+@model ClientSideFilterProductsDto
+
+@{
+    ViewData["Title"] = "لیست محصولات";
+}
+
+@section HeaderReferences {
+    <style>
+        /* افکت کلی روی کارت هنگام حرکت موس */
+        .compact-product-card {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+            .compact-product-card:hover {
+                box-shadow: 0 5px 15px rgba(0,0,0,0.08) !important;
+            }
+
+        /* تغییر رنگ عنوان محصول به رنگ اصلی قالب لکسا در حالت هاور */
+        .hover-primary-text:hover {
+            color: #3c4ccf !important;
+        }
+
+        /* افکت دکمه حذف */
+        .hover-danger:hover {
+            color: #fff !important;
+            background-color: #f46a6a !important;
+        }
+
+        /* پدینگ‌های سیستم راست‌چین (RTL) */
+        .ms-3 {
+            margin-right: 1rem !important;
+            margin-left: 0 !important;
+        }
+
+        .pe-4 {
+            padding-left: 2rem !important;
+            padding-right: 0 !important;
+        }
+
+        .mt-2\.5 {
+            margin-top: 0.65rem !important;
+        }
+    </style>
+}
+
+@if (Model?.Entities?.Any() ?? false)
 {
     <div class="container-fluid">
-        <div class="row align-items-center mb-4">
-            <div class="col-12">
-                <h4 class="page-title mb-0 fw-bold font-size-18 text-dark">
-                    <i class="mdi mdi-eye-outline text-primary me-2"></i> لیست دیده‌بان من (WishList)
-                </h4>
-                <p class="text-muted font-size-13 mb-0 mt-1">محصولاتی که برای مانیتورینگ قیمت نشان کرده‌اید.</p>
+        <div class="row mb-3">
+            <div class="col-12 d-flex justify-content-between align-items-center">
+                <div class="page-title-box">
+                    <h4>مدیریت محصولات</h4>
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item">
+                            <a asp-area="UserPanel" asp-controller="Home" asp-action="Index">صفحه نخست</a>
+                        </li>
+
+                        <li class="breadcrumb-item active">@ViewData["Title"]</li>
+                    </ol>
+                </div>
+                <a asp-area="UserPanel" asp-controller="Product" asp-action="AddNewProduct" class="btn btn-primary btn-sm rounded-2 px-3">
+                    <i class="mdi mdi-plus-circle-outline me-1"></i> افزودن جدید
+                </a>
             </div>
         </div>
 
-        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+        <div class="row g-2">
+            @foreach (var item in Model.Entities ?? new List<ClientSideProductDto>())
+            {
+                <div class="col-12 col-md-6 col-xl-4">
+                    <div class="card mb-0 shadow-sm border-0 rounded-3 position-relative overflow-hidden compact-product-card" style="background: #fff;">
 
-            <div class="col">
-                <div class="card h-100 shadow-sm border-0 rounded-3 position-relative overflow-hidden">
-                    <button type="button" class="btn btn-sm btn-light text-danger position-absolute top-0 end-0 m-2 rounded-circle shadow-sm" style="z-index: 10;" title="حذف از لیست">
-                        <i class="mdi mdi-trash-can-outline font-size-16"></i>
-                    </button>
-
-                    <a href="/products/details/1" class="bg-light d-flex align-items-center justify-content-center p-3 d-block" style="height: 200px;">
-                        <img src="https://picsum.photos/200/200?random=1" class="img-fluid rounded-2 object-fit-contain h-100" alt="نام محصول هاردکد">
-                    </a>
-
-                    <div class="card-body d-flex flex-column p-3">
-                        <span class="badge bg-soft-success text-success font-size-11 align-self-start mb-2 px-2 py-1 rounded">در حال مانیتور</span>
-
-                        <a href="/products/details/1" class="text-decoration-none">
-                            <h5 class="font-size-14 text-dark fw-bold mb-2 text-truncate" title="گوشی موبایل سامسونگ مدل Galaxy S24 Ultra">
-                                گوشی موبایل سامسونگ مدل Galaxy S24 Ultra
-                            </h5>
-                        </a>
-
-                        <div class="mt-auto pt-3 border-top border-light">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span class="text-muted font-size-12">قیمت فعلی:</span>
-                                <span class="text-primary fw-extrabold font-size-15">۶۲,۵۰۰,۰۰۰ <span class="font-size-11 text-muted">تومان</span></span>
+                        <form class="delete-product-form position-absolute top-0 end-0 p-2"
+                              asp-area="UserPanel"
+                              asp-controller="Product"
+                              asp-action="DeleteProduct"
+                              asp-route-id="@item.Id"
+                              style="cursor: pointer; z-index: 10;"
+                              onclick="ConfirmDelete(this)"
+                              title="حذف">
+                            <div class="d-flex align-items-center justify-content-center rounded-circle text-muted hover-danger" style="width: 36px; height: 36px; background: rgba(0,0,0,0.03);">
+                                <i class="mdi mdi-close font-size-16"></i>
                             </div>
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <span class="text-muted font-size-11">آخرین تغییر قیمت:</span>
-                                <span class="text-muted font-size-11 fw-bold">۲ ساعت قبل</span>
+                        </form>
+
+                        <div class="p-3">
+                            <div class="d-flex align-items-center">
+
+                                <a asp-area="UserPanel" asp-controller="Product" asp-action="ProductDetails" asp-route-id="@item.Id"
+                                   class="bg-light rounded-2 d-flex align-items-center justify-content-center p-1 flex-shrink-0 d-block"
+                                   style="width: 65px; height: 65px;">
+                                    <img src="@item.ImageUrl" class="img-fluid rounded-2 object-fit-contain h-100" alt="@item.Title">
+                                </a>
+
+                                <div class="flex-grow-1 ms-3 pe-4 overflow-hidden">
+
+                                    <a asp-area="UserPanel" asp-controller="Product" asp-action="ProductDetails" asp-route-id="@item.Id" class="text-decoration-none d-block">
+                                        <h5 class="font-size-13 text-dark fw-bold mb-1 text-truncate hover-primary-text" title="@item.Title">
+                                            @item.Title
+                                        </h5>
+                                    </a>
+
+                                    <div class="d-flex align-items-center gap-2 mb-1">
+                                        <span class="badge bg-soft-success text-success font-size-10 px-1.5 py-0.5 rounded">در حال مانیتور</span>
+                                        <span class="text-muted font-size-11">
+                                            <i class="mdi mdi-clock-outline font-size-11 align-middle"></i>
+                                            @item.LastUpdatedDate.ToPersianRelativeTime()
+                                        </span>
+                                    </div>
+
+                                    <div class="d-flex align-items-baseline">
+                                        <span class="text-primary fw-extrabold font-size-14">
+                                            @item.NewPrice.ToTomanFormat()
+                                        </span>
+                                        <span class="font-size-10 text-muted ms-1">تومان</span>
+                                    </div>
+                                </div>
+
                             </div>
 
-                            <div class="row g-2">
-                                <div class="col-8">
-                                    <a href="#" class="btn btn-primary btn-sm w-100 py-2 font-size-12 rounded-2">
-                                        <i class="mdi mdi-chart-bell-curve-cumulative me-1"></i> نمودار قیمت
-                                    </a>
-                                </div>
-                                <div class="col-4">
-                                    <a href="#" target="_blank" class="btn btn-outline-secondary btn-sm w-100 py-2 rounded-2" title="مشاهده در سایت منبع">
-                                        <i class="mdi mdi-open-in-new"></i>
-                                    </a>
-                                </div>
+                            <div class="mt-2.5 pt-2 border-top border-light-subtle">
+                                <a href="@item.Url" target="_blank"
+                                   class="btn btn-soft-secondary btn-sm w-100 py-1.5 rounded-2 font-size-11 d-flex align-items-center justify-content-center gap-1 border-0">
+                                    <i class="mdi mdi-open-in-new font-size-13"></i>
+                                    <span>مشاهده کالا در سایت منبع</span>
+                                </a>
                             </div>
                         </div>
+
                     </div>
                 </div>
-            </div>
-
-            <div class="col">
-                <div class="card h-100 shadow-sm border-0 rounded-3 position-relative overflow-hidden">
-                    <button type="button" class="btn btn-sm btn-light text-danger position-absolute top-0 end-0 m-2 rounded-circle shadow-sm" style="z-index: 10;" title="حذف از لیست">
-                        <i class="mdi mdi-trash-can-outline font-size-16"></i>
-                    </button>
-
-                    <a href="/products/details/2" class="bg-light d-flex align-items-center justify-content-center p-3 d-block" style="height: 200px;">
-                        <img src="https://picsum.photos/200/200?random=2" class="img-fluid rounded-2 object-fit-contain h-100" alt="نام محصول">
-                    </a>
-
-                    <div class="card-body d-flex flex-column p-3">
-                        <span class="badge bg-soft-danger text-danger font-size-11 align-self-start mb-2 px-2 py-1 rounded">توقف مانیتور</span>
-
-                        <a href="/products/details/2" class="text-decoration-none">
-                            <h5 class="font-size-14 text-dark fw-bold mb-2 text-truncate" title="لپ تاپ ایسوس مدل ROG Strix G16">
-                                لپ تاپ ۱۵.۶ اینچی ایسوس مدل ROG Strix G16
-                            </h5>
-                        </a>
-
-                        <div class="mt-auto pt-3 border-top border-light">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span class="text-muted font-size-12">قیمت فعلی:</span>
-                                <span class="text-dark fw-extrabold font-size-15">۸۹,۹۰۰,۰۰۰ <span class="font-size-11 text-muted">تومان</span></span>
-                            </div>
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <span class="text-muted font-size-11">آخرین تغییر قیمت:</span>
-                                <span class="text-muted font-size-11 fw-bold">دیروز</span>
-                            </div>
-
-                            <div class="row g-2">
-                                <div class="col-8">
-                                    <a href="#" class="btn btn-primary btn-sm w-100 py-2 font-size-12 rounded-2">
-                                        <i class="mdi mdi-chart-bell-curve-cumulative me-1"></i> نمودار قیمت
-                                    </a>
-                                </div>
-                                <div class="col-4">
-                                    <a href="#" target="_blank" class="btn btn-outline-secondary btn-sm w-100 py-2 rounded-2" title="مشاهده در سایت منبع">
-                                        <i class="mdi mdi-open-in-new"></i>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
+            }
         </div>
     </div>
 }
@@ -117,16 +145,15 @@ else
                     <i class="mdi mdi-eye-off-outline text-primary" style="font-size: 48px;"></i>
                 </div>
 
-                <h3 class="font-size-18 text-dark fw-bold mb-2">لیست دیده‌بان شما خالی است!</h3>
+                <h3 class="font-size-18 text-dark fw-bold mb-2">لیست محصولات شما خالی است!</h3>
                 <p class="text-muted font-size-13 mb-4 mx-auto" style="max-width: 320px; line-height: 1.6;">
                     در حال حاضر هیچ محصولی را برای مانیتورینگ و رصد قیمت اضافه نکرده‌اید. با اضافه کردن اولین محصول، تغییرات قیمت به شما اطلاع‌رسانی می‌شود.
                 </p>
 
-                <a href="/products/add" class="btn btn-primary btn-md px-4 py-2 font-size-13 rounded-3 shadow-sm transition-all">
+                <a asp-area="UserPanel" asp-controller="Product" asp-action="AddNewProduct" class="btn btn-primary btn-md px-4 py-2 font-size-13 rounded-3 shadow-sm transition-all">
                     <i class="mdi mdi-plus-circle-outline me-1 align-middle font-size-16"></i>
-                    <span class="align-middle">افزودن محصول جدید به دیده‌بان</span>
+                    <span class="align-middle">افزودن محصول جدید</span>
                 </a>
-
             </div>
         </div>
     </div>

@@ -31,6 +31,8 @@ namespace Web
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
+            services.AddHttpClient<IDigiKalaService, DigiKalaService>();
+
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IUserValidationService, UserValidationService>();
             services.AddScoped<IRoleService, RoleService>();

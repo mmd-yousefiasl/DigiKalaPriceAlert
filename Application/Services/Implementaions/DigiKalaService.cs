@@ -121,12 +121,12 @@ namespace Application.Services.Implementaions
             return Result.Failure<string>(Messages.OperationFailedError);
         }
 
-        public async Task<Result<DigiKalaProductResultDto>> GetProductDetailsAsync(string digiKalaId)
+        public async Task<Result<DigiKalaProductResultDto>> GetProductDetails(string digiKalaId)
         {
             return await FetchProductDetailsInternalAsync(digiKalaId, downloadImage: true);
         }
 
-        public async Task<Result<DigiKalaProductResultDto>> GetProductDetailsWithoutImageAsync(string digiKalaId)
+        public async Task<Result<DigiKalaProductResultDto>> GetProductDetailsWithoutImage(string digiKalaId)
         {
             return await FetchProductDetailsInternalAsync(digiKalaId, downloadImage: false);
         }

@@ -2,7 +2,7 @@
 {
     public class ProductPriceHistory : AuditBaseEntity<int>
     {
-        public decimal? Price { get; set; }
+        public decimal Price { get; set; }
 
         #region Relations
         public int ProductId { get; set; }

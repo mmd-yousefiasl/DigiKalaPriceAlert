@@ -26,5 +26,11 @@ namespace Web.Areas.UserPanel.Controllers
 
             return View(result.Value);
         }
+
+        [HttpGet("/user/subscription-expired")]
+        public IActionResult SubscriptionExpired()
+        {
+            return View();
+        }
     }
 }

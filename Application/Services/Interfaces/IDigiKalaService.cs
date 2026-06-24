@@ -7,8 +7,8 @@ namespace Application.Services.Interfaces
     {
         Result<string> ExtractProductIdFromUrl(string url);
 
-        Task<Result<DigiKalaProductResultDto>> GetProductDetailsAsync(string digiKalaId);
+        Task<Result<DigiKalaProductResultDto>> GetProductDetails(string digiKalaId);
 
-        Task<Result<DigiKalaProductResultDto>> GetProductDetailsWithoutImageAsync(string digiKalaId);
+        Task<Result<DigiKalaProductResultDto>> GetProductDetailsWithoutImage(string digiKalaId);
     }
 }

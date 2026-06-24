@@ -35,5 +35,9 @@ namespace Application.Services.Interfaces
         Task<Result> ClientSideAddToUserSubscription(int durationInDays);
 
         Task<Result> ClientSideAddRefundTransaction(decimal amount);
+
+        Task<Result> ClientSideCanUserAddProduct();
+
+        Task<Result> ClientSideIsUserHaveSubscription(int userId);
     }
 }

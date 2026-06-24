@@ -51,6 +51,25 @@ namespace Application.Tools
             return $"{day} {PersianMonthNames[month - 1]} {year} {hour:D2}:{minute:D2}";
         }
 
+        public static string ToPersianRelativeTime(this DateTime utcDateTime)
+        {
+            var now = DateTime.UtcNow;
+
+            if (utcDateTime > now) return "لحظاتی پیش";
+
+            var timeSpan = now - utcDateTime;
+
+            string result = timeSpan.TotalSeconds switch
+            {
+                < 60 => "لحظاتی پیش",
+                < 3600 => $"{Math.Floor(timeSpan.TotalMinutes)} دقیقه قبل",
+                < 86400 => $"{Math.Floor(timeSpan.TotalHours)} ساعت قبل",
+                _ => $"{Math.Floor(timeSpan.TotalDays)} روز پیش"
+            };
+
+            return result;
+        }
+
         private static DateTime NormalizeToIranTimeZone(this DateTime value)
         {
             if (value.Kind != DateTimeKind.Utc && value.Kind != DateTimeKind.Unspecified)

@@ -28,6 +28,8 @@
         public const string PaymentFailedError = "پرداخت با شکست مواجه شد";
         public const string TransactionAlreadyVerified = "تراکنش قبلاً تأیید شده است";
         public const string InSufficentBalanceError = "موجودی کافی برای انجام تراکنش وجود ندارد";
+        public const string InvalidDigiKalaProductUrlError = "آدرس وارد شده یک لینک معتبر از محصول دیجی‌کالا نمی‌باشد";
+        public const string UserReachedMaximumProductsError = "تعداد محصولات شما به سقف مجاز رسیده است";
 
         #endregion
 
