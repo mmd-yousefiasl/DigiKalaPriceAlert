@@ -23,6 +23,7 @@ namespace Web.Areas.UserPanel.Controllers
         [HttpGet("/user/products/list")]
         public async Task<IActionResult> ProductsList(ClientSideFilterProductsDto filter)
         {
+            filter.TakeEntity = 20;
             var result = await _productService.ClientSideFilterProducts(filter);
             if (result.IsFailure)
                 return View(new ClientSideFilterProductsDto());
