@@ -2,6 +2,7 @@
 using Application.Services.Interfaces;
 using Application.Tools;
 using Data.Context;
+using Domain.Enums.Products;
 using Domain.Models.Products;
 using Domain.Models.Users;
 using Domain.Shared;
@@ -183,6 +184,11 @@ namespace Application.Services.Implementaions
                 conditions.Add(n => n.Title.Contains(filter.Search));
             }
 
+            if (filter.SortType == ProductSortTypeEnum.UnreadOnly)
+            {
+                conditions.Add(n => n.Users.Any(u => u.UserId == userId && !u.IsRead));
+            }
+
             IQueryable<Product> query = _context.Products;
 
             foreach (var item in conditions)
@@ -203,9 +209,35 @@ namespace Application.Services.Implementaions
                 IsRead = n.Users.Where(u => u.UserId == userId).Select(u => u.IsRead).FirstOrDefault()
             });
 
-            var sortedQuery = projectedQuery
-                .OrderBy(n => n.IsRead)
-                .ThenByDescending(n => n.LastUpdatedDate);
+            IOrderedQueryable<ClientSideProductDto> sortedQuery;
+
+            switch (filter.SortType)
+            {
+                case ProductSortTypeEnum.OldestUpdate:
+                    sortedQuery = projectedQuery.OrderBy(n => n.LastUpdatedDate);
+                    break;
+
+                case ProductSortTypeEnum.HighestPrice:
+                    sortedQuery = projectedQuery.OrderByDescending(n => n.NewPrice);
+                    break;
+
+                case ProductSortTypeEnum.LowestPrice:
+                    sortedQuery = projectedQuery.OrderBy(n => n.NewPrice);
+                    break;
+
+                case ProductSortTypeEnum.HighestPriceDrop:
+                    sortedQuery = projectedQuery.OrderBy(n => n.ChangePercent);
+                    break;
+
+                case ProductSortTypeEnum.UnreadOnly:
+                    sortedQuery = projectedQuery.OrderByDescending(n => n.LastUpdatedDate);
+                    break;
+
+                case ProductSortTypeEnum.NewestUpdate:
+                default:
+                    sortedQuery = projectedQuery.OrderBy(n => n.IsRead).ThenByDescending(n => n.LastUpdatedDate);
+                    break;
+            }
 
             await filter.Paging(sortedQuery);
 

@@ -1,5 +1,6 @@
 ﻿@using Application.Dtos.Products.ClientSide
 @using Application.Tools
+@using Domain.Enums.Products
 @model ClientSideFilterProductsDto
 
 @{
@@ -89,6 +90,12 @@
                     <div class="col-12 col-md-6">
                         <label class="form-label font-size-12 fw-bold text-dark" asp-for="Search"></label>
                         <input type="text" class="form-control border-dark-subtle font-size-13" asp-for="Search" autocomplete="off" placeholder="عنوان محصول...">
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                        <label class="form-label font-size-12 fw-bold text-dark" asp-for="SortType"></label>
+                        <select class="form-control border-dark-subtle font-size-13" asp-for="SortType" asp-items="@Html.GetEnumSelectList<ProductSortTypeEnum>()">
+                        </select>
                     </div>
 
                     <div class="col-12 d-flex justify-content-between align-items-center mt-3">
