@@ -1,4 +1,33 @@
-﻿.list-delete-button {
+﻿/* 1. Map "the one with nothing" as your standard Regular text (Weight: 400) */
+@font-face {
+    font-family: 'VazirmatnFD';
+    src: url('/fonts/Vazir-FD-WOL.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* 2. Map the Bold file for headings and strong text (Weight: 700) */
+@font-face {
+    font-family: 'VazirmatnFD';
+    src: url('/fonts/Vazir-Bold-FD-WOL.woff2') format('woff2');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+html, body {
+    font-family: 'VazirmatnFD', Tahoma, sans-serif !important;
+    font-variant-numeric: normal !important;
+}
+
+/* 4. FORCE the inputs to use the FD font and reset variant properties */
+input, select, textarea, button {
+    font-family: 'VazirmatnFD', Tahoma, sans-serif !important;
+    font-variant-numeric: normal !important; /* Prevents browsers from forcing system digits */
+}
+
+.list-delete-button {
     cursor: pointer;
     display: contents;
 }
@@ -75,4 +104,33 @@
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.25s ease-out;
+}
+
+
+/* کلاس‌های شخصی‌سازی شده برای پس‌زمینه‌های نرم (Soft Badges) */
+
+.bg-soft-warning {
+    background-color: rgba(241, 180, 76, 0.18) !important;
+    color: #f1b44c !important;
+}
+
+.bg-soft-success {
+    background-color: rgba(52, 195, 143, 0.18) !important;
+    color: #34c38f !important;
+}
+
+.bg-soft-primary {
+    background-color: rgba(85, 110, 230, 0.18) !important;
+    color: #556ee6 !important;
+}
+
+/* استایل تکمیلی برای اینکه پدینگ و فونت بج‌ها در کل سایت تمیزتر دیده بشه */
+.badge[class*="bg-soft-"] {
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    font-weight: 600;
+    padding: 0.4em 0.6em;
+}
+.bg-soft-danger {
+    background-color: rgba(244, 106, 106, 0.18) !important;
+    color: #f46a6a !important;
 }

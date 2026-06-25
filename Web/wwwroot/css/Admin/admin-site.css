@@ -1,4 +1,27 @@
-﻿.list-delete-button {
+﻿/* 1. Map "the one with nothing" as your standard Regular text (Weight: 400) */
+@font-face {
+    font-family: 'VazirmatnFD';
+    src: url('/fonts/Vazir-FD-WOL.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* 2. Map the Bold file for headings and strong text (Weight: 700) */
+@font-face {
+    font-family: 'VazirmatnFD';
+    src: url('/fonts/Vazir-Bold-FD-WOL.woff2') format('woff2');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+html, body {
+    font-family: 'VazirmatnFD', Tahoma, sans-serif !important;
+    font-variant-numeric: normal !important;
+}
+
+.list-delete-button {
     cursor: pointer;
     display: contents;
 }

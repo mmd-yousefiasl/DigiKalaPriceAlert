@@ -7,26 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="wwwroot\adminAssets\fontawesome\**" />
-    <Compile Remove="wwwroot\adminAssets\jalalidatepicker\**" />
-    <Compile Remove="wwwroot\adminAssets\libs\**" />
-    <Compile Remove="wwwroot\adminAssets\tinymce\**" />
-    <Content Remove="wwwroot\adminAssets\fontawesome\**" />
-    <Content Remove="wwwroot\adminAssets\jalalidatepicker\**" />
-    <Content Remove="wwwroot\adminAssets\libs\**" />
-    <Content Remove="wwwroot\adminAssets\tinymce\**" />
-    <EmbeddedResource Remove="wwwroot\adminAssets\fontawesome\**" />
-    <EmbeddedResource Remove="wwwroot\adminAssets\jalalidatepicker\**" />
-    <EmbeddedResource Remove="wwwroot\adminAssets\libs\**" />
-    <EmbeddedResource Remove="wwwroot\adminAssets\tinymce\**" />
-    <None Remove="wwwroot\adminAssets\fontawesome\**" />
-    <None Remove="wwwroot\adminAssets\jalalidatepicker\**" />
-    <None Remove="wwwroot\adminAssets\libs\**" />
-    <None Remove="wwwroot\adminAssets\tinymce\**" />
+    <Compile Remove="wwwroot\adminAssets\**" />
+    <Content Remove="wwwroot\adminAssets\**" />
+    <EmbeddedResource Remove="wwwroot\adminAssets\**" />
+    <None Remove="wwwroot\adminAssets\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="wwwroot\adminAssets\js\tinymce\.DS_Store" />
     <None Include="wwwroot\assets\fontawesome\.DS_Store" />
     <None Include="wwwroot\assets\libs\%40fullcalendar\.DS_Store" />
     <None Include="wwwroot\assets\libs\.DS_Store" />
@@ -55,30 +42,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Application\Application.csproj" />
     <ProjectReference Include="..\Data\Data.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="wwwroot\adminAssets\fonts\fontawesome\css\" />
-    <Folder Include="wwwroot\adminAssets\fonts\fontawesome\js\" />
-    <Folder Include="wwwroot\adminAssets\fonts\fontawesome\less\" />
-    <Folder Include="wwwroot\adminAssets\fonts\fontawesome\metadata\" />
-    <Folder Include="wwwroot\adminAssets\fonts\fontawesome\scss\" />
-    <Folder Include="wwwroot\adminAssets\fonts\fontawesome\sprites\" />
-    <Folder Include="wwwroot\adminAssets\fonts\fontawesome\svgs\brands\" />
-    <Folder Include="wwwroot\adminAssets\fonts\fontawesome\svgs\regular\" />
-    <Folder Include="wwwroot\adminAssets\fonts\fontawesome\svgs\solid\" />
-    <Folder Include="wwwroot\adminAssets\fonts\fontawesome\webfonts\" />
-    <Folder Include="wwwroot\adminAssets\fonts\vazir-font-v27.2.2-Fontjo.com\fonts\Farsi-Digits-Without-Latin\" />
-    <Folder Include="wwwroot\adminAssets\fonts\vazir-font-v27.2.2-Fontjo.com\fonts\Farsi-Digits\" />
-    <Folder Include="wwwroot\adminAssets\fonts\vazir-font-v27.2.2-Fontjo.com\fonts\UI\Farsi-Digits-Without-Latin\" />
-    <Folder Include="wwwroot\adminAssets\fonts\vazir-font-v27.2.2-Fontjo.com\fonts\UI\Farsi-Digits\" />
-    <Folder Include="wwwroot\adminAssets\fonts\vazir-font-v27.2.2-Fontjo.com\fonts\UI\Without-Latin\" />
-    <Folder Include="wwwroot\adminAssets\fonts\vazir-font-v27.2.2-Fontjo.com\fonts\Without-Latin\" />
-    <Folder Include="wwwroot\adminAssets\images\flags\" />
-    <Folder Include="wwwroot\adminAssets\images\layouts\" />
-    <Folder Include="wwwroot\adminAssets\images\small\" />
-    <Folder Include="wwwroot\adminAssets\images\users\" />
-    <Folder Include="wwwroot\adminAssets\js\pages\" />
   </ItemGroup>
 
 </Project>

@@ -1,5 +1,24 @@
-span, a, table, td, th, tr, h1, h2, h3, h4, h5, h6 {
-    font-family: Vazir;
+/* 1. Map "the one with nothing" as your standard Regular text (Weight: 400) */
+@font-face {
+    font-family: 'VazirmatnFD';
+    src: url('/fonts/Vazir-FD-WOL.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* 2. Map the Bold file for headings and strong text (Weight: 700) */
+@font-face {
+    font-family: 'VazirmatnFD';
+    src: url('/fonts/Vazir-Bold-FD-WOL.woff2') format('woff2');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+* {
+    font-family: 'VazirmatnFD', Tahoma, sans-serif !important;
+    font-variant-numeric: normal !important;
 }
 
 .text-danger {
