@@ -129,7 +129,7 @@ namespace Application.Services.Implementaions
 
             var product = await _context.Products
                 .AsNoTracking()
-                .Where(n => n.Id == id)
+                .Where(n => n.Id == id && n.Users.Any(u => u.UserId == userId))
                 .Select(n => new ClientSideProductDetailsDto()
                 {
                     Id = n.Id,
@@ -155,7 +155,8 @@ namespace Application.Services.Implementaions
                             Id = ph.Id,
                             Price = ph.Price,
                             CreatedDate = ph.CreatedDate
-                        }).ToList()
+                        }).Take(50)
+                        .ToList()
                 }).FirstOrDefaultAsync();
 
             if (product is null)

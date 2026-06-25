@@ -12,6 +12,8 @@ namespace Data.Context.Configurations.Products
 
             builder.HasKey(pph => pph.Id);
 
+            builder.HasIndex(pph => new { pph.ProductId, pph.CreatedDate });
+
             builder.Property(pph => pph.Price)
                 .HasColumnType("numeric(18,0)");
 
