@@ -29,6 +29,10 @@ namespace Data.Context.Configurations.Products
             builder.Property(p => p.NewPrice)
                 .HasColumnType("numeric(18,0)");
 
+            builder.Property(p => p.ChangePercent)
+                .HasColumnType("numeric(18,2)")
+                .IsRequired(false);
+
             builder.Property(p => p.ImageFileName)
                 .HasMaxLength(200);
 

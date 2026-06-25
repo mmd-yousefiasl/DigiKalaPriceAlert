@@ -1,6 +1,5 @@
 ﻿using Application.Dtos.PriceMonitor;
 using Application.Dtos.Products.ClientSide;
-using Application.Dtos.Users.ClientSide;
 using Application.Services.Interfaces;
 using Application.Tools;
 using Domain.Shared;
@@ -65,7 +64,11 @@ namespace Web.BackgroundServices
 
             while (hasMoreProducts && !stoppingToken.IsCancellationRequested)
             {
-                var batchIds = allProductIds.Skip(page * batchSize).Take(batchSize).ToList();
+                var batchIds = allProductIds.OrderBy(n => n.Id)
+                    .Select(n => n.Id)
+                    .Skip(page * batchSize)
+                    .Take(batchSize)
+                    .ToList();
 
                 if (!batchIds.Any())
                 {
@@ -109,13 +112,11 @@ namespace Web.BackgroundServices
                             CancellationToken = stoppingToken
                         });
 
-                        var userMobiles = await userService.ClientSideGetUsersTrackingProduct(new ClientSideGetUsersTrackingProductDto()
-                        {
-                            ProductId = product.Id,
-                            CancellationToken = stoppingToken
-                        });
+                        var userMobiles = allProductIds
+                            .Where(n => n.Id == product.Id)
+                            .SelectMany(n => n.Users.Select(u => u.Mobile));
 
-                        foreach (var item in userMobiles)
+                        foreach (var item in userMobiles ?? new List<string>())
                         {
                             mobilesToNotify.Add(item);
                         }

@@ -1,4 +1,5 @@
-﻿using Application.Dtos.Users.AdminSide;
+﻿using Application.Dtos.Products.ClientSide;
+using Application.Dtos.Users.AdminSide;
 using Application.Dtos.Users.ClientSide;
 using Domain.Shared;
 
@@ -40,7 +41,7 @@ namespace Application.Services.Interfaces
 
         Task<Result> ClientSideIsUserHaveSubscription(int userId);
 
-        Task<Result<List<int>>> ClientSideGetAllEligibleProductIdsAsync(CancellationToken cancellationToken);
+        Task<Result<List<ClientSideEligibleProductIdWithUsersDto>>> ClientSideGetAllEligibleProductIdsAsync(CancellationToken cancellationToken);
 
         Task<List<string>> ClientSideGetUsersTrackingProduct(ClientSideGetUsersTrackingProductDto dto);
     }

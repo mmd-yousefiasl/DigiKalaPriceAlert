@@ -17,5 +17,7 @@ namespace Application.Services.Interfaces
         Task<List<Product>> GetProductsBatchForMonitoringAsync(ClientSideGetProductsBatchForMonitoringDto dto);
 
         Task<Result> ClientSideUpdateProductPrices(ClientSideUpdateProductPricesDto dto);
+
+        Task<Result> ClientSideSetProductAsReadForUser(int id);
     }
 }

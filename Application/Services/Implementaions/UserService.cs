@@ -1,4 +1,5 @@
-﻿using Application.Dtos.Role.AdminSide;
+﻿using Application.Dtos.Products.ClientSide;
+using Application.Dtos.Role.AdminSide;
 using Application.Dtos.Users.AdminSide;
 using Application.Dtos.Users.ClientSide;
 using Application.Services.Interfaces;
@@ -423,21 +424,30 @@ namespace Application.Services.Implementaions
             return Result.Failure(Messages.OperationFailedError);
         }
 
-        public async Task<Result<List<int>>> ClientSideGetAllEligibleProductIdsAsync(CancellationToken cancellationToken)
+        public async Task<Result<List<ClientSideEligibleProductIdWithUsersDto>>> ClientSideGetAllEligibleProductIdsAsync(CancellationToken cancellationToken)
         {
             var now = DateTime.UtcNow;
 
-            var productIds = await _context.UserProductMapping
+            var result = await _context.UserProductMapping
                 .AsNoTracking()
                 .Where(upm => upm.User.SubscriptionEndDate > now)
-                .Select(upm => upm.ProductId)
-                .Distinct()
+                .GroupBy(upm => upm.ProductId)
+                .Select(group => new ClientSideEligibleProductIdWithUsersDto
+                {
+                    Id = group.Key,
+                    Users = group.Select(upm => new ClientSideUserDto
+                    {
+                        Id = upm.User.Id,
+                        Mobile = upm.User.Mobile,
+                        IsBanned = upm.User.IsUserBanned
+                    }).ToList()
+                })
                 .ToListAsync(cancellationToken);
 
-            if (productIds.Count == 0)
-                return Result.Failure<List<int>>(Messages.OperationFailedError);
+            if (result.Count == 0)
+                return Result.Failure<List<ClientSideEligibleProductIdWithUsersDto>>(Messages.OperationFailedError);
 
-            return Result.Success(productIds);
+            return Result.Success(result);
         }
 
         public async Task<List<string>> ClientSideGetUsersTrackingProduct(ClientSideGetUsersTrackingProductDto dto)

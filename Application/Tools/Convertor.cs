@@ -118,5 +118,15 @@ namespace Application.Tools
         {
             return "https://www.digikala.com/product/dkp-" + digiKalaId + "/";
         }
+
+        public static decimal? CalculateChangePercent(this decimal oldPrice, decimal newPrice)
+        {
+            if (oldPrice == 0 || newPrice == 0)
+                return null;
+
+            var percentage = ((newPrice - oldPrice) / oldPrice) * 100;
+
+            return Math.Round(percentage, 2);
+        }
     }
 }

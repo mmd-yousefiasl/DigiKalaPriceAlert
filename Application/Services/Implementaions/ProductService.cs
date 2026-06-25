@@ -141,6 +141,7 @@ namespace Application.Services.Implementaions
                     Url = n.Url,
                     CreatedDate = n.CreatedDate,
                     LastUpdatedDate = n.LastUpdatedDate,
+                    ChangePercent = n.ChangePercent,
 
                     AllTimeMaxPrice = n.PriceHistory.Max(ph => (decimal?)ph.Price) ?? 0,
                     AllTimeMinPrice = n.PriceHistory.Min(ph => (decimal?)ph.Price) ?? 0,
@@ -188,9 +189,7 @@ namespace Application.Services.Implementaions
                 query = query.Where(item);
             }
 
-            query = query.OrderByDescending(n => n.LastUpdatedDate);
-
-            await filter.Paging(query.Select(n => new ClientSideProductDto()
+            var projectedQuery = query.Select(n => new ClientSideProductDto()
             {
                 Id = n.Id,
                 ImageUrl = n.ImageUrl,
@@ -198,8 +197,16 @@ namespace Application.Services.Implementaions
                 LastUpdatedDate = n.LastUpdatedDate,
                 NewPrice = n.NewPrice,
                 OldPrice = n.OldPrice,
-                Url = n.Url
-            }));
+                Url = n.Url,
+                ChangePercent = n.ChangePercent,
+                IsRead = n.Users.Where(u => u.UserId == userId).Select(u => u.IsRead).FirstOrDefault()
+            });
+
+            var sortedQuery = projectedQuery
+                .OrderBy(n => n.IsRead)
+                .ThenByDescending(n => n.LastUpdatedDate);
+
+            await filter.Paging(sortedQuery);
 
             return filter;
         }
@@ -241,16 +248,25 @@ namespace Application.Services.Implementaions
                 using var transaction = await _context.Database.BeginTransactionAsync(dto.CancellationToken);
                 try
                 {
+                    decimal? calculatedPercent = dto.OldPrice.CalculateChangePercent(dto.NewPrice);
+
                     var rowsAffected = await _context.Products
                         .Where(p => p.Id == dto.ProductId)
                         .ExecuteUpdateAsync(s => s
                             .SetProperty(p => p.OldPrice, p => p.NewPrice)
                             .SetProperty(p => p.NewPrice, dto.NewPrice)
-                            .SetProperty(p => p.LastUpdatedDate, DateTime.UtcNow),
+                            .SetProperty(p => p.LastUpdatedDate, DateTime.UtcNow)
+                            .SetProperty(p => p.ChangePercent, calculatedPercent),
                         dto.CancellationToken);
 
                     if (rowsAffected == 0)
                         return Result.Failure(Messages.OperationFailedError);
+
+                    await _context.UserProductMapping
+                        .Where(upm => upm.ProductId == dto.ProductId)
+                        .ExecuteUpdateAsync(s => s
+                            .SetProperty(upm => upm.IsRead, false),
+                        dto.CancellationToken);
 
                     var history = new ProductPriceHistory
                     {
@@ -260,7 +276,6 @@ namespace Application.Services.Implementaions
                     _context.ProductPriceHistory.Add(history);
 
                     await _context.SaveChangesAsync(dto.CancellationToken);
-
                     await transaction.CommitAsync(dto.CancellationToken);
 
                     return Result.Success();
@@ -268,10 +283,29 @@ namespace Application.Services.Implementaions
                 catch (Exception ex)
                 {
                     await transaction.RollbackAsync(dto.CancellationToken);
-                    _logger.LogError(ex, "Error updating prices for product {ProductId}", dto.ProductId);
+                    _logger.LogError(ex, "Error updating prices and notification flags for product {ProductId}", dto.ProductId);
                     throw;
                 }
             });
+        }
+
+        public async Task<Result> ClientSideSetProductAsReadForUser(int id)
+        {
+            if (id < 1)
+                return Result.Failure(Messages.OperationFailedError);
+
+            var userId = _httpContextAccessor.HttpContext.User.GetUserId();
+            if (userId < 1)
+                return Result.Failure(Messages.OperationFailedError);
+
+            var rowsAffected = await _context.UserProductMapping
+                .Where(n => n.UserId == userId && n.ProductId == id)
+                .ExecuteUpdateAsync(s => s.SetProperty(upm => upm.IsRead, true));
+
+            if (rowsAffected == 0)
+                return Result.Failure(Messages.OperationFailedError);
+
+            return Result.Success();
         }
     }
 }

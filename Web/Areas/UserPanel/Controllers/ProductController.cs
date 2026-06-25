@@ -69,6 +69,7 @@ namespace Web.Areas.UserPanel.Controllers
                 TempData[TemporaryErrorMessage] = result.Message;
                 return RedirectToAction(nameof(ProductsList));
             }
+            await _productService.ClientSideSetProductAsReadForUser(result.Value.Id);
 
             return View(result.Value);
         }

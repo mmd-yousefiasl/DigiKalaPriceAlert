@@ -15,7 +15,6 @@
         }
 
             .compact-product-card:hover {
-                transform: translateY(-2px);
                 box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12) !important;
             }
 
@@ -114,7 +113,10 @@
 
                     <div class="card mb-0 border border-dark shadow-sm position-relative overflow-hidden compact-product-card" style="background: #fff;">
 
-                        <div class="unread-ribbon">نرخ جدید</div>
+                        @if (!item.IsRead)
+                        {
+                            <div class="unread-ribbon">نرخ جدید</div>
+                        }
 
                         <form class="delete-product-form position-absolute top-0 end-0 p-2"
                               asp-area="UserPanel"
@@ -171,6 +173,14 @@
                                                 </span>
                                             }
                                         </div>
+
+                                        @if (item.ChangePercent.HasValue && item.ChangePercent.Value != 0)
+                                        {
+                                            var isDrop = item.ChangePercent.Value < 0;
+                                            <span class="badge bg-danger font-size-11 px-1.5 py-0.5 rounded dir-ltr" style="direction: ltr;">
+                                                @(isDrop ? "" : "+")@item.ChangePercent.Value%
+                                            </span>
+                                        }
 
                                         @if (item.OldPrice > 0)
                                         {

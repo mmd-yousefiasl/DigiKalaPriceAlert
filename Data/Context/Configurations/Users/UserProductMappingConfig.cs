@@ -12,6 +12,9 @@ namespace Data.Context.Configurations.Users
 
             builder.HasKey(upm => new { upm.UserId, upm.ProductId });
 
+            builder.HasIndex(upm => new { upm.UserId, upm.ProductId })
+                .IncludeProperties(upm => upm.IsRead);
+
             builder.HasIndex(upm => upm.ProductId);
 
             builder.HasOne(upm => upm.User)
