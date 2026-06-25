@@ -13,7 +13,8 @@ namespace Data.Context.Configurations.Blogs
 
             builder.HasOne(n => n.Blog)
                 .WithMany(n => n.Views)
-                .HasForeignKey(n => n.BlogId);
+                .HasForeignKey(n => n.BlogId)
+                .IsRequired(false);
         }
     }
 }

@@ -1,6 +1,4 @@
-﻿using System.Runtime.InteropServices;
-
-namespace Domain.Models.Tickets
+﻿namespace Domain.Models.Tickets
 {
     public class TicketMessage : AuditBaseEntity<int>
     {
@@ -10,7 +8,7 @@ namespace Domain.Models.Tickets
 
         #region Relations
         public int TicketId { get; set; }
-        public Ticket Ticket { get; set; }
+        public Ticket? Ticket { get; set; }
 
         public int SenderId { get; set; }
         #endregion

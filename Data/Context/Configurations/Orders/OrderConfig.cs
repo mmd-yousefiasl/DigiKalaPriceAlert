@@ -22,7 +22,8 @@ namespace Data.Context.Configurations.Orders
 
             builder.HasOne(o => o.User)
                 .WithMany(u => u.Orders)
-                .HasForeignKey(o => o.UserId);
+                .HasForeignKey(o => o.UserId)
+                .IsRequired(false);
 
             builder.HasOne(o => o.SubscriptionPlan)
                 .WithMany(sp => sp.Orders)

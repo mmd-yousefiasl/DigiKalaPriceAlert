@@ -7,8 +7,8 @@
 
         #region Relations
 
-        public Role Role { get; set; }
-        public Permission Permission { get; set; }
+        public Role? Role { get; set; }
+        public Permission? Permission { get; set; }
 
         #endregion
     }

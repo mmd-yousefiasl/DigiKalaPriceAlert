@@ -22,7 +22,8 @@ namespace Data.Context.Configurations.Tickets
 
             builder.HasOne(tm => tm.Ticket)
                 .WithMany(t => t.Messages)
-                .HasForeignKey(tm => tm.TicketId);
+                .HasForeignKey(tm => tm.TicketId)
+                .IsRequired(false);
 
             builder.HasIndex(tm => tm.TicketId);
         }

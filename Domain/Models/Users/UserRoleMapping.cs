@@ -9,8 +9,8 @@ namespace Domain.Models.Users
 
         #region Relations
 
-        public User User { get; set; }
-        public Role Role { get; set; }
+        public User? User { get; set; }
+        public Role? Role { get; set; }
 
         #endregion
     }

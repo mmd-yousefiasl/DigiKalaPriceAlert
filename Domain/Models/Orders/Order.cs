@@ -16,7 +16,7 @@ namespace Domain.Models.Orders
         public SubscriptionPlan SubscriptionPlan { get; set; }
 
         public int UserId { get; set; }
-        public User User { get; set; }
+        public User? User { get; set; }
         #endregion
     }
 }

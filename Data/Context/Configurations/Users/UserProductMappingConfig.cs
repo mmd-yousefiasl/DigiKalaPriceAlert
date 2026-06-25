@@ -19,7 +19,8 @@ namespace Data.Context.Configurations.Users
 
             builder.HasOne(upm => upm.User)
                 .WithMany(u => u.Products)
-                .HasForeignKey(upm => upm.UserId);
+                .HasForeignKey(upm => upm.UserId)
+                .IsRequired(false);
 
             builder.HasOne(upm => upm.Product)
                 .WithMany(p => p.Users)

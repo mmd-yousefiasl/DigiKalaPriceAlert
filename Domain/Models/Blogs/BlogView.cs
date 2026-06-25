@@ -7,7 +7,7 @@
 
         #region Relations
         public int BlogId { get; set; }
-        public Blog Blog { get; set; }
+        public Blog? Blog { get; set; }
         #endregion
     }
 }

@@ -16,11 +16,13 @@ namespace Data.Context.Configurations.Identity
 
             builder.HasOne(rpm => rpm.Role)
                 .WithMany(r => r.RolePermissionMapping)
-                .HasForeignKey(rpm => rpm.RoleId);
+                .HasForeignKey(rpm => rpm.RoleId)
+                .IsRequired(false);
 
             builder.HasOne(rpm => rpm.Permission)
                 .WithMany(p => p.RolePermissionMapping)
-                .HasForeignKey(rpm => rpm.PermissionId);
+                .HasForeignKey(rpm => rpm.PermissionId)
+                .IsRequired(false);
         }
     }
 }

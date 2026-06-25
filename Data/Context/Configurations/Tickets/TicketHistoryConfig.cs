@@ -18,7 +18,8 @@ namespace Data.Context.Configurations.Tickets
 
             builder.HasOne(th => th.Ticket)
                 .WithMany(t => t.TicketHistories)
-                .HasForeignKey(th => th.TicketId);
+                .HasForeignKey(th => th.TicketId)
+                .IsRequired(false);
 
             builder.HasIndex(th => th.TicketId);
 

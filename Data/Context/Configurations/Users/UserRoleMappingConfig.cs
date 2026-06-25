@@ -16,11 +16,13 @@ namespace Data.Context.Configurations.Users
 
             builder.HasOne(urm => urm.User)
                 .WithMany(u => u.UserRoleMapping)
-                .HasForeignKey(urm => urm.UserId);
+                .HasForeignKey(urm => urm.UserId)
+                .IsRequired(false);
 
             builder.HasOne(urm => urm.Role)
                 .WithMany(u => u.UserRoleMapping)
-                .HasForeignKey(urm => urm.RoleId);
+                .HasForeignKey(urm => urm.RoleId)
+                .IsRequired(false);
         }
     }
 }
