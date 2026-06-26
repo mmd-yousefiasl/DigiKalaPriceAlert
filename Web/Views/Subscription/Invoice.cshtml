@@ -334,8 +334,8 @@
                         برای شروع استفاده از سیستم پایش قیمت دیجیتو نیازی به پرداخت وجه نیست. با کلیک روی دکمه زیر، اشتراک تست ۷ روزه فوراً روی حساب شما اعمال شده و به صفحه مدیریت کالاها منتقل می‌شوید.
                     </p>
 
-                    <form asp-area="" asp-controller="Subscription" asp-action="Checkout" method="post">
-                        <button type="submit" class="btn-checkout-submit btn-free">
+                    <form asp-area="" asp-controller="Subscription" asp-action="Checkout" method="post" onsubmit="submitAnimation()">
+                        <button type="submit" class="btn-submit btn-checkout-submit btn-free">
                             فعال‌سازی رایگان اشتراک تست 🎉
                         </button>
                     </form>

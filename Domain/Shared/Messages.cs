@@ -50,7 +50,7 @@
 
         #region Message
 
-        public const string ProductPriceChangedMessage = "کاربر گرامی، قیمت حداقل یکی از محصولات مورد رصد شما تغییر یافته است. جهت مشاهده جزئیات به ربات مراجعه کنید.";
+        public const string ProductPriceChangedMessage = "تغییر قیمت در محصولات درحال پایش.";
         public const string IncreaseUserBalanceMessage = "افزایش موجودی کیف پول از طریق درگاه پرداخت به منظور پردازش سفارش";
         public const string RefundUserBalanceMessage = "بازگشت وجه سبد خرید به کیف پول به دلیل خطا در پردازش سفارش.";
         public const string NewTicketCreatedByUser = "تیکت جدید توسط کاربر ایجاد شد";

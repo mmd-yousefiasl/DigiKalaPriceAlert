@@ -56,7 +56,7 @@ namespace Data.Context
                         Priority = 10,
                         SubscriptionPlanId = 1,
                         IsDeleted =false,
-                        Title = " پایش همزمان حداکثر ۲ کالا"
+                        Title = " پایش همزمان تا 20 کالا"
                     },
                     new SubscriptionPlanFeature()
                     {
