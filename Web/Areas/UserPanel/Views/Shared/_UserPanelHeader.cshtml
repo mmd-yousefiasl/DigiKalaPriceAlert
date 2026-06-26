@@ -1,15 +1,13 @@
 ﻿<header id="page-topbar">
     <div class="navbar-header">
         <div class="d-flex">
-            <!-- LOGO -->
             <div class="navbar-brand-box">
                 <a asp-area="UserPanel" asp-controller="Home" asp-action="Index" class="logo logo-light">
                     <span class="logo-sm">
-                        <img src="~/lexaAssets/images/logo-sm.png" alt="" height="22">
+                        <img src="~/assets/logo.png" alt="لوگو سایت" height="22">
                     </span>
                     <span class="logo-lg">
-                        @* @await Component.InvokeAsync("AdminLogo") *@
-                        <img src="~/lexaAssets/images/logo-sm.png" alt="" height="18">
+                        <img src="~/assets/logo.png" alt="لوگو سایت" height="18">
                     </span>
                 </a>
             </div>
@@ -17,34 +15,15 @@
             <button type="button" class="btn btn-sm px-3 font-size-24 header-item waves-effect vertical-menu-btn">
                 <i class="mdi mdi-menu"></i>
             </button>
-            <div class="d-none d-sm-block" permission="ManageMedia">
-                <div class="dropdown dropdown-topbar pt-3 mt-1 d-inline-block">
-                    <a class="btn btn-light dropdown-toggle" href="javascript:void(0)" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        دسترسی سریع
-                        <i class="mdi mdi-chevron-down"></i>
-                    </a>
-
-                    <div class="dropdown-menu" aria-labelledby="dropdownMenuLink" style="">
-                        <a class="dropdown-item" href="javascript:void(0)" onclick="showLargeModal('مدیریت رسانه ها', '/admin/media-list')" title="مدیریت رسانه ها">مدیریت رسانه ها</a>
-                    </div>
-                </div>
-            </div>
         </div>
 
         <div class="d-flex">
-            @* @await Component.InvokeAsync("LatestNotifications") *@
-
-            <div class="dropdown d-inline-block">
-                <button type="button" class="btn header-item waves-effect" id="page-header-user-dropdown"
-                        data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    @* @await Component.InvokeAsync("AdminAvatar") *@
-                </button>
-                <div class="dropdown-menu dropdown-menu-end">
-                    <a class="dropdown-item" asp-area="Admin" asp-controller="UserProfile" asp-action="UpdateUserProfile">
-                        <i class="mdi mdi-account-circle font-size-17 text-muted align-middle mex-1"></i> مشخصات
+            <div>
+                <div class="d-inline-block">
+                    <a class="btn btn-outline-danger" asp-area="" asp-controller="Account" asp-action="Logout">
+                        خروج
+                        <i class="mdi mdi-power font-size-17 align-middle mex-1"></i>
                     </a>
-                    <div class="dropdown-divider"></div>
-                    <a class="dropdown-item text-danger" asp-area="" asp-controller="Account" asp-action="Logout"><i class="mdi mdi-power font-size-17 text-muted align-middle mex-1 text-danger"></i> خروج</a>
                 </div>
             </div>
         </div>
