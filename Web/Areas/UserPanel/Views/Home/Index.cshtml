@@ -13,87 +13,90 @@
             <div class="page-title-box">
                 <h4>پنل کاربری</h4>
                 <ol class="breadcrumb m-0">
-                    <li class="breadcrumb-item active">@ViewData["Title"]</li>
+                    <li class="breadcrumb-item active">صفحه نخست</li>
                 </ol>
             </div>
         </div>
     </div>
 
-    <div class="row">
-        <div class="col-xl-4 col-lg-5">
+    <div class="row align-items-stretch">
 
-            <div class="card text-center border border-dark" style="border-top: 4px solid #000000 !important;">
-                <div class="card-body">
-                    <div class="mb-3">
-                        <div class="avatar-sm mx-auto bg-dark rounded-circle d-flex align-items-center justify-content-center" style="width: 72px; height: 72px;">
-                            @if (!string.IsNullOrEmpty(Model.FirstName))
-                            {
-                                <span class="text-white font-size-24 fw-bold">@Model.FirstName.FirstOrDefault()</span>
-                            }
-                            else
-                            {
-                                <i class="mdi mdi-account text-white font-size-24"></i>
-                            }
+        <div class="col-xl-4 col-lg-5 mb-4 d-flex">
+            <div class="card border border-dark w-100 mb-0 d-flex flex-column justify-content-between" style="border-top: 4px solid #000000 !important;">
+                <div class="card-body d-flex flex-column justify-content-between gap-4">
+
+                    <div class="text-center pt-2">
+                        <div class="mb-3">
+                            <div class="avatar-sm mx-auto bg-dark rounded-circle d-flex align-items-center justify-content-center" style="width: 72px; height: 72px;">
+                                @if (!string.IsNullOrEmpty(Model.FirstName))
+                                {
+                                    <span class="text-white font-size-24 fw-bold">@Model.FirstName.FirstOrDefault()</span>
+                                }
+                                else
+                                {
+                                    <i class="mdi mdi-account text-white font-size-24"></i>
+                                }
+                            </div>
+                        </div>
+
+                        @if (string.IsNullOrEmpty(Model.FirstName) && string.IsNullOrEmpty(Model.LastName))
+                        {
+                            <h5 class="font-size-16 mb-1 text-dark fw-bold">کاربر بدون نام</h5>
+                        }
+                        else
+                        {
+                            <h5 class="font-size-16 mb-1 text-dark fw-bold">
+                                @(Model.FirstName ?? "") @(Model.LastName ?? "")
+                            </h5>
+                        }
+
+                        <div class="mt-2">
+                            <span class="badge bg-dark px-3 py-2 font-size-12">
+                                حساب کاربری @(Model.IsUserBanned ? "غیرفعال" : "فعال")
+                            </span>
                         </div>
                     </div>
 
-                    @if (string.IsNullOrEmpty(Model.FirstName) && string.IsNullOrEmpty(Model.LastName))
-                    {
-                        <h5 class="font-size-16 mb-1 text-dark fw-bold">کاربر بدون نام</h5>
-                    }
-                    else
-                    {
-                        <h5 class="font-size-16 mb-1 text-dark fw-bold">
-                            @(Model.FirstName ?? "") @(Model.LastName ?? "")
-                        </h5>
-                    }
+                    <div class="pt-3 border-top border-light">
+                        <h4 class="card-title mb-3 pb-2 text-dark font-size-14">
+                            <i class="mdi mdi-information-outline me-1 text-muted"></i> اطلاعات ارتباطی و سیستم
+                        </h4>
 
-                    <div>
-                        <span class="badge bg-dark px-3 py-2 font-size-12">
-                            حساب کاربری @(Model.IsUserBanned ? "غیرفعال" : "فعال")
-                        </span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card border border-dark">
-                <div class="card-body">
-                    <h4 class="card-title mb-4 pb-2 border-bottom text-dark font-size-14">
-                        <i class="mdi mdi-information-outline me-1 text-muted"></i> اطلاعات ارتباطی و سیستم
-                    </h4>
-
-                    <div class="table-responsive">
-                        <table class="table table-borderless mb-0 font-size-13">
-                            <tbody>
-                                <tr>
-                                    <th scope="row" class="text-muted ps-0" style="width: 40%;">شماره موبایل:</th>
-                                    <td class="text-end fw-bold text-dark" dir="ltr">@Model.Mobile</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row" class="text-muted ps-0">نقش‌های کاربری:</th>
-                                    <td class="text-end">
-                                        @if (Model.UserRoles?.Any() ?? false)
-                                        {
-                                            foreach (var item in Model.UserRoles)
+                        <div class="table-responsive">
+                            <table class="table table-borderless mb-0 font-size-13">
+                                <tbody>
+                                    <tr>
+                                        <th scope="row" class="text-muted ps-0" style="width: 40%;">شماره موبایل:</th>
+                                        <td class="text-end fw-bold text-dark" dir="ltr">@Model.Mobile</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row" class="text-muted ps-0">نقش‌های کاربری:</th>
+                                        <td class="text-end">
+                                            @if (Model.UserRoles?.Any() ?? false)
                                             {
-                                                <span class="badge border border-dark text-dark bg-transparent me-1">@item.Title</span>
+                                                foreach (var item in Model.UserRoles)
+                                                {
+                                                    <span class="badge border border-dark text-dark bg-transparent me-1">@item.Title</span>
+                                                }
                                             }
-                                        }
-                                        else
-                                        {
-                                            <span class="badge bg-light text-muted border">کاربر عادی</span>
-                                        }
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                                            else
+                                            {
+                                                <span class="badge bg-light text-muted border">کاربر عادی</span>
+                                            }
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
+
                 </div>
             </div>
         </div>
 
-        <div class="col-xl-8 col-lg-7">
-            <div class="card border border-dark" style="border-top: 4px solid #000000 !important;">
+        <div class="col-xl-8 col-lg-7 mb-4 d-flex flex-column justify-content-between gap-3">
+
+            <div class="card border border-dark mb-0 flex-grow-1 d-flex flex-column justify-content-center" style="border-top: 4px solid #000000 !important;">
                 <div class="card-body">
                     <h4 class="card-title mb-4 pb-2 border-bottom text-dark font-size-14 d-flex justify-content-between align-items-center">
                         <span><i class="mdi mdi-star-outline me-1 text-muted"></i> وضعیت اشتراک فعلی</span>
@@ -144,8 +147,32 @@
                 </div>
             </div>
 
-            <div class="card border border-dark">
-                <div class="card-body">
+            <div class="card border border-dark mb-0 flex-grow-1 d-flex align-items-center">
+                <div class="card-body w-100">
+                    <div class="row align-items-center">
+                        <div class="col-sm-7 mb-3 mb-sm-0">
+                            <div class="d-flex align-items-center">
+                                <div class="avatar-xs me-3 bg-dark text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                    <i class="mdi mdi-package-variant-closed font-size-20"></i>
+                                </div>
+                                <div>
+                                    <span class="text-muted font-size-13 d-block mb-1">کالاها و خدمات ثبت شده:</span>
+                                    <h4 class="font-size-16 fw-bold text-dark mb-0">مدیریت و پایش محصولات شما</h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-5 text-sm-end">
+                            <a asp-area="UserPanel" asp-controller="Product" asp-action="ProductsList" class="btn btn-dark waves-effect waves-light">
+                                <i class="mdi mdi-arrow-left-circle me-1"></i>
+                                مدیریت محصولات
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border border-dark mb-0 flex-grow-1 d-flex align-items-center">
+                <div class="card-body w-100">
                     <div class="row align-items-center">
                         <div class="col-sm-7 mb-3 mb-sm-0">
                             <div class="d-flex align-items-center">
@@ -153,7 +180,7 @@
                                     <i class="mdi mdi-wallet font-size-20"></i>
                                 </div>
                                 <div>
-                                    <span class="text-muted font-size-13 d-block mb-1">موجودی فعلی کیف پول:</span>
+                                    <span class="text-muted font-size-13 d-block mb-1">موجوبی فعلی کیف پول:</span>
                                     <h4 class="font-size-20 fw-bold text-dark mb-0">@Model.Balance.ToTomanFormat() <span class="font-size-13 fw-normal text-muted">تومان</span></h4>
                                 </div>
                             </div>
@@ -168,7 +195,7 @@
                 </div>
             </div>
 
-            @await Component.InvokeAsync("ClientSideLatestBalanceTransactions")
         </div>
+
     </div>
 </div>
