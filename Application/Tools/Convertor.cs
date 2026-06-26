@@ -51,6 +51,24 @@ namespace Application.Tools
             return $"{day} {PersianMonthNames[month - 1]} {year} {hour:D2}:{minute:D2}";
         }
 
+        public static string GetEndDateInDays(this DateTime utcDateTime)
+        {
+            var now = DateTime.UtcNow;
+
+            if (now > utcDateTime) return "منقضی شده";
+
+            var timeSpan = utcDateTime - now;
+
+            string result = timeSpan.TotalSeconds switch
+            {
+                < 3600 => $"{Math.Floor(timeSpan.TotalMinutes)} دقیقه",
+                < 86400 => $"{Math.Floor(timeSpan.TotalHours)} ساعت",
+                _ => $"{Math.Floor(timeSpan.TotalDays)} روز"
+            };
+
+            return result;
+        }
+
         public static string ToPersianRelativeTime(this DateTime utcDateTime)
         {
             var now = DateTime.UtcNow;
