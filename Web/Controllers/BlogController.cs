@@ -24,23 +24,20 @@ namespace Web.Controllers
         [HttpGet("/blogs/{category?}")]
         public async Task<IActionResult> BlogsList(string? category, ClientSideFilterBlogsDto filter)
         {
-            var path = HttpContext.Request.Path.Value?.TrimEnd('/');
-            var query = HttpContext.Request.QueryString.Value;
+            var query = HttpContext.Request.Query;
 
-            if (!string.IsNullOrEmpty(path) &&
-                path.StartsWith("/blogs/", StringComparison.OrdinalIgnoreCase) &&
-                path.Count(c => c == '/') == 2 && // only /products/{slug}
-                string.IsNullOrEmpty(query))       // no query string
+            if (query.Count == 0 && !string.IsNullOrWhiteSpace(category))
             {
                 ViewData["NoIndex"] = false;
             }
-            else
+            else if (query.Count > 0)
             {
                 ViewData["NoIndex"] = true;
             }
 
             filter.Category = category;
             filter.TakeEntity = 9;
+
             var result = await _blogService.ClientSideFilterBlogs(filter);
             if (result.IsFailure) return View(new ClientSideFilterBlogsDto());
 

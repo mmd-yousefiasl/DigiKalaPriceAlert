@@ -1,0 +1,21 @@
+User-agent: *
+
+# Block administrative and private user portals
+Disallow: /admin/
+Disallow: /user/
+Disallow: /login/
+Disallow: /login-code/
+
+# Block checkout/invoices, but allow public pricing sheets
+Disallow: /subscription/
+Allow: /subscription/pricing
+
+# Stop indexing system search parameters and pagination leaks
+Disallow: /blogs/*?*TagId=
+Disallow: /blogs/*?*page=
+
+# Allow access to general assets
+Allow: /blogs/
+Allow: /sitemap.xml
+
+Sitemap: https://digipricealert.ir/sitemap.xml

@@ -74,7 +74,7 @@ namespace Web.Controllers
         }
 
         [Authorize]
-        [HttpPost("/subscription/checkout")]
+        [HttpPost("/subscription/checkout"), ValidateAntiForgeryToken]
         public async Task<IActionResult> Checkout(bool useBalance)
         {
             ViewData["NoIndex"] = true;

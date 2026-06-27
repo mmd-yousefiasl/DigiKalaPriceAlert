@@ -8,27 +8,21 @@
 
   <ItemGroup>
     <Compile Remove="wwwroot\adminAssets\**" />
+    <Compile Remove="wwwroot\assets\fontawesome\**" />
+    <Compile Remove="wwwroot\assets\libs\**" />
+    <Compile Remove="wwwroot\assets\tinymce\**" />
     <Content Remove="wwwroot\adminAssets\**" />
+    <Content Remove="wwwroot\assets\fontawesome\**" />
+    <Content Remove="wwwroot\assets\libs\**" />
+    <Content Remove="wwwroot\assets\tinymce\**" />
     <EmbeddedResource Remove="wwwroot\adminAssets\**" />
+    <EmbeddedResource Remove="wwwroot\assets\fontawesome\**" />
+    <EmbeddedResource Remove="wwwroot\assets\libs\**" />
+    <EmbeddedResource Remove="wwwroot\assets\tinymce\**" />
     <None Remove="wwwroot\adminAssets\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="wwwroot\assets\fontawesome\.DS_Store" />
-    <None Include="wwwroot\assets\libs\%40fullcalendar\.DS_Store" />
-    <None Include="wwwroot\assets\libs\.DS_Store" />
-    <None Include="wwwroot\assets\libs\admin-resources\.DS_Store" />
-    <None Include="wwwroot\assets\libs\bootstrap-datepicker\.DS_Store" />
-    <None Include="wwwroot\assets\libs\bootstrap-editable\.DS_Store" />
-    <None Include="wwwroot\assets\libs\datatables.net-bs4\.DS_Store" />
-    <None Include="wwwroot\assets\libs\datatables.net-buttons-bs4\.DS_Store" />
-    <None Include="wwwroot\assets\libs\datatables.net-responsive-bs4\.DS_Store" />
-    <None Include="wwwroot\assets\libs\datatables.net\.DS_Store" />
-    <None Include="wwwroot\assets\libs\ion-rangeslider\.DS_Store" />
-    <None Include="wwwroot\assets\libs\select2\.DS_Store" />
-    <None Include="wwwroot\assets\tinymce\.DS_Store" />
-    <None Include="wwwroot\assets\tinymce\js\.DS_Store" />
-    <None Include="wwwroot\assets\tinymce\js\tinymce\.DS_Store" />
+    <None Remove="wwwroot\assets\fontawesome\**" />
+    <None Remove="wwwroot\assets\libs\**" />
+    <None Remove="wwwroot\assets\tinymce\**" />
   </ItemGroup>
 
   <ItemGroup>
