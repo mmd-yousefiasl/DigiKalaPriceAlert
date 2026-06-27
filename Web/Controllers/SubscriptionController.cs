@@ -25,6 +25,7 @@ namespace Web.Controllers
         [HttpGet("/subscription/purchase/{planId}")]
         public async Task<IActionResult> Purchase(int planId)
         {
+            ViewData["NoIndex"] = true;
             if (planId < 1)
             {
                 TempData[TemporaryErrorMessage] = Messages.OperationFailedError;
@@ -44,6 +45,7 @@ namespace Web.Controllers
         [HttpGet("/subscription/get-invoice")]
         public async Task<IActionResult> GetInvoice()
         {
+            ViewData["NoIndex"] = true;
             var result = await _orderService.ClientSideGetInvoiceId();
             if (result.IsFailure)
             {
@@ -57,6 +59,7 @@ namespace Web.Controllers
         [HttpGet("/subscription/invoice/{id}")]
         public async Task<IActionResult> Invoice(int id)
         {
+            ViewData["NoIndex"] = true;
             if (id < 1)
             {
                 return RedirectToAction(nameof(GetInvoice));
@@ -74,6 +77,7 @@ namespace Web.Controllers
         [HttpPost("/subscription/checkout")]
         public async Task<IActionResult> Checkout(bool useBalance)
         {
+            ViewData["NoIndex"] = true;
             var result = await _orderService.ClientSideProceedToCheckout(useBalance);
             if (result.IsFailure)
             {
@@ -90,6 +94,7 @@ namespace Web.Controllers
         [HttpGet("/subscription/payment-result")]
         public async Task<IActionResult> PaymentResult(PaymentResultDto model)
         {
+            ViewData["NoIndex"] = true;
             if (!ModelState.IsValid || model.status != PaymentResultStatusEnum.PaidButNotVerified)
             {
                 TempData[TemporaryErrorMessage] = Messages.PaymentFailedError;

@@ -38,18 +38,21 @@ namespace Web.Controllers
         [HttpGet("/404")]
         public IActionResult PageNotFound()
         {
+            ViewData["NoIndex"] = true;
             return View();
         }
 
         [HttpGet("/403")]
         public IActionResult AccessDenied()
         {
+            ViewData["NoIndex"] = true;
             return View();
         }
 
         [HttpGet("/500")]
         public IActionResult InternalServerError()
         {
+            ViewData["NoIndex"] = true;
             return View();
         }
 
