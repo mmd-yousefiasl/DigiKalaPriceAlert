@@ -4,6 +4,10 @@
     {
         public static string SiteUrl { get; set; }
 
+        public static string ENemadUrl { get; set; }
+
+        public static string ENemadLogo { get; set; }
+
         public static string SiteName { get; set; }
 
         public static string BlogFile { get; set; }
