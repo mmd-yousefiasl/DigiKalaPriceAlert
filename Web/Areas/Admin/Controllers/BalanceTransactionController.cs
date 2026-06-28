@@ -9,13 +9,13 @@ namespace Web.Areas.Admin.Controllers
     public class BalanceTransactionController : BaseAdminController
     {
         #region Fields
-        private readonly IBalanceTransactionService _transactionService;
+        private readonly IUserService _userService;
         #endregion
 
         #region Ctor
-        public BalanceTransactionController(IBalanceTransactionService transactionService)
+        public BalanceTransactionController(IUserService userService)
         {
-            _transactionService = transactionService;
+            _userService = userService;
         }
         #endregion
 
@@ -24,7 +24,7 @@ namespace Web.Areas.Admin.Controllers
         [HttpGet("/admin/transactions-list")]
         public async Task<IActionResult> BalanceTransactionsList(AdminSideFilterBalanceTransactionsDto filter)
         {
-            var result = await _transactionService.AdminSideFilterTransactions(filter);
+            var result = await _userService.AdminSideFilterTransactions(filter);
             if (result.IsFailure)
                 return View(new AdminSideFilterBalanceTransactionsDto() { UserId = filter.UserId });
 
@@ -44,7 +44,7 @@ namespace Web.Areas.Admin.Controllers
         {
             if (!ModelState.IsValid) return View(model);
 
-            var result = await _transactionService.AdminSideCreateNewTransaction(model);
+            var result = await _userService.AdminSideCreateNewTransaction(model);
             if (result.IsFailure)
             {
                 TempData[TemporaryErrorMessage] = result.Message;

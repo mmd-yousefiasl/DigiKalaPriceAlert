@@ -36,7 +36,6 @@ namespace Web
             services.AddHttpClient<IDigiKalaService, DigiKalaService>();
 
             services.AddScoped<IUserService, UserService>();
-            services.AddScoped<IUserValidationService, UserValidationService>();
             services.AddScoped<IRoleService, RoleService>();
             services.AddScoped<IPermissionService, PermissionService>();
             services.AddScoped<IContactUsFormService, ContactUsFormService>();
@@ -47,7 +46,6 @@ namespace Web
             services.AddScoped<IBlogService, BlogService>();
             services.AddScoped<IFaqService, FaqService>();
             services.AddScoped<ISocialMediaService, SocialMediaService>();
-            services.AddScoped<IBalanceTransactionService, BalanceTransactionService>();
             services.AddScoped<IPaymentDataService, PaymentDataService>();
             services.AddScoped<IPaymentService, PaymentService>();
             services.AddScoped<IUsedFreePlanService, UsedFreePlanService>();

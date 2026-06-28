@@ -7,20 +7,20 @@ namespace Web.Areas.UserPanel.Controllers
     public class UserController : BaseUserPanelController
     {
         #region Fields
-        private readonly IBalanceTransactionService _balanceTransactionService;
+        private readonly IUserService _userService;
         #endregion
 
         #region Ctor
-        public UserController(IBalanceTransactionService balanceTransactionService)
+        public UserController(IUserService userService)
         {
-            _balanceTransactionService = balanceTransactionService;
+            _userService = userService;
         }
         #endregion
 
         [HttpGet("/user/transactions")]
         public async Task<IActionResult> MyTransactions(ClientSideFilterBalanceTransactionsDto filter)
         {
-            var result = await _balanceTransactionService.ClientSideFilterTransactions(filter);
+            var result = await _userService.ClientSideFilterTransactions(filter);
             if (result.IsFailure)
                 return View(new ClientSideFilterBalanceTransactionsDto());
 

@@ -1,4 +1,6 @@
-﻿using Application.Dtos.Products.ClientSide;
+﻿using Application.Dtos.BalanceTransaction.AdminSide;
+using Application.Dtos.BalanceTransaction.ClientSide;
+using Application.Dtos.Products.ClientSide;
 using Application.Dtos.Users.AdminSide;
 using Application.Dtos.Users.ClientSide;
 using Domain.Shared;
@@ -44,5 +46,19 @@ namespace Application.Services.Interfaces
         Task<Result<List<ClientSideEligibleProductIdWithUsersDto>>> ClientSideGetAllEligibleProductIdsAsync(CancellationToken cancellationToken);
 
         Task<List<string>> ClientSideGetUsersTrackingProduct(ClientSideGetUsersTrackingProductDto dto);
+
+        Task<Result<string>> GenerateUserValidationCode(string mobile);
+
+        Task<Result> ValidateUserLoginCode(string mobile, string code);
+
+        Task<Result<AdminSideFilterBalanceTransactionsDto>> AdminSideFilterTransactions(AdminSideFilterBalanceTransactionsDto filter);
+
+        Task<Result> AdminSideCreateNewTransaction(AdminSideCreateNewBalanceTransactionDto model);
+
+        Task<Result<ClientSideFilterBalanceTransactionsDto>> ClientSideFilterTransactions(ClientSideFilterBalanceTransactionsDto filter);
+
+        Task<Result> ClientSideAddUnVerifiedTransaction(ClientSideCreateNewTransactionDto model);
+
+        Task<Result> ClientSideVerifyTransaction(string transId);
     }
 }

@@ -7,19 +7,19 @@ namespace Web.Areas.UserPanel.Components
     public class ClientSideLatestBalanceTransactionsViewComponent : ViewComponent
     {
         #region Fields
-        private readonly IBalanceTransactionService _balanceTransactionService;
+        private readonly IUserService _userService;
         #endregion
 
         #region Ctor
-        public ClientSideLatestBalanceTransactionsViewComponent(IBalanceTransactionService balanceTransactionService)
+        public ClientSideLatestBalanceTransactionsViewComponent(IUserService userService)
         {
-            _balanceTransactionService = balanceTransactionService;
+            _userService = userService;
         }
         #endregion
 
         public async Task<IViewComponentResult> InvokeAsync()
         {
-            var result = await _balanceTransactionService.ClientSideFilterTransactions(new ClientSideFilterBalanceTransactionsDto()
+            var result = await _userService.ClientSideFilterTransactions(new ClientSideFilterBalanceTransactionsDto()
             {
                 TakeEntity = 15
             });

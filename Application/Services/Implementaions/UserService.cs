@@ -1,4 +1,6 @@
-﻿using Application.Dtos.Products.ClientSide;
+﻿using Application.Dtos.BalanceTransaction.AdminSide;
+using Application.Dtos.BalanceTransaction.ClientSide;
+using Application.Dtos.Products.ClientSide;
 using Application.Dtos.Role.AdminSide;
 using Application.Dtos.Users.AdminSide;
 using Application.Dtos.Users.ClientSide;
@@ -18,17 +20,14 @@ namespace Application.Services.Implementaions
     {
         #region Fields
         private protected DigiKalaPriceAlertDbContext _context;
-        private readonly IUserValidationService _userValidationService;
         private readonly IHttpContextAccessor _httpContextAccessor;
         #endregion
 
         #region Ctor
         public UserService(DigiKalaPriceAlertDbContext context,
-            IUserValidationService userValidationService,
             IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
-            _userValidationService = userValidationService;
             _httpContextAccessor = httpContextAccessor;
         }
         #endregion
@@ -69,7 +68,7 @@ namespace Application.Services.Implementaions
                 if (loginUser.IsUserBanned) return Result.Failure<string>(Messages.OperationFailedError);
             }
 
-            var validationResult = await _userValidationService.GenerateUserValidationCode(model.Mobile);
+            var validationResult = await GenerateUserValidationCode(model.Mobile);
             if (validationResult.IsFailure) return Result.Failure<string>(validationResult.Message);
 
             Console.WriteLine("Login Code: " + validationResult.Value);
@@ -84,7 +83,7 @@ namespace Application.Services.Implementaions
             if (model is null) return Result.Failure<ClientSideUserDto>(Messages.OperationFailedError);
 
             string loginCode = string.Join("", model.LoginCode);
-            var validationResult = await _userValidationService.ValidateUserLoginCode(model.Mobile, loginCode);
+            var validationResult = await ValidateUserLoginCode(model.Mobile, loginCode);
             if (validationResult.IsFailure) return Result.Failure<ClientSideUserDto>(validationResult.Message);
 
             var user = await _context.Users.Where(n => n.Mobile == model.Mobile).Select(n => new ClientSideUserDto()
@@ -459,6 +458,231 @@ namespace Application.Services.Implementaions
                 .Where(up => up.ProductId == dto.ProductId && up.User.SubscriptionEndDate > now)
                 .Select(up => up.User.Mobile)
                 .ToListAsync(dto.CancellationToken);
+        }
+
+        public async Task<Result<string>> GenerateUserValidationCode(string mobile)
+        {
+            if (string.IsNullOrWhiteSpace(mobile))
+                return Result.Failure<string>(Messages.OperationFailedError);
+
+            var existingValidations = await _context.UserValidation
+                .Where(uv => uv.Mobile == mobile)
+                .OrderByDescending(v => v.CreatedDate)
+                .ToListAsync();
+
+            var latestValidation = existingValidations.FirstOrDefault();
+            if (latestValidation != null &&
+                DateTime.UtcNow - latestValidation.CreatedDate < TimeSpan.FromMinutes(2))
+            {
+                return Result.Failure<string>(Messages.ToManyLoginAttemptError);
+            }
+
+            if (existingValidations.Any())
+                _context.UserValidation.RemoveRange(existingValidations);
+
+            var code = Generate.UserLoginCode();
+            var hashedCode = code.HashPassword(out string salt);
+
+            var validation = new UserValidation
+            {
+                Code = hashedCode,
+                Salt = salt,
+                Mobile = mobile,
+                CreatedDate = DateTime.UtcNow,
+            };
+
+            _context.UserValidation.Add(validation);
+            await _context.SaveChangesAsync();
+
+            return code;
+        }
+
+        public async Task<Result> ValidateUserLoginCode(string mobile, string code)
+        {
+            if (string.IsNullOrWhiteSpace(mobile) || string.IsNullOrWhiteSpace(code)) return Result.Failure(Messages.OperationFailedError);
+
+            var validation = await _context.UserValidation.Where(uv => uv.Mobile == mobile)
+                .FirstOrDefaultAsync();
+            if (validation is null)
+                return Result.Failure(Messages.OperationFailedError);
+
+            if (!code.VerifyPassword(validation.Salt, validation.Code)) return Result.Failure(Messages.InvalidLoginCodeError);
+
+            _context.UserValidation.Remove(validation);
+            await _context.SaveChangesAsync();
+
+            return Result.Success();
+        }
+
+        public async Task<Result> AdminSideCreateNewTransaction(AdminSideCreateNewBalanceTransactionDto model)
+        {
+            if (model is null) return Result.Failure(Messages.OperationFailedError);
+
+            var user = await _context.Set<User>().FindAsync(model.UserId);
+            if (user is null) return Result.Failure(Messages.OperationFailedError);
+
+            // Create the transaction
+            var transaction = new BalanceTransaction()
+            {
+                Amount = model.Amount,
+                Type = model.Type,
+                Description = model.Description,
+                UserId = model.UserId,
+                IsSuccess = true,
+            };
+
+            // Update user's balance
+            if (model.Type == BalanceTransactionTypeEnum.Credit) user.Balance += model.Amount;
+            else user.Balance -= model.Amount;
+
+            if (user.Balance < 0) return Result.Failure(Messages.UserBalnaceCantBeLessThanZeroError);
+
+            // Save both transaction and updated user
+            _context.BalanceTransactions.Add(transaction);
+            await _context.SaveChangesAsync();
+
+            return Result.Success();
+        }
+
+        public async Task<Result<AdminSideFilterBalanceTransactionsDto>> AdminSideFilterTransactions(AdminSideFilterBalanceTransactionsDto filter)
+        {
+            if (filter is null)
+                return Result.Failure<AdminSideFilterBalanceTransactionsDto>(Messages.OperationFailedError);
+
+            var conditions = Filter.GenerateConditions<BalanceTransaction>();
+
+            conditions.Add(n => n.UserId == filter.UserId);
+
+            if (!string.IsNullOrWhiteSpace(filter.Search))
+            {
+                conditions.Add(n => n.TransId.Contains(filter.Search) ||
+                n.Description.Contains(filter.Search));
+            }
+
+            if (filter.Type is not null)
+            {
+                conditions.Add(n => n.Type == filter.Type);
+            }
+
+            if (filter.IsSuccess is not null)
+            {
+                conditions.Add(n => n.IsSuccess == filter.IsSuccess);
+            }
+
+            IQueryable<BalanceTransaction> query = _context.BalanceTransactions;
+            query = query.OrderByDescending(n => n.Id);
+
+            foreach (var item in conditions ?? new FilterConditions<BalanceTransaction>())
+            {
+                query = query.Where(item);
+            }
+
+            await filter.Paging(query.Select(n => new AdminSideBalanceTransactionDto()
+            {
+                Id = n.Id,
+                Amount = n.Amount,
+                Description = n.Description,
+                IsSuccess = n.IsSuccess,
+                TransId = n.TransId,
+                Type = n.Type,
+                CreatedDate = n.CreatedDate,
+            }));
+
+            return filter;
+        }
+
+        public async Task<Result<ClientSideFilterBalanceTransactionsDto>> ClientSideFilterTransactions(ClientSideFilterBalanceTransactionsDto filter)
+        {
+
+            if (filter is null)
+                return Result.Failure<ClientSideFilterBalanceTransactionsDto>(Messages.OperationFailedError);
+
+            var userId = _httpContextAccessor.HttpContext.User.GetUserId();
+            if (userId < 1)
+                return Result.Failure<ClientSideFilterBalanceTransactionsDto>(Messages.OperationFailedError);
+
+            var conditions = Filter.GenerateConditions<BalanceTransaction>();
+
+            conditions.Add(n => n.UserId == userId);
+
+            if (!string.IsNullOrWhiteSpace(filter.Search))
+            {
+                conditions.Add(n => n.TransId.Contains(filter.Search) ||
+                n.Description.Contains(filter.Search));
+            }
+
+            if (filter.Type is not null)
+            {
+                conditions.Add(n => n.Type == filter.Type);
+            }
+
+            if (filter.IsSuccess is not null)
+            {
+                conditions.Add(n => n.IsSuccess == filter.IsSuccess);
+            }
+
+            IQueryable<BalanceTransaction> query = _context.BalanceTransactions;
+            query = query.OrderByDescending(n => n.Id);
+
+            foreach (var item in conditions ?? new FilterConditions<BalanceTransaction>())
+            {
+                query = query.Where(item);
+            }
+
+            await filter.Paging(query.Select(n => new ClientSideBalanceTransactionDto()
+            {
+                Amount = n.Amount,
+                Description = n.Description,
+                IsSuccess = n.IsSuccess,
+                TransId = n.TransId,
+                Type = n.Type,
+                CreatedDate = n.CreatedDate,
+            }));
+
+            return filter;
+        }
+
+        public async Task<Result> ClientSideAddUnVerifiedTransaction(ClientSideCreateNewTransactionDto model)
+        {
+            if (model is null) return Result.Failure(Messages.OperationFailedError);
+
+            var userId = _httpContextAccessor.HttpContext.User.GetUserId();
+            if (userId < 1) return Result.Failure(Messages.OperationFailedError);
+
+            var transaction = new BalanceTransaction()
+            {
+                Amount = model.Amount,
+                Type = model.Type,
+                Description = model.Description,
+                IsSuccess = model.IsSuccess,
+                TransId = model.TransId,
+                UserId = userId
+            };
+
+            _context.BalanceTransactions.Add(transaction);
+            await _context.SaveChangesAsync();
+
+            return Result.Success();
+        }
+
+        public async Task<Result> ClientSideVerifyTransaction(string transId)
+        {
+            var transaction = await _context.BalanceTransactions
+                .Include(n => n.User)
+                .FirstOrDefaultAsync(n => n.TransId == transId);
+
+            if (transaction is null)
+                return Result.Failure(Messages.OperationFailedError);
+
+            if (transaction.IsSuccess)
+                return Result.Success(Messages.TransactionAlreadyVerified);
+
+            transaction.IsSuccess = true;
+            transaction.User.Balance += transaction.Amount;
+
+            await _context.SaveChangesAsync();
+
+            return Result.Success();
         }
     }
 }

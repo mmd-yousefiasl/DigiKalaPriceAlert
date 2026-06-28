@@ -26,7 +26,6 @@ namespace Application.Services.Implementaions
         private readonly ISubscriptionPlanService _subscriptionPlanService;
         private readonly IUserService _userService;
         private readonly IPaymentService _paymentService;
-        private readonly IBalanceTransactionService _transactionService;
         #endregion
 
         #region Ctor
@@ -35,8 +34,7 @@ namespace Application.Services.Implementaions
             IUsedFreePlanService usedFreePlanService,
             ISubscriptionPlanService subscriptionPlanService,
             IUserService userService,
-            IPaymentService paymentService,
-            IBalanceTransactionService transactionService)
+            IPaymentService paymentService)
         {
             _context = context;
             _httpContextAccessor = httpContextAccessor;
@@ -44,7 +42,6 @@ namespace Application.Services.Implementaions
             _subscriptionPlanService = subscriptionPlanService;
             _userService = userService;
             _paymentService = paymentService;
-            _transactionService = transactionService;
         }
         #endregion
 
@@ -209,7 +206,7 @@ namespace Application.Services.Implementaions
                 if (paymentResult.IsFailure)
                     return Result.Failure<ClientSideProceedToCheckoutDto>(paymentResult.Message!);
 
-                var transactionResult = await _transactionService.ClientSideAddUnVerifiedTransaction(new ClientSideCreateNewTransactionDto()
+                var transactionResult = await _userService.ClientSideAddUnVerifiedTransaction(new ClientSideCreateNewTransactionDto()
                 {
                     Amount = requiredGatewayAmount,
                     TransId = paymentResult.Value.trackId.ToString(),
@@ -248,7 +245,7 @@ namespace Application.Services.Implementaions
             if (paymentResult.IsFailure || paymentResult.Value.result != VerifyPaymentResultStatusEnum.Success)
                 return Result.Failure(Messages.PaymentFailedError);
 
-            var verifyTransaction = await _transactionService.ClientSideVerifyTransaction(dto.trackId.ToString());
+            var verifyTransaction = await _userService.ClientSideVerifyTransaction(dto.trackId.ToString());
             if (verifyTransaction.IsFailure)
                 return Result.Failure(Messages.PaymentFailedError);
 
