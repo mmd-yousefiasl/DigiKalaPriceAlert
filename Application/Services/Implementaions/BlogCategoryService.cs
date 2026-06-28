@@ -33,7 +33,9 @@ namespace Application.Services.Implementaions
             BlogCategory category = new BlogCategory()
             {
                 Title = model.Title,
-                Slug = model.Slug.Replace(" ", "-")
+                Slug = model.Slug.Replace(" ", "-"),
+                IsPublished = model.IsPublished,
+                Priority = model.Priority,
             };
 
             _context.BlogCategories.Add(category);
@@ -83,23 +85,12 @@ namespace Application.Services.Implementaions
             {
                 Id = n.Id,
                 Title = n.Title,
-                Slug = n.Slug
+                Slug = n.Slug,
+                Priority = n.Priority,
+                IsPublished = n.IsPublished
             }));
 
             return filter;
-        }
-
-        public async Task<Result<List<AdminSideBlogCategoryDto>>> AdminSideGetCategories()
-        {
-            var categories = await _context.BlogCategories.Select(n => new AdminSideBlogCategoryDto()
-            {
-                Id = n.Id,
-                Title = n.Title
-            }).AsNoTracking().ToListAsync();
-            if (!categories.Any())
-                return Result.Failure<List<AdminSideBlogCategoryDto>>(Messages.OperationFailedError);
-
-            return categories;
         }
 
         public async Task<Result<AdminSideUpdateBlogCategoryDto>> AdminSideGetCategoryForUpdate(int id)
@@ -110,7 +101,9 @@ namespace Application.Services.Implementaions
             {
                 Id = n.Id,
                 Title = n.Title,
-                Slug = n.Slug
+                Slug = n.Slug,
+                Priority = n.Priority,
+                IsPublished = n.IsPublished,
             }).AsNoTracking().FirstOrDefaultAsync();
             if (category is null)
                 return Result.Failure<AdminSideUpdateBlogCategoryDto>(Messages.OperationFailedError);
@@ -132,6 +125,8 @@ namespace Application.Services.Implementaions
 
             category.Title = model.Title;
             category.Slug = model.Slug.Replace(" ", "-");
+            category.IsPublished = model.IsPublished;
+            category.Priority = model.Priority;
 
             _context.BlogCategories.Update(category);
             await _context.SaveChangesAsync();
@@ -141,12 +136,16 @@ namespace Application.Services.Implementaions
 
         public async Task<Result<List<ClientSideBlogCategoryDto>>> ClientSideGetCategories()
         {
-            var categories = await _context.BlogCategories.Select(n => new ClientSideBlogCategoryDto()
-            {
-                Id = n.Id,
-                Title = n.Title,
-                Slug = n.Slug
-            }).AsNoTracking().ToListAsync();
+            var categories = await _context.BlogCategories
+                .AsNoTracking()
+                .Where(n => n.IsPublished)
+                .OrderBy(n => n.Priority)
+                .Select(n => new ClientSideBlogCategoryDto()
+                {
+                    Id = n.Id,
+                    Title = n.Title,
+                    Slug = n.Slug,
+                }).ToListAsync();
 
             if (!categories?.Any() ?? true)
                 return Result.Failure<List<ClientSideBlogCategoryDto>>(Messages.OperationFailedError);
@@ -154,15 +153,18 @@ namespace Application.Services.Implementaions
             return categories;
         }
 
-        public async Task<Result<List<AdminSideBlogCategoryAsOptionDto>>> GetCategoriesAsOptions()
+        public async Task<Result<List<AdminSideBlogCategoryAsOptionDto>>> AdminSideGetCategoriesAsOptions()
         {
-            var categories = await _context.BlogCategories.Where(n => n.IsPublished).OrderBy(n => n.Priority)
+            var categories = await _context.BlogCategories
+                .AsNoTracking()
+                .Where(n => n.IsPublished)
+                .OrderBy(n => n.Priority)
                 .Select(n => new AdminSideBlogCategoryAsOptionDto()
                 {
                     Id = n.Id,
                     Title = n.Title,
                     Slug = n.Slug
-                }).AsNoTracking().ToListAsync();
+                }).ToListAsync();
             if (!categories?.Any() ?? true) return Result.Failure<List<AdminSideBlogCategoryAsOptionDto>>(Messages.OperationFailedError);
 
             return categories;

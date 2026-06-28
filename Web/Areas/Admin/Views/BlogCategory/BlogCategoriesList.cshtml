@@ -53,6 +53,8 @@
                                 <tr>
                                     <th>#</th>
                                     <th>عنوان</th>
+                                    <th>اولویت</th>
+                                    <th>وضعیت انتشار</th>
                                     <th>عملیات</th>
                                 </tr>
                             </thead>
@@ -69,6 +71,17 @@
                                             <tr>
                                                 <th scope="row">@counter</th>
                                                 <td title="@item.Slug">@item.Title</td>
+                                                <td>@item.Priority</td>
+                                                <td>
+                                                    @if (item.IsPublished)
+                                                    {
+                                                        <span class="text-success">منتشرشده</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="text-danger">منتشرنشده</span>
+                                                    }
+                                                </td>
                                                 <td>
                                                     <a permission="UpdateBlogCategory" asp-area="Admin" asp-controller="BlogCategory" asp-action="UpdateBlogCategory" asp-route-id="@item.Id" class="btn btn-outline-secondary btn-sm edit" title="ویرایش">
                                                         <i class="fas fa-pencil-alt"></i>

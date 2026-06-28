@@ -173,7 +173,7 @@ namespace Application.Services.Implementaions
 
         public async Task<Result> UpdateBlogCategoriesSiteMap()
         {
-            var blogCategoriesResult = await _blogCategoryService.GetCategoriesAsOptions();
+            var blogCategoriesResult = await _blogCategoryService.AdminSideGetCategoriesAsOptions();
             if (blogCategoriesResult.IsFailure)
                 return Result.Failure(Messages.OperationFailedError);
 

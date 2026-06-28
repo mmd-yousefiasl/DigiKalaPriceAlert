@@ -5,7 +5,7 @@
 @inject IBlogCategoryService _categoryService;
 @{
     ViewData["Title"] = "ویرایش مقاله";
-    var categoriesResult = await _categoryService.AdminSideGetCategories();
+    var categoriesResult = await _categoryService.AdminSideGetCategoriesAsOptions();
 }
 
 <div class="container-fluid">
@@ -102,7 +102,7 @@
                                 <option value="">انتخاب کنید</option>
                                 @if (categoriesResult.IsSuccess)
                                 {
-                                    @foreach (var item in categoriesResult.Value ?? new List<AdminSideBlogCategoryDto>())
+                                    @foreach (var item in categoriesResult.Value ?? new List<AdminSideBlogCategoryAsOptionDto>())
                                     {
                                         <option value="@item.Id">@item.Title</option>
                                     }

@@ -16,10 +16,8 @@ namespace Application.Services.Interfaces
 
         Task<Result> AdminSideDeleteCategory(int id);
 
-        Task<Result<List<AdminSideBlogCategoryDto>>> AdminSideGetCategories();
-
         Task<Result<List<ClientSideBlogCategoryDto>>> ClientSideGetCategories();
 
-        Task<Result<List<AdminSideBlogCategoryAsOptionDto>>> GetCategoriesAsOptions();
+        Task<Result<List<AdminSideBlogCategoryAsOptionDto>>> AdminSideGetCategoriesAsOptions();
     }
 }

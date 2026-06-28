@@ -14,5 +14,14 @@ namespace Application.Dtos.BlogCategory.AdminSide
         [Required(ErrorMessage = Messages.RequiredError)]
         [MaxLength(200, ErrorMessage = Messages.MaxLengthError)]
         public string Slug { get; set; }
+
+        [Display(Name = "اولویت")]
+        [Required(ErrorMessage = Messages.RequiredError)]
+        [Range(1, 100, ErrorMessage = Messages.RangeError)]
+        public int Priority { get; set; }
+
+        [Display(Name = "وضعیت انتشار")]
+        [Required(ErrorMessage = Messages.RequiredError)]
+        public bool IsPublished { get; set; }
     }
 }

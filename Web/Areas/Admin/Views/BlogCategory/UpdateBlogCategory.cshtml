@@ -48,6 +48,24 @@
                         </div>
                     </div>
 
+                    <div class="mb-3 row">
+                        <label asp-for="Priority" class="col-md-2 col-form-label"></label>
+                        <div class="col-md-10">
+                            <input class="form-control" asp-for="Priority">
+                            <span asp-validation-for="Priority" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3 row">
+                        <label class="col-md-2 col-form-label" asp-for="IsPublished"></label>
+                        <div class="col-md-10">
+                            <select class="form-control" asp-for="IsPublished">
+                                <option value="true">منتشرشده</option>
+                                <option value="false">منتشرنشده</option>
+                            </select>
+                        </div>
+                    </div>
+
                     <div asp-validation-summary="All" class="text-danger"></div>
 
                     <div class="col-12 text-end mt-5">
