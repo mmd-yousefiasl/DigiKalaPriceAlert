@@ -51,6 +51,7 @@ namespace Data.Context
 
         public DbSet<EmailData> EmailData => Set<EmailData>();
         public DbSet<PaymentData> PaymentData => Set<PaymentData>();
+        public DbSet<SiteMap> SiteMap => Set<SiteMap>();
 
         public DbSet<Blog> Blogs => Set<Blog>();
         public DbSet<BlogCategory> BlogCategories => Set<BlogCategory>();

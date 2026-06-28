@@ -23,5 +23,7 @@ namespace Application.Services.Interfaces
         Task<Result<ClientSideBlogDetailsDto>> ClientSideGetBlogDetails(int id);
 
         Task<Result<List<ClientSideBlogDto>>> ClientSideGetRelatedBlogs(int blogId, int categoryId);
+
+        Task<Result<List<AdminSideBlogForSiteMapDto>>> AdminSideGetBlogIdsForSiteMap();
     }
 }

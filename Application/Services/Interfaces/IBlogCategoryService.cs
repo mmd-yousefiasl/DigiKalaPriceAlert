@@ -19,5 +19,7 @@ namespace Application.Services.Interfaces
         Task<Result<List<AdminSideBlogCategoryDto>>> AdminSideGetCategories();
 
         Task<Result<List<ClientSideBlogCategoryDto>>> ClientSideGetCategories();
+
+        Task<Result<List<AdminSideBlogCategoryAsOptionDto>>> GetCategoriesAsOptions();
     }
 }

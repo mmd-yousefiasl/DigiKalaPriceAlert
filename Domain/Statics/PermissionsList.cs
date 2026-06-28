@@ -413,9 +413,47 @@ namespace Domain.Statics
                 UniqueName = "UpdateTicketStatus"
             },
             #endregion
+
+            #region SiteMap
+            new Permission
+            {
+                Id = 54,
+                ParentId = 1,
+                Title = "مدیریت نقشه سایت",
+                UniqueName = "ManageSiteMap"
+            },
+            new Permission
+            {
+                Id = 55,
+                ParentId = 54,
+                Title = "لیست نقشه سایت",
+                UniqueName = "SiteMapList"
+            },
+            new Permission
+            {
+                Id = 56,
+                ParentId = 54,
+                Title = "افزودن نقشه سایت جدید",
+                UniqueName = "CreateNewSiteMap"
+            },
+            new Permission
+            {
+                Id = 57,
+                ParentId = 54,
+                Title = "ویرایش نقشه سایت",
+                UniqueName = "UpdateSiteMap"
+            },
+            new Permission
+            {
+                Id =  58,
+                ParentId = 54,
+                Title = "حذف نقشه سایت",
+                UniqueName = "DeleteSiteMap"
+            },
+            #endregion
         };
 
-        //Last used id ==> 53
+        //Last used id ==> 58
         public static List<Permission> Permissions = _permissions;
     }
 }

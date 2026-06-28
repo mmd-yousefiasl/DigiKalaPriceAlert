@@ -57,6 +57,7 @@ namespace Web
             services.AddScoped<ISubscriptionPlanService, SubscriptionPlanService>();
             services.AddScoped<ITicketService, TicketService>();
             services.AddScoped<IProductService, ProductService>();
+            services.AddScoped<ISiteMapService, SiteMapService>();
 
             services.AddHostedService<PriceMonitorWorker>();
             services.AddHostedService<SmsConsumerWorker>();

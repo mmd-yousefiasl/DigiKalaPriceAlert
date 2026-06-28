@@ -269,5 +269,21 @@ namespace Application.Services.Implementaions
 
             return blogs;
         }
+
+        public async Task<Result<List<AdminSideBlogForSiteMapDto>>> AdminSideGetBlogIdsForSiteMap()
+        {
+            var ids = await _context.Blogs.Where(n => n.IsPublished)
+                .Select(n => new AdminSideBlogForSiteMapDto()
+                {
+                    Id = n.Id,
+                    Slug = n.Slug
+                })
+                .AsNoTracking()
+                .ToListAsync();
+            if (!ids.Any())
+                return Result.Failure<List<AdminSideBlogForSiteMapDto>>(Messages.OperationFailedError);
+
+            return ids;
+        }
     }
 }

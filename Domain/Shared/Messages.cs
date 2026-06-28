@@ -30,6 +30,8 @@
         public const string InSufficentBalanceError = "موجودی کافی برای انجام تراکنش وجود ندارد";
         public const string InvalidDigiKalaProductUrlError = "آدرس وارد شده یک لینک معتبر از محصول دیجی‌کالا نمی‌باشد";
         public const string UserReachedMaximumProductsError = "تعداد محصولات شما به سقف مجاز رسیده است";
+        public const string UpdateBlogCategoriesSiteMapError = "خطایی هنگام بروزرسانی دسته بندی مقالات رخ داد";
+        public const string UpdateBlogSiteMapError = "خطایی هنگام بروزرسانی مقالات رخ داد";
 
         #endregion
 

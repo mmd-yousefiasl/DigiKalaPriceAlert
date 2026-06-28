@@ -1,0 +1,180 @@
+﻿@using Application.Dtos.SiteMap.AdminSide
+@using Application.Tools
+@using Domain.Enums.GeneralInfo
+@model AdminSideFilterSiteMapDto
+
+@{
+    ViewData["Title"] = "لیست نقشه سایت";
+}
+
+<div class="container-fluid">
+
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="page-title-box">
+                <h4>مدیریت نقشه سایت</h4>
+                <ol class="breadcrumb m-0">
+                    <li class="breadcrumb-item">
+                        <a asp-area="Admin" asp-controller="Home" asp-action="Index">صفحه نخست</a>
+                    </li>
+                    <li class="breadcrumb-item active">@ViewData["Title"]</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xl-12">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">جست و جوی نقشه سایت</h4>
+                    <form novalidate asp-area="Admin" asp-controller="SiteMap" method="get" asp-action="SiteMapList" id="search-form">
+                        <input type="hidden" asp-for="Page" id="Page" />
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label" asp-for="Search"></label>
+                                    <input type="text" class="form-control" asp-for="Search" autocomplete="off">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label" asp-for="ChangeFreq"></label>
+                                    <select type="text" class="form-control" asp-for="ChangeFreq" asp-items="@Html.GetEnumSelectList<ChangeFreqEnum>()">
+                                        <option>همه</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label" asp-for="IsPublished"></label>
+                                    <select type="text" class="form-control" asp-for="IsPublished">
+                                        <option>همه</option>
+                                        <option value="false">منتشرنشده</option>
+                                        <option value="true">منتشرشده</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label" asp-for="Type"></label>
+                                    <select type="text" class="form-control" asp-for="Type" asp-items="@Html.GetEnumSelectList<SiteMapTypeEnum>()">
+                                        <option>همه</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary" type="submit">جست و جو</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div permission="UpdateSiteMap" class="mb-3">
+        <div class="d-flex flex-wrap gap-2" role="group">
+            <form method="post" onclick="ConfirmDelete(this)" asp-area="Admin" asp-controller="SiteMap" asp-action="UpdateAllLinks" class="d-inline">
+                <button type="button" class="btn btn-primary" title="به روز رسانی همه">
+                    <i class="mdi mdi-refresh me-1"></i> به روز رسانی همه
+                </button>
+            </form>
+
+            <form method="post" onclick="ConfirmDelete(this)" asp-area="Admin" asp-controller="SiteMap" asp-action="DeleteAllLinks" class="d-inline">
+                <button type="button" class="btn btn-danger" title="حذف همه">
+                    <i class="mdi mdi-delete-forever me-1"></i> حذف همه
+                </button>
+            </form>
+
+            <form method="post" onclick="ConfirmDelete(this)" asp-area="Admin" asp-controller="SiteMap" asp-action="DeleteAllExceptOtherPagesLinks" class="d-inline">
+                <button type="button" class="btn btn-outline-danger" title="حذف همه به جز سایر صفحات">
+                    <i class="mdi mdi-delete-variant me-1"></i> حذف همه به جز سایر صفحات
+                </button>
+            </form>
+
+            <a asp-area="Admin" asp-controller="SiteMap" asp-action="UpdateBlogLinks" class="btn btn-info">
+                <i class="mdi mdi-text-box-refresh me-1"></i> تازه سازی مقالات
+            </a>
+
+            <a asp-area="Admin" asp-controller="SiteMap" asp-action="UpdateBlogCategoryLinks" class="btn btn-secondary">
+                <i class="mdi mdi-folder-refresh me-1"></i> تازه سازی دسته بندی مقالات
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table mb-0">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>لینک</th>
+                                    <th>تغییر</th>
+                                    <th>اولویت</th>
+                                    <th>وضعیت انتشار</th>
+                                    <th>نوع</th>
+                                    <th>عملیات</th>
+                                </tr>
+                            </thead>
+                            @if (Model?.Entities?.Any() ?? false)
+                            {
+                                <tbody>
+                                    @{
+                                        int counter = 0;
+
+                                        foreach (var item in Model.Entities ?? new List<AdminSideSiteMapDto>())
+                                        {
+                                            counter++;
+
+                                            <tr>
+                                                <th scope="row">@counter</th>
+                                                <td>@item.Url</td>
+                                                <td>@item.ChangeFreq.GetDisplayName()</td>
+                                                <td>@item.Priority</td>
+                                                <td>
+                                                    @if (item.IsPublished)
+                                                    {
+                                                        <span class="text-success">منتشرشده</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="text-danger">منتشرنشده</span>
+                                                    }
+                                                </td>
+                                                <td>@item.Type.GetDisplayName()</td>
+                                                <td>
+                                                    <a permission="UpdateSiteMap" asp-area="Admin" asp-controller="SiteMap" asp-action="UpdateSiteMap" asp-route-id="@item.Id" class="btn btn-outline-secondary btn-sm edit" title="ویرایش">
+                                                        <i class="fas fa-pencil-alt"></i>
+                                                    </a>
+
+                                                    <form permission="DeleteSiteMap" class="btn btn-outline-secondary btn-sm" method="post" onclick="ConfirmDelete(this)" asp-route-id="@item.Id" asp-area="Admin" asp-controller="SiteMap" asp-action="DeleteSiteMap" title="حذف">
+                                                        <i class="mdi mdi-delete"></i>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                </tbody>
+                            }
+                            else
+                            {
+                                <tbody>
+                                    <tr>
+                                        <td colspan="100">
+                                            <partial name="_NotFoundPartial" />
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            }
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <partial name="_Paging" model="@Model.GetCurrentPaging()" />
+</div>

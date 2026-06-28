@@ -153,5 +153,19 @@ namespace Application.Services.Implementaions
 
             return categories;
         }
+
+        public async Task<Result<List<AdminSideBlogCategoryAsOptionDto>>> GetCategoriesAsOptions()
+        {
+            var categories = await _context.BlogCategories.Where(n => n.IsPublished).OrderBy(n => n.Priority)
+                .Select(n => new AdminSideBlogCategoryAsOptionDto()
+                {
+                    Id = n.Id,
+                    Title = n.Title,
+                    Slug = n.Slug
+                }).AsNoTracking().ToListAsync();
+            if (!categories?.Any() ?? true) return Result.Failure<List<AdminSideBlogCategoryAsOptionDto>>(Messages.OperationFailedError);
+
+            return categories;
+        }
     }
 }
