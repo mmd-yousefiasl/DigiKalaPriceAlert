@@ -1,4 +1,5 @@
-﻿using Domain.Models.GeneralInfo;
+﻿using Domain.Enums.GeneralInfo;
+using Domain.Models.GeneralInfo;
 using Domain.Models.Identity;
 using Domain.Models.SubscriptionPlans;
 using Domain.Models.Users;
@@ -278,6 +279,72 @@ namespace Data.Context
                 PaymentGatewayPin = "sandbox"
             };
             modelBuilder.Entity<PaymentData>().HasData(paymentData);
+            #endregion
+
+            #region SiteMap
+            List<SiteMap> siteMaps = new List<SiteMap>() {
+            new SiteMap()
+{
+    Id = 1,
+    Url = $"{SiteTools.SiteUrl}",
+    ChangeFreq = ChangeFreqEnum.Daily,
+    Priority = 1.0m,
+    IsPublished = true,
+    Type = SiteMapTypeEnum.OtherPages,
+    IsDeleted = false
+},
+new SiteMap()
+{
+    Id = 2,
+    Url = $"{SiteTools.SiteUrl}subscription/pricing",
+    ChangeFreq = ChangeFreqEnum.Weekly,
+    Priority = 0.9m,
+    IsPublished = true,
+    Type = SiteMapTypeEnum.OtherPages,
+    IsDeleted = false
+},
+new SiteMap()
+{
+    Id = 3,
+    Url = $"{SiteTools.SiteUrl}features",
+    ChangeFreq = ChangeFreqEnum.Weekly,
+    Priority = 0.8m,
+    IsPublished = true,
+    Type = SiteMapTypeEnum.OtherPages,
+    IsDeleted = false
+},
+new SiteMap()
+{
+    Id = 4,
+    Url = $"{SiteTools.SiteUrl}faq",
+    ChangeFreq = ChangeFreqEnum.Monthly,
+    Priority = 0.6m,
+    IsPublished = true,
+    Type = SiteMapTypeEnum.OtherPages,
+    IsDeleted = false
+},
+new SiteMap()
+{
+    Id = 5,
+    Url = $"{SiteTools.SiteUrl}about-us",
+    ChangeFreq = ChangeFreqEnum.Monthly,
+    Priority = 0.5m,
+    IsPublished = true,
+    Type = SiteMapTypeEnum.OtherPages,
+    IsDeleted = false
+},
+new SiteMap()
+{
+    Id = 6,
+    Url = $"{SiteTools.SiteUrl}contact-us",
+    ChangeFreq = ChangeFreqEnum.Monthly,
+    Priority = 0.5m,
+    IsPublished = true,
+    Type = SiteMapTypeEnum.OtherPages,
+    IsDeleted = false
+}};
+
+            modelBuilder.Entity<SiteMap>().HasData(siteMaps);
             #endregion
         }
     }
