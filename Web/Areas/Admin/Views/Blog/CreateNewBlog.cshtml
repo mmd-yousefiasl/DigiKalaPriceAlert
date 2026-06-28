@@ -2,10 +2,10 @@
 @using Application.Dtos.BlogCategory.AdminSide
 @using Application.Services.Interfaces
 @model AdminSideCreateNewBlogDto
-@inject IBlogCategoryService _categoryService;
+@inject IBlogService _blogService;
 @{
     ViewData["Title"] = "افزودن مقاله جدید";
-    var categoriesResult = await _categoryService.AdminSideGetCategoriesAsOptions();
+    var categoriesResult = await _blogService.AdminSideGetCategoriesAsOptions();
 }
 
 <div class="container-fluid">

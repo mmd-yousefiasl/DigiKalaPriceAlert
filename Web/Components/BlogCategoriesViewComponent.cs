@@ -6,15 +6,15 @@ namespace Web.Components
 {
     public class BlogCategoriesViewComponent : ViewComponent
     {
-        private readonly IBlogCategoryService _categoryService;
-        public BlogCategoriesViewComponent(IBlogCategoryService categoryService)
+        private readonly IBlogService _blogService;
+        public BlogCategoriesViewComponent(IBlogService blogService)
         {
-            _categoryService = categoryService;
+            _blogService = blogService;
         }
 
         public async Task<IViewComponentResult> InvokeAsync()
         {
-            var result = await _categoryService.ClientSideGetCategories();
+            var result = await _blogService.ClientSideGetCategories();
             if (result.IsFailure) return View("BlogCategories", new List<ClientSideBlogCategoryDto>());
 
             return View("BlogCategories", result.Value);

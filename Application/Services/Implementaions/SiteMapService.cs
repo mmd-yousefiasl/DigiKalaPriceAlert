@@ -15,17 +15,14 @@ namespace Application.Services.Implementaions
     {
         #region Fields
         private readonly DigiKalaPriceAlertDbContext _context;
-        private readonly IBlogCategoryService _blogCategoryService;
         private readonly IBlogService _blogService;
         #endregion
 
         #region Ctor
         public SiteMapService(DigiKalaPriceAlertDbContext context,
-            IBlogCategoryService blogCategoryService,
             IBlogService blogService)
         {
             _context = context;
-            _blogCategoryService = blogCategoryService;
             _blogService = blogService;
         }
         #endregion
@@ -173,7 +170,7 @@ namespace Application.Services.Implementaions
 
         public async Task<Result> UpdateBlogCategoriesSiteMap()
         {
-            var blogCategoriesResult = await _blogCategoryService.AdminSideGetCategoriesAsOptions();
+            var blogCategoriesResult = await _blogService.AdminSideGetCategoriesAsOptions();
             if (blogCategoriesResult.IsFailure)
                 return Result.Failure(Messages.OperationFailedError);
 

@@ -45,8 +45,6 @@ namespace Web
             services.AddScoped<ISendEmailService, SendEmailService>();
             services.AddScoped<IEmailDataService, EmailDataService>();
             services.AddScoped<IBlogService, BlogService>();
-            services.AddScoped<IBlogCategoryService, BlogCategoryService>();
-            services.AddScoped<IBlogViewService, BlogViewService>();
             services.AddScoped<IFaqService, FaqService>();
             services.AddScoped<ISocialMediaService, SocialMediaService>();
             services.AddScoped<IBalanceTransactionService, BalanceTransactionService>();

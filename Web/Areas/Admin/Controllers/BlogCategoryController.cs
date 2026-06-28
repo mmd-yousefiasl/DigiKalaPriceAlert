@@ -10,13 +10,13 @@ namespace Web.Areas.Admin.Controllers
     public class BlogCategoryController : BaseAdminController
     {
         #region Fields
-        private readonly IBlogCategoryService _categoryService;
+        private readonly IBlogService _blogService;
         #endregion
 
         #region Ctor
-        public BlogCategoryController(IBlogCategoryService categoryService)
+        public BlogCategoryController(IBlogService blogService)
         {
-            _categoryService = categoryService;
+            _blogService = blogService;
         }
         #endregion
 
@@ -24,7 +24,7 @@ namespace Web.Areas.Admin.Controllers
         [HttpGet("/admin/blog-categories-list")]
         public async Task<IActionResult> BlogCategoriesList(AdminSideFilterBlogCategoriesDto filter)
         {
-            var result = await _categoryService.AdminSideFilterCategories(filter);
+            var result = await _blogService.AdminSideFilterCategories(filter);
             if (result.IsFailure) return View(new AdminSideFilterBlogCategoriesDto());
 
             return View(result.Value);
@@ -43,7 +43,7 @@ namespace Web.Areas.Admin.Controllers
         {
             if (!ModelState.IsValid) return View(model);
 
-            var result = await _categoryService.AdminSideCreateNewBlogCategory(model);
+            var result = await _blogService.AdminSideCreateNewBlogCategory(model);
             if (result.IsFailure)
             {
                 TempData[TemporaryErrorMessage] = result.Message;
@@ -63,7 +63,7 @@ namespace Web.Areas.Admin.Controllers
                 TempData[TemporaryErrorMessage] = Messages.OperationFailedError;
                 return RedirectToAction(nameof(BlogCategoriesList));
             }
-            var result = await _categoryService.AdminSideGetCategoryForUpdate(id);
+            var result = await _blogService.AdminSideGetCategoryForUpdate(id);
             if (result.IsFailure)
             {
                 TempData[TemporaryErrorMessage] = result.Message;
@@ -79,7 +79,7 @@ namespace Web.Areas.Admin.Controllers
         {
             if (!ModelState.IsValid) return View(model);
 
-            var result = await _categoryService.AdminSideUpdateCategory(model);
+            var result = await _blogService.AdminSideUpdateCategory(model);
             if (result.IsFailure)
             {
                 TempData[TemporaryErrorMessage] = result.Message;
@@ -99,7 +99,7 @@ namespace Web.Areas.Admin.Controllers
                 TempData[TemporaryErrorMessage] = Messages.OperationFailedError;
                 return RedirectToAction(nameof(BlogCategoriesList));
             }
-            var result = await _categoryService.AdminSideDeleteCategory(id);
+            var result = await _blogService.AdminSideDeleteCategory(id);
             if (result.IsFailure)
             {
                 TempData[TemporaryErrorMessage] = result.Message;

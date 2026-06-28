@@ -9,15 +9,12 @@ namespace Web.Controllers
     {
         #region Fields
         private readonly IBlogService _blogService;
-        private readonly IBlogViewService _viewService;
         #endregion
 
         #region Ctor
-        public BlogController(IBlogService blogService,
-            IBlogViewService viewService)
+        public BlogController(IBlogService blogService)
         {
             _blogService = blogService;
-            _viewService = viewService;
         }
         #endregion
 
@@ -58,7 +55,7 @@ namespace Web.Controllers
                 TempData[TemporaryErrorMessage] = result.Message;
                 return RedirectToAction(nameof(BlogsList));
             }
-            await _viewService.ClientSideAddBlogView(result.Value.Id);
+            await _blogService.ClientSideAddBlogView(result.Value.Id);
 
             return View(result.Value);
         }
@@ -77,7 +74,7 @@ namespace Web.Controllers
                 TempData[TemporaryErrorMessage] = result.Message;
                 return RedirectToAction(nameof(BlogsList));
             }
-            await _viewService.ClientSideAddBlogView(result.Value.Id);
+            await _blogService.ClientSideAddBlogView(result.Value.Id);
 
             return View(result.Value);
         }
