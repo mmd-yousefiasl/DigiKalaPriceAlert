@@ -4,12 +4,14 @@ namespace Application.ValidationAttributes
 {
     public class RequiredEachAttribute : ValidationAttribute
     {
-        public override bool IsValid(object value)
+        public override bool IsValid(object? value)
         {
-            var list = value as IEnumerable<string>;
-            if (list == null) return false;
+            if (value is IEnumerable<string> list)
+            {
+                return list.All(item => !string.IsNullOrWhiteSpace(item));
+            }
 
-            return list.All(item => !string.IsNullOrWhiteSpace(item));
+            return false;
         }
     }
 }
