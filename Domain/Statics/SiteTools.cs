@@ -8,6 +8,8 @@
 
         public static string ENemadLogo { get; set; }
 
+        public static string SupportEmailAddress { get; set; }
+
         public static string SiteName { get; set; }
 
         public static string BlogFile { get; set; }
