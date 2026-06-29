@@ -126,5 +126,13 @@ namespace Web.Controllers
 
             return RedirectToAction(nameof(Index));
         }
+
+        [HttpGet("/alert")]
+        public IActionResult Alert()
+        {
+            ViewData["NoIndex"] = true;
+
+            return RedirectToActionPermanent("ProductsList", "Product", new { area = "UserPanel" });
+        }
     }
 }
