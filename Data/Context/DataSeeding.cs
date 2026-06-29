@@ -282,11 +282,13 @@ namespace Data.Context
             #endregion
 
             #region SiteMap
+            string SiteUrl = "https://digipricealert.ir/";
+
             List<SiteMap> siteMaps = new List<SiteMap>() {
             new SiteMap()
 {
     Id = 1,
-    Url = $"{SiteTools.SiteUrl}",
+    Url = $"{SiteUrl}",
     ChangeFreq = ChangeFreqEnum.Daily,
     Priority = 1.0m,
     IsPublished = true,
@@ -296,7 +298,7 @@ namespace Data.Context
 new SiteMap()
 {
     Id = 2,
-    Url = $"{SiteTools.SiteUrl}subscription/pricing",
+    Url = $"{SiteUrl}subscription/pricing",
     ChangeFreq = ChangeFreqEnum.Weekly,
     Priority = 0.9m,
     IsPublished = true,
@@ -306,7 +308,7 @@ new SiteMap()
 new SiteMap()
 {
     Id = 3,
-    Url = $"{SiteTools.SiteUrl}features",
+    Url = $"{SiteUrl}features",
     ChangeFreq = ChangeFreqEnum.Weekly,
     Priority = 0.8m,
     IsPublished = true,
@@ -316,7 +318,7 @@ new SiteMap()
 new SiteMap()
 {
     Id = 4,
-    Url = $"{SiteTools.SiteUrl}faq",
+    Url = $"{SiteUrl}faq",
     ChangeFreq = ChangeFreqEnum.Monthly,
     Priority = 0.6m,
     IsPublished = true,
@@ -326,7 +328,7 @@ new SiteMap()
 new SiteMap()
 {
     Id = 5,
-    Url = $"{SiteTools.SiteUrl}about-us",
+    Url = $"{SiteUrl}about-us",
     ChangeFreq = ChangeFreqEnum.Monthly,
     Priority = 0.5m,
     IsPublished = true,
@@ -336,7 +338,7 @@ new SiteMap()
 new SiteMap()
 {
     Id = 6,
-    Url = $"{SiteTools.SiteUrl}contact-us",
+    Url = $"{SiteUrl}contact-us",
     ChangeFreq = ChangeFreqEnum.Monthly,
     Priority = 0.5m,
     IsPublished = true,
