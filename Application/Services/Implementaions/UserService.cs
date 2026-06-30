@@ -83,13 +83,12 @@ namespace Application.Services.Implementaions
 
             if (validation.HasActiveCode == false && !string.IsNullOrWhiteSpace(validation.Code))
             {
-                /*                var smsResult = await _sendSmsService.ClientSideSendLoginCode(new ClientSideSendLoginCodeDto()
-                                {
-                                    Code = validation.Code,
-                                    Mobile = loginUser.Mobile
-                                });*/
+                var smsResult = await _sendSmsService.ClientSideSendLoginCode(new ClientSideSendLoginCodeDto()
+                {
+                    Code = validation.Code,
+                    Mobile = loginUser.Mobile
+                });
             }
-            Console.WriteLine(validation.Code);
             return validation.CreatedDate;
         }
 
@@ -98,8 +97,10 @@ namespace Application.Services.Implementaions
             if (model is null) return Result.Failure<ClientSideUserDto>(Messages.OperationFailedError);
 
             string loginCode = string.Join("", model.LoginCode);
+
             var validationResult = await ValidateUserLoginCode(model.Mobile, loginCode);
-            if (validationResult.IsFailure) return Result.Failure<ClientSideUserDto>(validationResult.Message);
+            if (validationResult.IsFailure)
+                return Result.Failure<ClientSideUserDto>(validationResult.Message!);
 
             var user = await _context.Users.Where(n => n.Mobile == model.Mobile).Select(n => new ClientSideUserDto()
             {
@@ -527,14 +528,26 @@ namespace Application.Services.Implementaions
 
         public async Task<Result> ValidateUserLoginCode(string mobile, string code)
         {
-            if (string.IsNullOrWhiteSpace(mobile) || string.IsNullOrWhiteSpace(code)) return Result.Failure(Messages.OperationFailedError);
+            if (string.IsNullOrWhiteSpace(mobile) || string.IsNullOrWhiteSpace(code))
+                return Result.Failure(Messages.InvalidLoginCodeError);
 
-            var validation = await _context.UserValidation.Where(uv => uv.Mobile == mobile)
+            var validation = await _context.UserValidation
+                .Where(uv => uv.Mobile == mobile)
                 .FirstOrDefaultAsync();
-            if (validation is null)
-                return Result.Failure(Messages.OperationFailedError);
 
-            if (!code.VerifyPassword(validation.Salt, validation.Code)) return Result.Failure(Messages.InvalidLoginCodeError);
+            if (validation is null)
+                return Result.Failure(Messages.InvalidLoginCodeError);
+
+            if (validation.CreatedDate.AddMinutes(2) < DateTime.UtcNow)
+            {
+                _context.UserValidation.Remove(validation);
+                await _context.SaveChangesAsync();
+
+                return Result.Failure(Messages.LoginCodeExpiredError);
+            }
+
+            if (!code.VerifyPassword(validation.Salt, validation.Code))
+                return Result.Failure(Messages.InvalidLoginCodeError);
 
             _context.UserValidation.Remove(validation);
             await _context.SaveChangesAsync();

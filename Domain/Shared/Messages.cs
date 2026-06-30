@@ -33,6 +33,7 @@
         public const string UpdateBlogCategoriesSiteMapError = "خطایی هنگام بروزرسانی دسته بندی مقالات رخ داد";
         public const string UpdateBlogSiteMapError = "خطایی هنگام بروزرسانی مقالات رخ داد";
         public const string FailedToSendSmsError = "ارسال پیامک با خطا مواجه شد. لطفا مجددا تلاش کنید";
+        public const string LoginCodeExpiredError = "کد تایید شما منقضی شده است. لطفا مجددا درخواست کد کنید";
 
         #endregion
 
