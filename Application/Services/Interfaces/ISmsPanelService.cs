@@ -1,4 +1,6 @@
 ﻿using Application.Dtos.SmsPanel.AdminSide;
+using Application.Dtos.SmsPanel.ClientSide;
+using Domain.Enums.GeneralInfo;
 using Domain.Shared;
 
 namespace Application.Services.Interfaces
@@ -14,5 +16,7 @@ namespace Application.Services.Interfaces
         Task<Result<AdminSideFilterSmsPanelsDto>> AdminSideFilterSmsPanles(AdminSideFilterSmsPanelsDto filter);
 
         Task<Result> AdminSideDeleteSmsPanel(int id);
+
+        Task<Result<ClientSideSmsPanelDto>> ClientSideGetSmsPanel(SmsPanelTypeEnum type);
     }
 }

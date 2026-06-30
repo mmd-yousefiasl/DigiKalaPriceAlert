@@ -43,13 +43,10 @@ namespace Web.Controllers
             }
             TempData[TemporarySuccessMessage] = Messages.LoginCodeSentSuccessfully;
 
-            var codes = result.Value.Select(c => c.ToString()).ToList();
-
             return RedirectToAction(nameof(LoginCode), new
             {
                 Mobile = model.Mobile,
-                ReturnUrl = model.ReturnUrl,
-                LoginCode = codes
+                ReturnUrl = model.ReturnUrl
             });
         }
 

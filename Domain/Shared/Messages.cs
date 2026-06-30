@@ -32,6 +32,7 @@
         public const string UserReachedMaximumProductsError = "تعداد محصولات شما به سقف مجاز رسیده است";
         public const string UpdateBlogCategoriesSiteMapError = "خطایی هنگام بروزرسانی دسته بندی مقالات رخ داد";
         public const string UpdateBlogSiteMapError = "خطایی هنگام بروزرسانی مقالات رخ داد";
+        public const string FailedToSendSmsError = "ارسال پیامک با خطا مواجه شد. لطفا مجددا تلاش کنید";
 
         #endregion
 

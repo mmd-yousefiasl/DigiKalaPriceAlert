@@ -13,7 +13,7 @@ namespace Application.Services.Interfaces
 
         Task<bool> CheckUserRoleIds(int userId, List<int> roleIds);
 
-        Task<Result<string>> SendUserLoginCode(ClientSideLoginDto model);
+        Task<Result> SendUserLoginCode(ClientSideLoginDto model);
 
         Task<Result<ClientSideUserDto>> VerifyLoginCode(ClientSideLoginCodeDto model);
 

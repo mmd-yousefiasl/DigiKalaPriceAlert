@@ -1,10 +1,10 @@
-﻿using Application.Dtos.PriceMonitor;
+﻿using Application.Dtos.SmsConsumer;
 
 namespace Application.Services.Interfaces
 {
     public interface ISmsQueue
     {
-        ValueTask QueueSmsAsync(SmsMessageDto message);
-        ValueTask<SmsMessageDto> DequeueSmsAsync(CancellationToken cancellationToken);
+        ValueTask QueueSmsAsync(SmsQueueItem message);
+        ValueTask<SmsQueueItem> DequeueSmsAsync(CancellationToken cancellationToken);
     }
 }

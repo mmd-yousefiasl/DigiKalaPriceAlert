@@ -1,5 +1,4 @@
-﻿using Application.Dtos.PriceMonitor;
-using Application.Dtos.Products.ClientSide;
+﻿using Application.Dtos.Products.ClientSide;
 using Application.Services.Interfaces;
 using Application.Tools;
 using Domain.Shared;
@@ -137,7 +136,7 @@ namespace Web.BackgroundServices
                 {
                     if (stoppingToken.IsCancellationRequested) break;
 
-                    await smsQueue.QueueSmsAsync(new SmsMessageDto(mobile, textMessage));
+                    //await smsQueue.QueueSmsAsync(new SmsMessageDto(mobile, textMessage));
                 }
             }
         }

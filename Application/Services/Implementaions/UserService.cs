@@ -2,6 +2,7 @@
 using Application.Dtos.BalanceTransaction.ClientSide;
 using Application.Dtos.Products.ClientSide;
 using Application.Dtos.Role.AdminSide;
+using Application.Dtos.SendSms.ClientSide;
 using Application.Dtos.Users.AdminSide;
 using Application.Dtos.Users.ClientSide;
 using Application.Services.Interfaces;
@@ -21,14 +22,17 @@ namespace Application.Services.Implementaions
         #region Fields
         private protected DigiKalaPriceAlertDbContext _context;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly ISendSmsService _sendSmsService;
         #endregion
 
         #region Ctor
         public UserService(DigiKalaPriceAlertDbContext context,
-            IHttpContextAccessor httpContextAccessor)
+            IHttpContextAccessor httpContextAccessor,
+            ISendSmsService sendSmsService)
         {
             _context = context;
             _httpContextAccessor = httpContextAccessor;
+            _sendSmsService = sendSmsService;
         }
         #endregion
 
@@ -48,11 +52,12 @@ namespace Application.Services.Implementaions
             return false;
         }
 
-        public async Task<Result<string>> SendUserLoginCode(ClientSideLoginDto model)
+        public async Task<Result> SendUserLoginCode(ClientSideLoginDto model)
         {
-            if (model is null) return Result.Failure<string>(Messages.OperationFailedError);
+            if (model is null)
+                return Result.Failure(Messages.OperationFailedError);
 
-            User loginUser = await _context.Users.Where(n => n.Mobile == model.Mobile).FirstOrDefaultAsync();
+            User? loginUser = await _context.Users.Where(n => n.Mobile == model.Mobile).FirstOrDefaultAsync();
             if (loginUser is null)
             {
                 loginUser = new User();
@@ -65,17 +70,21 @@ namespace Application.Services.Implementaions
             }
             else
             {
-                if (loginUser.IsUserBanned) return Result.Failure<string>(Messages.OperationFailedError);
+                if (loginUser.IsUserBanned)
+                    return Result.Failure(Messages.OperationFailedError);
             }
 
             var validationResult = await GenerateUserValidationCode(model.Mobile);
-            if (validationResult.IsFailure) return Result.Failure<string>(validationResult.Message);
+            if (validationResult.IsFailure)
+                return Result.Failure(validationResult.Message!);
 
-            Console.WriteLine("Login Code: " + validationResult.Value);
+            var smsResult = await _sendSmsService.ClientSideSendLoginCode(new ClientSideSendLoginCodeDto()
+            {
+                Code = validationResult.Value,
+                Mobile = loginUser.Mobile
+            });
 
-            //await _smsServiec.SendLoginCode(validationResult.Value, loginUser.Mobile);
-
-            return validationResult.Value;
+            return Result.Success();
         }
 
         public async Task<Result<ClientSideUserDto>> VerifyLoginCode(ClientSideLoginCodeDto model)

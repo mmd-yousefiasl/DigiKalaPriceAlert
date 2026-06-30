@@ -1,4 +1,7 @@
-﻿using Application.Services.Interfaces;
+﻿using Application.Dtos.SmsConsumer;
+using Application.Services.Interfaces;
+using IPE.SmsIrClient;
+using IPE.SmsIrClient.Models.Requests;
 
 namespace Web.BackgroundServices
 {
@@ -23,18 +26,31 @@ namespace Web.BackgroundServices
             {
                 try
                 {
-                    var notification = await _queue.DequeueSmsAsync(stoppingToken);
+                    SmsQueueItem smsItem = await _queue.DequeueSmsAsync(stoppingToken);
 
-                    //Send SmsHere
+                    var verifySendParameters = smsItem.Parameters
+                        .Select(p => new VerifySendParameter(p.Name, p.Value))
+                        .ToArray();
 
-                    await Task.Delay(50, stoppingToken);
+                    var smsClient = new SmsIr(smsItem.ApiKey);
+
+                    var result = await smsClient.VerifySendAsync(
+                        smsItem.Mobile,
+                        smsItem.PatternId,
+                        verifySendParameters
+                    );
+
+                    if (result.Status != 1)
+                    {
+                        _logger.LogWarning("SMS sent but sms.ir returned status: {Status}", result.Status);
+                    }
                 }
                 catch (OperationCanceledException)
                 {
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Error occurred while sending queued notification.");
+                    _logger.LogError(ex, "Error occurred while processing queued SMS notification.");
                 }
             }
         }

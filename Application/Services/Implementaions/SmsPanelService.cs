@@ -1,7 +1,9 @@
 ﻿using Application.Dtos.SmsPanel.AdminSide;
+using Application.Dtos.SmsPanel.ClientSide;
 using Application.Services.Interfaces;
 using Application.Tools;
 using Data.Context;
+using Domain.Enums.GeneralInfo;
 using Domain.Models.GeneralInfo;
 using Domain.Shared;
 using Microsoft.EntityFrameworkCore;
@@ -153,6 +155,22 @@ namespace Application.Services.Implementaions
             await _context.SaveChangesAsync();
 
             return Result.Success();
+        }
+
+        public async Task<Result<ClientSideSmsPanelDto>> ClientSideGetSmsPanel(SmsPanelTypeEnum type)
+        {
+            var panel = await _context.SmsPanels
+                .AsNoTracking()
+                .Where(n => n.Type == type && n.IsActive == true)
+                .Select(n => new ClientSideSmsPanelDto()
+                {
+                    ApiKey = n.ApiKey,
+                    PatternId = n.PatternId
+                }).FirstOrDefaultAsync();
+            if (panel is null)
+                return Result.Failure<ClientSideSmsPanelDto>(Messages.OperationFailedError);
+
+            return panel;
         }
     }
 }
