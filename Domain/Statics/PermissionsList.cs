@@ -451,9 +451,47 @@ namespace Domain.Statics
                 UniqueName = "DeleteSiteMap"
             },
             #endregion
+
+            #region SmsPanel
+            new Permission
+            {
+                Id = 59,
+                ParentId = 1,
+                Title = "مدیریت پنل های پیامکی",
+                UniqueName = "ManageSmsPanels"
+            },
+            new Permission
+            {
+                Id = 60,
+                ParentId = 59,
+                Title = "لیست پنل های پیامکی",
+                UniqueName = "SmsPanelsList"
+            },
+            new Permission
+            {
+                Id = 61,
+                ParentId = 59,
+                Title = "افزودن پنل پیامکی",
+                UniqueName = "CreateNewSmsPanel"
+            },
+            new Permission
+            {
+                Id = 62,
+                ParentId = 59,
+                Title = "ویرایش پنل پیامکی",
+                UniqueName = "UpdateSmsPanel"
+            },
+            new Permission
+            {
+                Id = 63,
+                ParentId = 59,
+                Title = "حذف پنل پیامکی",
+                UniqueName = "DeleteSmsPanel"
+            },
+            #endregion
         };
 
-        //Last used id ==> 58
+        //Last used id ==> 63
         public static List<Permission> Permissions = _permissions;
     }
 }
