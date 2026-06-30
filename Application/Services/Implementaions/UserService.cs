@@ -751,5 +751,42 @@ namespace Application.Services.Implementaions
 
             return Result.Success();
         }
+
+        public async Task<Result> ClientSideIsUserProfileCompleted(int userId)
+        {
+            if (userId < 1)
+                return Result.Failure(Messages.OperationFailedError);
+
+            var user = await _context.Users.FindAsync(userId);
+            if (user is null)
+                return Result.Failure(Messages.OperationFailedError);
+
+            if (string.IsNullOrWhiteSpace(user.FirstName) || string.IsNullOrWhiteSpace(user.LastName))
+                return Result.Failure(Messages.OperationFailedError);
+
+            return Result.Success();
+        }
+
+        public async Task<Result> ClientSideUpdateUserProfile(ClientSideUpdateProfileDto dto)
+        {
+            if (dto is null)
+                return Result.Failure(Messages.OperationFailedError);
+
+            var userId = _httpContextAccessor.HttpContext.User.GetUserId();
+            if (userId < 1)
+                return Result.Failure(Messages.OperationFailedError);
+
+            var user = await _context.Users.FindAsync(userId);
+            if (user is null)
+                return Result.Failure(Messages.OperationFailedError);
+
+            user.FirstName = dto.FirstName;
+            user.LastName = dto.LastName;
+            user.LastUpdatedDate = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+
+            return Result.Success(Messages.YourProfileUpdatedSuccessfully);
+        }
     }
 }

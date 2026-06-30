@@ -7,6 +7,7 @@ namespace Domain.Enums.GeneralInfo
         [Display(Name = "کد تایید")]
         OTP = 1,
 
-
+        [Display(Name = "هشدار قیمت")]
+        PriceAlert = 2,
     }
 }

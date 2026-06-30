@@ -49,6 +49,7 @@
         public const string FreePlanActivatedSuccessfully = "طرح رایگان با موفقیت فعال شد";
         public const string PaymentDoneSuccessfully = "پرداخت با موفقیت انجام شد";
         public const string TicketClosedSuccessfully = "تیکت با موفقیت بسته شد";
+        public const string YourProfileUpdatedSuccessfully = "اطلاعات حساب کاربری شما با موفقیت بروزرسانی شد";
 
         #endregion
 

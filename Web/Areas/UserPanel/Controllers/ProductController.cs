@@ -31,12 +31,14 @@ namespace Web.Areas.UserPanel.Controllers
             return View(result.Value);
         }
 
+        [Profile]
         [HttpGet("/user/products/add")]
         public IActionResult AddNewProduct()
         {
             return View();
         }
 
+        [Profile]
         [HttpPost("/user/products/add"), ValidateAntiForgeryToken]
         public async Task<IActionResult> AddNewProduct(ClientSideCreateNewProductDto dto)
         {

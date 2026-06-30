@@ -61,5 +61,9 @@ namespace Application.Services.Interfaces
         Task<Result> ClientSideAddUnVerifiedTransaction(ClientSideCreateNewTransactionDto model);
 
         Task<Result> ClientSideVerifyTransaction(string transId);
+
+        Task<Result> ClientSideIsUserProfileCompleted(int userId);
+
+        Task<Result> ClientSideUpdateUserProfile(ClientSideUpdateProfileDto dto);
     }
 }
