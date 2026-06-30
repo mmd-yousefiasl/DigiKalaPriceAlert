@@ -73,6 +73,18 @@ namespace Application.Services.Implementaions
             {
                 if (loginUser.IsUserBanned)
                     return Result.Failure<DateTime>(Messages.OperationFailedError);
+
+                if (loginUser.LockoutEnd.HasValue && loginUser.LockoutEnd.Value > DateTime.UtcNow)
+                {
+                    var remainingMins = Math.Ceiling((loginUser.LockoutEnd.Value - DateTime.UtcNow).TotalMinutes);
+                    return Result.Failure<DateTime>($"بیش از حد مجاز تلاش کرده‌اید. لطفا {remainingMins} دقیقه دیگر مجددا تلاش کنید.");
+                }
+                else
+                {
+                    loginUser.AccessFailedCount = 0;
+                    loginUser.LockoutEnd = null;
+                    await _context.SaveChangesAsync();
+                }
             }
 
             var validationResult = await GenerateUserValidationCode(model.Mobile);
@@ -529,25 +541,39 @@ namespace Application.Services.Implementaions
         public async Task<Result> ValidateUserLoginCode(string mobile, string code)
         {
             if (string.IsNullOrWhiteSpace(mobile) || string.IsNullOrWhiteSpace(code))
-                return Result.Failure(Messages.InvalidLoginCodeError);
+                return Result.Failure(Messages.OperationFailedError);
 
-            var validation = await _context.UserValidation
-                .Where(uv => uv.Mobile == mobile)
-                .FirstOrDefaultAsync();
+            var user = await _context.Users.Where(u => u.Mobile == mobile).FirstOrDefaultAsync();
+            if (user is null) return Result.Failure(Messages.OperationFailedError);
 
-            if (validation is null)
-                return Result.Failure(Messages.InvalidLoginCodeError);
-
-            if (validation.CreatedDate.AddMinutes(2) < DateTime.UtcNow)
+            if (user.LockoutEnd.HasValue && user.LockoutEnd.Value > DateTime.UtcNow)
             {
-                _context.UserValidation.Remove(validation);
-                await _context.SaveChangesAsync();
+                var remainingMins = Math.Ceiling((user.LockoutEnd.Value - DateTime.UtcNow).TotalMinutes);
+                return Result.Failure($"حساب شما قفل شده است. {remainingMins} دقیقه دیگر تلاش کنید.");
+            }
 
+            var validation = await _context.UserValidation.Where(uv => uv.Mobile == mobile).FirstOrDefaultAsync();
+            if (validation is null || validation.CreatedDate.AddMinutes(2) < DateTime.UtcNow)
+            {
                 return Result.Failure(Messages.LoginCodeExpiredError);
             }
 
             if (!code.VerifyPassword(validation.Salt, validation.Code))
+            {
+                user.AccessFailedCount++;
+
+                if (user.AccessFailedCount >= 5)
+                {
+                    user.LockoutEnd = DateTime.UtcNow.AddHours(2);
+                    user.AccessFailedCount = 0;
+                }
+
+                await _context.SaveChangesAsync();
                 return Result.Failure(Messages.InvalidLoginCodeError);
+            }
+
+            user.AccessFailedCount = 0;
+            user.LockoutEnd = null;
 
             _context.UserValidation.Remove(validation);
             await _context.SaveChangesAsync();

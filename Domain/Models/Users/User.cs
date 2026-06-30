@@ -10,6 +10,8 @@ namespace Domain.Models.Users
         public DateTime? SubscriptionEndDate { get; set; }
         public bool IsUserBanned { get; set; } = false;
         public decimal Balance { get; set; }
+        public int AccessFailedCount { get; set; } = 0;
+        public DateTime? LockoutEnd { get; set; }
 
         #region Relations
         public ICollection<UserProductMapping>? Products { get; set; }
