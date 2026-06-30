@@ -98,7 +98,7 @@ namespace Web.Controllers
             return View(model);
         }
 
-        [HttpPost("/login-code")]
+        [HttpPost("/login-code"), ValidateAntiForgeryToken]
         public async Task<IActionResult> VerifyLoginCode(ClientSideLoginCodeDto model)
         {
             if (!ModelState.IsValid) return View("LoginCode", model);

@@ -89,7 +89,7 @@ namespace Application.Services.Implementaions
                                     Mobile = loginUser.Mobile
                                 });*/
             }
-
+            Console.WriteLine(validation.Code);
             return validation.CreatedDate;
         }
 
