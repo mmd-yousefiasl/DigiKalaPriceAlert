@@ -49,5 +49,29 @@ namespace Application.Services.Implementaions
 
             return Result.Success();
         }
+
+        public async Task<Result> ClientSideSendPriceAlert(ClientSideSendPriceAlertDto dto)
+        {
+            if (dto is null)
+                return Result.Failure(Messages.OperationFailedError);
+
+            var infoResult = await _smsPanelService.ClientSideGetSmsPanel(SmsPanelTypeEnum.PriceAlert);
+            if (infoResult.IsFailure)
+                return Result.Failure(Messages.OperationFailedError);
+
+            var loginSms = new SmsQueueItem(
+                Mobile: dto.Mobile,
+                ApiKey: infoResult.Value.ApiKey,
+                PatternId: infoResult.Value.PatternId,
+                Parameters: new List<SmsParameterItem>
+                {
+                        new("NAME", dto.FirstName)
+                }
+            );
+
+            await _smsQueue.QueueSmsAsync(loginSms);
+
+            return Result.Success();
+        }
     }
 }

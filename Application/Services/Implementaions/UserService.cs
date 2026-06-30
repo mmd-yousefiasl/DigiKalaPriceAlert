@@ -101,6 +101,7 @@ namespace Application.Services.Implementaions
                     Mobile = loginUser.Mobile
                 });
             }
+
             return validation.CreatedDate;
         }
 
@@ -465,6 +466,7 @@ namespace Application.Services.Implementaions
                     Users = group.Select(upm => new ClientSideUserDto
                     {
                         Id = upm.User.Id,
+                        FirstName = upm.User.FirstName,
                         Mobile = upm.User.Mobile,
                         IsBanned = upm.User.IsUserBanned
                     }).ToList()

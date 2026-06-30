@@ -1,7 +1,8 @@
 ﻿using Application.Dtos.Products.ClientSide;
+using Application.Dtos.SendSms.ClientSide;
+using Application.Dtos.Users.ClientSide;
 using Application.Services.Interfaces;
 using Application.Tools;
-using Domain.Shared;
 
 namespace Web.BackgroundServices
 {
@@ -32,14 +33,20 @@ namespace Web.BackgroundServices
                 {
                     _logger.LogInformation("Starting a new price monitoring cycle at: {Time}", DateTimeOffset.Now);
                     await RunMonitoringCycleAsync(stoppingToken);
+
+                    _logger.LogInformation("Monitoring cycle finished. Sleeping for 20 min's...");
+                    await Task.Delay(TimeSpan.FromMinutes(20), stoppingToken);
+                }
+                catch (OperationCanceledException)
+                {
+                    _logger.LogWarning("Price Monitor Worker operation was canceled (System shutting down).");
                 }
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, "An error occurred during the price monitoring cycle.");
-                }
 
-                _logger.LogInformation("Monitoring cycle finished. Sleeping for 3 hours...");
-                await Task.Delay(TimeSpan.FromHours(3), stoppingToken);
+                    await Task.Delay(TimeSpan.FromMinutes(5), stoppingToken);
+                }
             }
         }
 
@@ -59,7 +66,8 @@ namespace Web.BackgroundServices
             int page = 0;
             bool hasMoreProducts = true;
 
-            var mobilesToNotify = new List<string>();
+            var mobilesToNotify = new List<ClientSideUserToNotifyDto>();
+            var random = new Random();
 
             while (hasMoreProducts && !stoppingToken.IsCancellationRequested)
             {
@@ -86,7 +94,6 @@ namespace Web.BackgroundServices
                     page++;
                     continue;
                 }
-                var random = new Random();
 
                 foreach (var product in productsBatch)
                 {
@@ -113,11 +120,17 @@ namespace Web.BackgroundServices
 
                         var userMobiles = allProductIds
                             .Where(n => n.Id == product.Id)
-                            .SelectMany(n => n.Users.Select(u => u.Mobile));
+                            .SelectMany(n => n.Users)
+                            .Where(u => !string.IsNullOrWhiteSpace(u.FirstName))
+                            .Select(u => new ClientSideUserToNotifyDto()
+                            {
+                                Mobile = u.Mobile,
+                                FirstName = u.FirstName!
+                            }).ToList();
 
-                        foreach (var item in userMobiles ?? new List<string>())
+                        if (userMobiles.Any())
                         {
-                            mobilesToNotify.Add(item);
+                            mobilesToNotify.AddRange(userMobiles);
                         }
                     }
                 }
@@ -125,18 +138,21 @@ namespace Web.BackgroundServices
                 page++;
             }
 
-            var uniqueMobiles = mobilesToNotify.Distinct().ToList();
+            var uniqueUsers = mobilesToNotify.DistinctBy(u => u.Mobile).ToList();
 
-            if (uniqueMobiles.Any() && !stoppingToken.IsCancellationRequested)
+            if (uniqueUsers.Any() && !stoppingToken.IsCancellationRequested)
             {
-                var smsQueue = scope.ServiceProvider.GetRequiredService<ISmsQueue>();
-                string textMessage = Messages.ProductPriceChangedMessage;
+                var sendSmsService = scope.ServiceProvider.GetRequiredService<ISendSmsService>();
 
-                foreach (var mobile in uniqueMobiles)
+                foreach (var user in uniqueUsers)
                 {
                     if (stoppingToken.IsCancellationRequested) break;
 
-                    //await smsQueue.QueueSmsAsync(new SmsMessageDto(mobile, textMessage));
+                    await sendSmsService.ClientSideSendPriceAlert(new ClientSideSendPriceAlertDto()
+                    {
+                        Mobile = user.Mobile,
+                        FirstName = user.FirstName
+                    });
                 }
             }
         }

@@ -6,5 +6,7 @@ namespace Application.Services.Interfaces
     public interface ISendSmsService
     {
         Task<Result> ClientSideSendLoginCode(ClientSideSendLoginCodeDto dto);
+
+        Task<Result> ClientSideSendPriceAlert(ClientSideSendPriceAlertDto dto);
     }
 }
