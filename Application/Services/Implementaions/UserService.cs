@@ -5,6 +5,7 @@ using Application.Dtos.Role.AdminSide;
 using Application.Dtos.SendSms.ClientSide;
 using Application.Dtos.Users.AdminSide;
 using Application.Dtos.Users.ClientSide;
+using Application.Dtos.UserValidation;
 using Application.Services.Interfaces;
 using Application.Tools;
 using Data.Context;
@@ -52,10 +53,10 @@ namespace Application.Services.Implementaions
             return false;
         }
 
-        public async Task<Result> SendUserLoginCode(ClientSideLoginDto model)
+        public async Task<Result<DateTime>> SendUserLoginCode(ClientSideLoginDto model)
         {
             if (model is null)
-                return Result.Failure(Messages.OperationFailedError);
+                return Result.Failure<DateTime>(Messages.OperationFailedError);
 
             User? loginUser = await _context.Users.Where(n => n.Mobile == model.Mobile).FirstOrDefaultAsync();
             if (loginUser is null)
@@ -71,20 +72,25 @@ namespace Application.Services.Implementaions
             else
             {
                 if (loginUser.IsUserBanned)
-                    return Result.Failure(Messages.OperationFailedError);
+                    return Result.Failure<DateTime>(Messages.OperationFailedError);
             }
 
             var validationResult = await GenerateUserValidationCode(model.Mobile);
             if (validationResult.IsFailure)
-                return Result.Failure(validationResult.Message!);
+                return Result.Failure<DateTime>(validationResult.Message!);
 
-            var smsResult = await _sendSmsService.ClientSideSendLoginCode(new ClientSideSendLoginCodeDto()
+            var validation = validationResult.Value;
+
+            if (validation.HasActiveCode == false && !string.IsNullOrWhiteSpace(validation.Code))
             {
-                Code = validationResult.Value,
-                Mobile = loginUser.Mobile
-            });
+                /*                var smsResult = await _sendSmsService.ClientSideSendLoginCode(new ClientSideSendLoginCodeDto()
+                                {
+                                    Code = validation.Code,
+                                    Mobile = loginUser.Mobile
+                                });*/
+            }
 
-            return Result.Success();
+            return validation.CreatedDate;
         }
 
         public async Task<Result<ClientSideUserDto>> VerifyLoginCode(ClientSideLoginCodeDto model)
@@ -469,10 +475,10 @@ namespace Application.Services.Implementaions
                 .ToListAsync(dto.CancellationToken);
         }
 
-        public async Task<Result<string>> GenerateUserValidationCode(string mobile)
+        public async Task<Result<OtpGenerationResultDto>> GenerateUserValidationCode(string mobile)
         {
             if (string.IsNullOrWhiteSpace(mobile))
-                return Result.Failure<string>(Messages.OperationFailedError);
+                return Result.Failure<OtpGenerationResultDto>(Messages.OperationFailedError);
 
             var existingValidations = await _context.UserValidation
                 .Where(uv => uv.Mobile == mobile)
@@ -480,30 +486,43 @@ namespace Application.Services.Implementaions
                 .ToListAsync();
 
             var latestValidation = existingValidations.FirstOrDefault();
-            if (latestValidation != null &&
-                DateTime.UtcNow - latestValidation.CreatedDate < TimeSpan.FromMinutes(2))
+
+            if (latestValidation != null && DateTime.UtcNow - latestValidation.CreatedDate < TimeSpan.FromMinutes(2))
             {
-                return Result.Failure<string>(Messages.ToManyLoginAttemptError);
+                return Result.Success(new OtpGenerationResultDto
+                {
+                    Code = null,
+                    CreatedDate = latestValidation.CreatedDate,
+                    HasActiveCode = true
+                });
             }
 
             if (existingValidations.Any())
+            {
                 _context.UserValidation.RemoveRange(existingValidations);
+            }
 
             var code = Generate.UserLoginCode();
             var hashedCode = code.HashPassword(out string salt);
+            var nowUtc = DateTime.UtcNow;
 
             var validation = new UserValidation
             {
                 Code = hashedCode,
                 Salt = salt,
                 Mobile = mobile,
-                CreatedDate = DateTime.UtcNow,
+                CreatedDate = nowUtc,
             };
 
             _context.UserValidation.Add(validation);
             await _context.SaveChangesAsync();
 
-            return code;
+            return Result.Success(new OtpGenerationResultDto
+            {
+                Code = code,
+                CreatedDate = nowUtc,
+                HasActiveCode = false
+            });
         }
 
         public async Task<Result> ValidateUserLoginCode(string mobile, string code)

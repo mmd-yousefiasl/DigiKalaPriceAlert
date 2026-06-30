@@ -146,5 +146,13 @@ namespace Application.Tools
 
             return Math.Round(percentage, 2);
         }
+
+        public static int GetRemainingCooldownSeconds(this DateTime createdDate, int cooldownSeconds = 120)
+        {
+            var expiryTime = createdDate.AddSeconds(cooldownSeconds);
+            var remaining = (expiryTime - DateTime.UtcNow).TotalSeconds;
+
+            return remaining > 0 ? (int)Math.Ceiling(remaining) : 0;
+        }
     }
 }

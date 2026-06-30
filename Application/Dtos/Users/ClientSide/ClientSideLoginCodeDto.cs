@@ -18,5 +18,7 @@ namespace Application.Dtos.Users.ClientSide
         [RequiredEach(ErrorMessage = Messages.RequiredError)]
         [Required(ErrorMessage = Messages.RequiredError)]
         public List<string> LoginCode { get; set; }
+
+        public DateTime CreatedDate { get; set; }
     }
 }

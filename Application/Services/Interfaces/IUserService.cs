@@ -3,6 +3,7 @@ using Application.Dtos.BalanceTransaction.ClientSide;
 using Application.Dtos.Products.ClientSide;
 using Application.Dtos.Users.AdminSide;
 using Application.Dtos.Users.ClientSide;
+using Application.Dtos.UserValidation;
 using Domain.Shared;
 
 namespace Application.Services.Interfaces
@@ -13,7 +14,7 @@ namespace Application.Services.Interfaces
 
         Task<bool> CheckUserRoleIds(int userId, List<int> roleIds);
 
-        Task<Result> SendUserLoginCode(ClientSideLoginDto model);
+        Task<Result<DateTime>> SendUserLoginCode(ClientSideLoginDto model);
 
         Task<Result<ClientSideUserDto>> VerifyLoginCode(ClientSideLoginCodeDto model);
 
@@ -47,7 +48,7 @@ namespace Application.Services.Interfaces
 
         Task<List<string>> ClientSideGetUsersTrackingProduct(ClientSideGetUsersTrackingProductDto dto);
 
-        Task<Result<string>> GenerateUserValidationCode(string mobile);
+        Task<Result<OtpGenerationResultDto>> GenerateUserValidationCode(string mobile);
 
         Task<Result> ValidateUserLoginCode(string mobile, string code);
 

@@ -21,8 +21,42 @@ namespace Web.Controllers
         }
         #endregion
 
+        [HttpGet("/resend-code")]
+        public async Task<IActionResult> ResendCode(string ReturnUrl, string Mobile)
+        {
+            if (User?.Identity?.IsAuthenticated ?? false)
+                return Redirect("/");
+
+            if (string.IsNullOrWhiteSpace(Mobile))
+            {
+                TempData[TemporaryErrorMessage] = Messages.OperationFailedError;
+                return RedirectToAction(nameof(Login));
+            }
+
+            var result = await _userService.SendUserLoginCode(new ClientSideLoginDto()
+            {
+                Mobile = Mobile,
+                ReturnUrl = ReturnUrl,
+                PrivacyPolicy = true,
+            });
+            if (result.IsFailure)
+            {
+                TempData[TemporaryErrorMessage] = result.Message;
+                return RedirectToAction(nameof(Login));
+            }
+            TempData[TemporarySuccessMessage] = Messages.LoginCodeSentSuccessfully;
+            string formattedDate = result.Value.ToString("o");
+
+            return RedirectToAction(nameof(LoginCode), new
+            {
+                Mobile = Mobile,
+                ReturnUrl = ReturnUrl,
+                CreatedDate = formattedDate
+            });
+        }
+
         [HttpGet("/login")]
-        public IActionResult Login(string ReturnUrl)
+        public IActionResult Login(string ReturnUrl, string? Mobile)
         {
             ViewData["NoIndex"] = true;
             if (User?.Identity?.IsAuthenticated ?? false) return Redirect("/");
@@ -41,12 +75,13 @@ namespace Web.Controllers
                 TempData[TemporaryErrorMessage] = result.Message;
                 return View(model);
             }
-            TempData[TemporarySuccessMessage] = Messages.LoginCodeSentSuccessfully;
+            string formattedDate = result.Value.ToString("o");
 
             return RedirectToAction(nameof(LoginCode), new
             {
                 Mobile = model.Mobile,
-                ReturnUrl = model.ReturnUrl
+                ReturnUrl = model.ReturnUrl,
+                CreatedDate = formattedDate
             });
         }
 
