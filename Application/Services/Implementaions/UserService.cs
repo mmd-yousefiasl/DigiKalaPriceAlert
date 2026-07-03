@@ -2,6 +2,7 @@
 using Application.Dtos.BalanceTransaction.ClientSide;
 using Application.Dtos.Products.ClientSide;
 using Application.Dtos.Role.AdminSide;
+using Application.Dtos.SendSms.ClientSide;
 using Application.Dtos.Users.AdminSide;
 using Application.Dtos.Users.ClientSide;
 using Application.Dtos.UserValidation;
@@ -94,12 +95,11 @@ namespace Application.Services.Implementaions
 
             if (validation.HasActiveCode == false && !string.IsNullOrWhiteSpace(validation.Code))
             {
-                /*                var smsResult = await _sendSmsService.ClientSideSendLoginCode(new ClientSideSendLoginCodeDto()
-                                {
-                                    Code = validation.Code,
-                                    Mobile = loginUser.Mobile
-                                });*/
-                Console.WriteLine(validation.Code);
+                var smsResult = await _sendSmsService.ClientSideSendLoginCode(new ClientSideSendLoginCodeDto()
+                {
+                    Code = validation.Code,
+                    Mobile = loginUser.Mobile
+                });
             }
 
             return validation.CreatedDate;

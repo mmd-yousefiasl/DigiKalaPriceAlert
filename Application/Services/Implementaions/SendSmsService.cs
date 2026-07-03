@@ -45,7 +45,7 @@ namespace Application.Services.Implementaions
                 }
             );
 
-            //await _smsQueue.QueueSmsAsync(loginSms);
+            await _smsQueue.QueueSmsAsync(loginSms);
 
             return Result.Success();
         }
@@ -69,7 +69,7 @@ namespace Application.Services.Implementaions
                 }
             );
 
-            //await _smsQueue.QueueSmsAsync(loginSms);
+            await _smsQueue.QueueSmsAsync(loginSms);
 
             return Result.Success();
         }
