@@ -102,7 +102,7 @@ namespace Web.BackgroundServices
                     int delay = random.Next(1000, 2800);
                     await Task.Delay(delay, stoppingToken);
 
-                    var scrapResult = await scraperService.GetProductDetailsWithoutImage(product.DigiKalaId);
+                    var scrapResult = await scraperService.GetProductDetails(product.DigiKalaId);
                     if (scrapResult.IsFailure) continue;
 
                     decimal newPrice = scrapResult.Value.Price;

@@ -83,7 +83,7 @@ namespace Application.Services.Implementaions
             }
             else
             {
-                var digiKalaResult = await _digiKalaService.GetProductDetailsWithoutImage(digiKalaId);
+                var digiKalaResult = await _digiKalaService.GetProductDetails(digiKalaId);
                 if (digiKalaResult.IsFailure)
                     return Result.Failure<int>(Messages.InvalidDigiKalaProductUrlError);
 

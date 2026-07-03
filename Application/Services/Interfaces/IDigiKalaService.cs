@@ -9,6 +9,6 @@ namespace Application.Services.Interfaces
 
         Task<Result<DigiKalaProductResultDto>> GetProductDetails(string digiKalaId);
 
-        Task<Result<DigiKalaProductResultDto>> GetProductDetailsWithoutImage(string digiKalaId);
+        Task<Result<DigiKalaProductResultDto>> GetCurrentPublicIpAsync();
     }
 }

@@ -1,8 +1,10 @@
 ﻿using Application.Services.Implementaions;
+using Application.Services.Implementations;
 using Application.Services.Interfaces;
 using Data.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using System.Net;
 using Web.BackgroundServices;
 
 namespace Web
@@ -33,7 +35,16 @@ namespace Web
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddSingleton<ISmsQueue, SmsQueue>();
 
-            services.AddHttpClient<IDigiKalaService, DigiKalaService>();
+            services.AddHttpClient<IDigiKalaService, DigiKalaService>()
+                .ConfigurePrimaryHttpMessageHandler(() =>
+                {
+                    return new HttpClientHandler
+                    {
+                        Proxy = new WebProxy("socks5://127.0.0.1:10809"),
+                        UseProxy = false,
+                        AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
+                    };
+                });
 
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IRoleService, RoleService>();

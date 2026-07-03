@@ -2,16 +2,20 @@
 using Application.Services.Interfaces;
 using Domain.Shared;
 using Microsoft.Extensions.Logging;
+using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 
-namespace Application.Services.Implementaions
+namespace Application.Services.Implementations
 {
     public class DigiKalaService : IDigiKalaService
     {
         #region Fields
         private readonly HttpClient _httpClient;
         private readonly ILogger<DigiKalaService> _logger;
+
+        // Modern Chrome on Windows 11 User-Agent
+        private const string _userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36";
         #endregion
 
         #region Ctor
@@ -19,116 +23,82 @@ namespace Application.Services.Implementaions
         {
             _httpClient = httpClient;
             _logger = logger;
-
-            _httpClient.DefaultRequestHeaders.Clear();
-            _httpClient.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Linux; Android 10; SM-G975F) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36");
-            _httpClient.DefaultRequestHeaders.Add("Accept", "application/json, text/plain, */*");
-            _httpClient.DefaultRequestHeaders.Add("X-Web-Client", "MobileWeb");
-            _httpClient.DefaultRequestHeaders.Add("Cache-Control", "no-cache");
         }
         #endregion
 
-        #region Private Methods
-        private async Task<Result<DigiKalaProductResultDto>> FetchProductDetailsInternalAsync(string digiKalaId, bool downloadImage)
+        private async Task<Result<DigiKalaProductResultDto>> FetchProductDetailsInternalAsync(string digiKalaId)
         {
             try
             {
-                // آدرس اختصاصی لایه ورکر کلودفلر شما
-                string workerUrl = "https://flat-sunset-4db4.mmdyousefi95.workers.dev/";
+                var request = new HttpRequestMessage(HttpMethod.Get, $"https://api.digikala.com/v2/product/{digiKalaId}/");
 
-                // ۱. اضافه کردن پارامتر دانلود تصویر به آدرس ورکر کلودفلر
-                string apiUrl = $"{workerUrl}?id={digiKalaId}&download_image={downloadImage.ToString().ToLower()}";
+                // Using the fixed, modern header
+                request.Headers.Add("User-Agent", _userAgent);
+                request.Headers.Add("Accept", "application/json, text/plain, */*");
+                request.Headers.Add("Accept-Language", "fa-IR,fa;q=0.9,en-US;q=0.8,en;q=0.7");
+                request.Headers.Add("X-Web-Client", "DesktopWeb");
+                request.Headers.Add("Referer", "https://www.digikala.com/");
+                request.Headers.Add("Origin", "https://www.digikala.com");
 
-                var request = new HttpRequestMessage(HttpMethod.Get, apiUrl);
-
-                // ارسال درخواست به ورکر کلودفلر
-                var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
-
+                var response = await _httpClient.SendAsync(request);
                 response.EnsureSuccessStatusCode();
 
-                // دریافت پاسخ متنی به صورت استریم زنده شبکه (فوق‌العاده بهینه و سریع)
-                using Stream responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+                var json = await response.Content.ReadFromJsonAsync<JsonElement>();
+                var product = json.GetProperty("data").GetProperty("product");
 
-                // پارس ناهمگام استریم جی‌سان مینی‌مال
-                using JsonDocument doc = await JsonDocument.ParseAsync(responseStream).ConfigureAwait(false);
-                JsonElement root = doc.RootElement;
+                string title = product.TryGetProperty("title_fa", out var t) ? t.GetString() ?? "بدون عنوان" : "بدون عنوان";
 
-                // استخراج مستقیم فیلدها از ریشه
-                string title = root.TryGetProperty("Title", out var titleElement)
-                    ? titleElement.GetString() ?? "بدون عنوان"
-                    : "بدون عنوان";
-
-                decimal price = root.TryGetProperty("Price", out var priceElement)
-                    ? priceElement.GetDecimal()
-                    : 0;
-
-                string? imageUrl = root.TryGetProperty("ImageUrl", out var imgElement)
-                    ? imgElement.GetString()
-                    : null;
-
-                // ۲. استخراج رشته Base64 تصویر و تبدیل آن به آرایه بایت (byte[])
-                byte[]? imageBytes = null;
-                if (root.TryGetProperty("ImageBytes", out var bytesElement) && bytesElement.ValueKind != JsonValueKind.Null)
+                decimal price = 0;
+                if (product.TryGetProperty("default_variant", out var dv) &&
+                    dv.TryGetProperty("price", out var p) &&
+                    p.TryGetProperty("selling_price", out var sp))
                 {
-                    string? base64String = bytesElement.GetString();
-                    if (!string.IsNullOrEmpty(base64String))
-                    {
-                        try
-                        {
-                            imageBytes = Convert.FromBase64String(base64String);
-                        }
-                        catch (FormatException ex)
-                        {
-                            _logger.LogWarning(ex, "Failed to convert ImageBytes Base64 string for DKP: {DkpId}", digiKalaId);
-                        }
-                    }
+                    price = sp.GetDecimal() / 10;
                 }
 
-                // اگر عنوان "بدون عنوان" باشد یا ساختار جی‌سان نامعتبر باشد، کالا یافت نشده است
-                if (title == "بدون عنوان" && price == 0 && string.IsNullOrEmpty(imageUrl))
+                string? imageUrl = null;
+                if (product.TryGetProperty("images", out var imgs) &&
+                    imgs.TryGetProperty("main", out var main) &&
+                    main.TryGetProperty("url", out var urls))
                 {
-                    return Result.Failure<DigiKalaProductResultDto>(Messages.OperationFailedError);
+                    imageUrl = urls[0].GetString();
                 }
 
-                // لاگ زدن وضعیت محصولات ناموجود یا بدون تنوع فعال
-                if (price == 0)
-                {
-                    _logger.LogInformation("Product DKP: {DkpId} has 0 price or no default variant. It might be out of stock.", digiKalaId);
-                }
-
-                var dto = new DigiKalaProductResultDto(title, price, imageUrl, imageBytes);
-                return Result.Success(dto);
+                return Result.Success(new DigiKalaProductResultDto(title, price, imageUrl, null));
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error processing optimized product details from DigiKala Proxy for DKP: {DkpId}", digiKalaId);
+                _logger.LogError(ex, "Error scraping DKP: {DkpId}", digiKalaId);
+                return Result.Failure<DigiKalaProductResultDto>(Messages.OperationFailedError);
             }
-
-            return Result.Failure<DigiKalaProductResultDto>(Messages.OperationFailedError);
-        }
-        #endregion
-
-        public Result<string> ExtractProductIdFromUrl(string url)
-        {
-            if (string.IsNullOrWhiteSpace(url))
-                return Result.Failure<string>(Messages.OperationFailedError);
-
-            var match = Regex.Match(url, @"dkp-(\d+)", RegexOptions.IgnoreCase);
-            if (match.Success) return match.Groups[1].Value;
-
-            if (long.TryParse(url.Trim(), out _)) return url.Trim();
-
-            return Result.Failure<string>(Messages.OperationFailedError);
         }
 
         public async Task<Result<DigiKalaProductResultDto>> GetProductDetails(string digiKalaId)
+            => await FetchProductDetailsInternalAsync(digiKalaId);
+
+        public Result<string> ExtractProductIdFromUrl(string url)
         {
-            return await FetchProductDetailsInternalAsync(digiKalaId, downloadImage: true);
+            var match = Regex.Match(url, @"dkp-(\d+)", RegexOptions.IgnoreCase);
+            return match.Success ? match.Groups[1].Value : (long.TryParse(url.Trim(), out _) ? url.Trim() : Result.Failure<string>(Messages.OperationFailedError));
         }
 
-        public async Task<Result<DigiKalaProductResultDto>> GetProductDetailsWithoutImage(string digiKalaId)
+        public async Task<Result<DigiKalaProductResultDto>> GetCurrentPublicIpAsync()
         {
-            return await FetchProductDetailsInternalAsync(digiKalaId, downloadImage: false);
+            int retries = 3;
+            while (retries > 0)
+            {
+                try
+                {
+                    Console.WriteLine(await _httpClient.GetStringAsync("https://api.ipify.org"));
+                    return Result.Failure<DigiKalaProductResultDto>(Messages.OperationFailedError);
+                }
+                catch (HttpRequestException)
+                {
+                    retries--;
+                    await Task.Delay(2000);
+                }
+            }
+            return Result.Failure<DigiKalaProductResultDto>(Messages.OperationFailedError);
         }
     }
 }
