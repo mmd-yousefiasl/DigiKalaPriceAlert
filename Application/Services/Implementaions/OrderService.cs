@@ -45,87 +45,93 @@ namespace Application.Services.Implementaions
         }
         #endregion
 
-        public async Task<Result<int>> ClientSideCreateNewPurchase(int planId)
+        public async Task<Result<string>> ClientSideCreateNewPurchase(int planId)
         {
+            // 1. Fail-fast validation guards
             if (planId < 1)
-                return Result.Failure<int>(Messages.OperationFailedError);
+                return Result.Failure<string>(Messages.OperationFailedError);
 
             var userId = _httpContextAccessor.HttpContext.User.GetUserId();
             if (userId < 1)
-                return Result.Failure<int>(Messages.OperationFailedError);
+                return Result.Failure<string>(Messages.OperationFailedError);
 
             var planResult = await _subscriptionPlanService.ClientSideGetPlanById(planId);
             if (planResult.IsFailure)
-                return Result.Failure<int>(planResult.Message!);
+                return Result.Failure<string>(planResult.Message!);
 
             var plan = planResult.Value;
 
-            var oldOrders = await _context.Orders
+            // 2. Check if the EXACT draft order already exists
+            var existingOrderInvoiceId = await _context.Orders
+                .Where(o => o.UserId == userId && o.SubscriptionPlanId == planId && o.Status == OrderStatusEnum.Draft)
+                .Select(o => o.InvoiceId)
+                .FirstOrDefaultAsync();
+
+            if (!string.IsNullOrEmpty(existingOrderInvoiceId))
+            {
+                // Cancel ANY OTHER draft plans the user had open except this current one
+                await _context.Orders
+                    .Where(o => o.UserId == userId && o.SubscriptionPlanId != planId && o.Status == OrderStatusEnum.Draft)
+                    .ExecuteUpdateAsync(setters => setters.SetProperty(o => o.Status, OrderStatusEnum.Canceled));
+
+                return existingOrderInvoiceId;
+            }
+
+            // 3. Cancel all old drafts instantly in 1 single database roundtrip (No EF tracking needed)
+            await _context.Orders
                 .Where(o => o.UserId == userId && o.Status == OrderStatusEnum.Draft)
-                .ToListAsync();
+                .ExecuteUpdateAsync(setters => setters.SetProperty(o => o.Status, OrderStatusEnum.Canceled));
 
-            int finalOrderId = 0;
-            bool isExist = false;
-
-            if (oldOrders.Any())
+            // 4. Generate Unique Invoice ID using a rapid verification set
+            string uniqueInvoiceId = string.Empty;
+            bool isDuplicate = true;
+            for (int i = 0; i < 3; i++)
             {
-                foreach (var order in oldOrders)
+                uniqueInvoiceId = Generate.InvoiceId();
+                if (!await _context.Orders.AnyAsync(o => o.InvoiceId == uniqueInvoiceId))
                 {
-                    if (order.SubscriptionPlanId == planId)
-                    {
-                        isExist = true;
-                        finalOrderId = order.Id;
-                    }
-                    else
-                    {
-                        order.Status = OrderStatusEnum.Canceled;
-                    }
+                    isDuplicate = false;
+                    break;
                 }
-
-                _context.Orders.UpdateRange(oldOrders);
             }
 
-            if (!isExist)
+            if (isDuplicate)
+                return Result.Failure<string>(Messages.FailedToCreatePurchaseError);
+
+            // 5. Create and attach the new Draft record
+            var newOrder = new Order
             {
-                var newOrder = new Order
-                {
-                    UserId = userId,
-                    SubscriptionPlanId = plan.Id,
-                    Status = OrderStatusEnum.Draft,
-                    PaidDate = null
-                };
+                UserId = userId,
+                SubscriptionPlanId = plan.Id,
+                Status = OrderStatusEnum.Draft,
+                PaidDate = null,
+                InvoiceId = uniqueInvoiceId
+            };
 
-                await _context.Orders.AddAsync(newOrder);
-                await _context.SaveChangesAsync();
+            await _context.Orders.AddAsync(newOrder);
+            await _context.SaveChangesAsync();
 
-                finalOrderId = newOrder.Id;
-            }
-            else
-            {
-                await _context.SaveChangesAsync();
-            }
-
-            return finalOrderId;
+            return uniqueInvoiceId;
         }
 
-        public async Task<Result<ClientSideInvoiceDto>> ClientSideGetInvoice(int orderId)
+        public async Task<Result<ClientSideInvoiceDto>> ClientSideGetInvoice(string invoiceId)
         {
-            if (orderId < 1)
+            if (string.IsNullOrWhiteSpace(invoiceId))
                 return Result.Failure<ClientSideInvoiceDto>(Messages.OperationFailedError);
 
             var userId = _httpContextAccessor.HttpContext.User.GetUserId();
             if (userId < 1)
                 return Result.Failure<ClientSideInvoiceDto>(Messages.OperationFailedError);
 
-            var order = await _context.Orders.Where(n => n.Id == orderId && n.UserId == userId)
+            var order = await _context.Orders.Where(n => n.InvoiceId == invoiceId && n.UserId == userId)
                 .Select(n => new ClientSideInvoiceDto()
                 {
-                    Id = n.Id,
                     DurationInDays = n.SubscriptionPlan.DurationInDays,
                     ShortDescription = n.SubscriptionPlan.ShortDescription,
                     IsPopular = n.SubscriptionPlan.IsPopular,
                     PlanPrice = n.SubscriptionPlan.Price,
                     PlanTitle = n.SubscriptionPlan.Name,
+                    InvoiceId = n.InvoiceId,
                     Features = n.SubscriptionPlan.Features.Where(f => f.IsPublished).OrderBy(f => f.Priority)
                     .Select(f => f.Title).ToList(),
                 })
@@ -139,17 +145,17 @@ namespace Application.Services.Implementaions
             return order;
         }
 
-        public async Task<Result<int>> ClientSideGetInvoiceId()
+        public async Task<Result<string>> ClientSideGetInvoiceId()
         {
             var userId = _httpContextAccessor.HttpContext.User.GetUserId();
             if (userId < 1)
-                return Result.Failure<int>(Messages.OperationFailedError);
+                return Result.Failure<string>(Messages.OperationFailedError);
 
             var invoiceId = await _context.Orders.Where(n => n.UserId == userId && n.Status == OrderStatusEnum.Draft)
-                .Select(n => n.Id)
+                .Select(n => n.InvoiceId)
                 .FirstOrDefaultAsync();
-            if (invoiceId < 1)
-                return Result.Failure<int>(Messages.EmptyInvoiceError);
+            if (string.IsNullOrWhiteSpace(invoiceId))
+                return Result.Failure<string>(Messages.EmptyInvoiceError);
 
             return invoiceId;
         }
@@ -162,7 +168,7 @@ namespace Application.Services.Implementaions
 
             var order = await _context.Orders
                 .Include(n => n.SubscriptionPlan)
-                .FirstOrDefaultAsync(n => n.Id == orderIdResult.Value);
+                .FirstOrDefaultAsync(n => n.InvoiceId == orderIdResult.Value);
 
             if (order is null)
                 return Result.Failure<ClientSideProceedToCheckoutDto>(Messages.OperationFailedError);
@@ -252,24 +258,24 @@ namespace Application.Services.Implementaions
             return Result.Success(Messages.PaymentDoneSuccessfully);
         }
 
-        public async Task<Result<int>> ClientSideVerifyOrder()
+        public async Task<Result<string>> ClientSideVerifyOrder()
         {
             var userId = _httpContextAccessor.HttpContext.User.GetUserId();
             if (userId < 1)
-                return Result.Failure<int>(Messages.OperationFailedError);
+                return Result.Failure<string>(Messages.OperationFailedError);
 
             var order = await _context.Orders
                 .Include(n => n.SubscriptionPlan)
                 .FirstOrDefaultAsync(n => n.UserId == userId && n.Status == OrderStatusEnum.Draft);
 
             if (order is null)
-                return Result.Failure<int>(Messages.OperationFailedError);
+                return Result.Failure<string>(Messages.OperationFailedError);
 
             if (order.SubscriptionPlanId == 1)
             {
                 var userResult = await _usedFreePlanService.ClientSideCanUserGetFreePlan();
                 if (userResult.IsFailure)
-                    return Result.Failure<int>(userResult.Message!);
+                    return Result.Failure<string>(userResult.Message!);
             }
 
             var strategy = _context.Database.CreateExecutionStrategy();
@@ -284,20 +290,20 @@ namespace Application.Services.Implementaions
                         if (userUsedResult.IsFailure)
                         {
                             await dbTx.RollbackAsync();
-                            return Result.Failure<int>(userUsedResult.Message!);
+                            return Result.Failure<string>(userUsedResult.Message!);
                         }
                     }
 
                     var withdrawRes = await _userService.ClientSideWithdrawUserOrder(new ClientSideWithdrawUserOrderDto()
                     {
                         Amount = order.SubscriptionPlan.Price,
-                        OrderId = order.Id
+                        InvoiceId = order.InvoiceId
                     });
 
                     if (withdrawRes.IsFailure)
                     {
                         await dbTx.RollbackAsync();
-                        return Result.Failure<int>(withdrawRes.Message!);
+                        return Result.Failure<string>(withdrawRes.Message!);
                     }
 
                     order.PaidDate = DateTime.UtcNow;
@@ -310,18 +316,18 @@ namespace Application.Services.Implementaions
                     if (userSubResult.IsFailure)
                     {
                         await dbTx.RollbackAsync();
-                        return Result.Failure<int>(Messages.OperationFailedError);
+                        return Result.Failure<string>(Messages.OperationFailedError);
                     }
 
                     await _context.SaveChangesAsync();
                     await dbTx.CommitAsync();
 
-                    return order.Id;
+                    return order.InvoiceId;
                 }
                 catch (Exception)
                 {
                     await dbTx.RollbackAsync();
-                    return Result.Failure<int>(Messages.OperationFailedError);
+                    return Result.Failure<string>(Messages.OperationFailedError);
                 }
             });
         }
@@ -360,6 +366,7 @@ namespace Application.Services.Implementaions
                 PaidDate = n.PaidDate,
                 PlanPrice = n.PlanPrice,
                 PlanTitle = n.PlanTitle,
+                InvoiceId = n.InvoiceId
             }));
 
             return filter;

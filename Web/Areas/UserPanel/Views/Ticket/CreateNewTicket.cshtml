@@ -70,15 +70,27 @@
                                 <span asp-validation-for="Attachment" class="text-danger font-size-11 mt-1 d-block"></span>
                             </div>
 
-                            <div class="col-12 text-start mt-4">
-                                <a asp-area="UserPanel" asp-controller="Ticket" asp-action="TicketsList" class="btn btn-outline-secondary btn-sm px-4 font-size-13 me-2">
-                                    انصراف و بازگشت
-                                </a>
-                                <button class="btn-submit btn btn-dark btn-sm px-4 font-size-13" type="submit">
-                                    <i class="mdi mdi-check me-1"></i> ثبت و ارسال تیکت
-                                </button>
-                            </div>
+                            <div class="col-12 mt-4">
+                                <!-- flex-column-reverse ensures the dark submit button is on top on mobile viewports -->
+                                <div class="d-flex flex-column-reverse flex-sm-row justify-content-start gap-2">
 
+                                    <a asp-area="UserPanel" asp-controller="Ticket" asp-action="TicketsList"
+                                       class="btn btn-outline-secondary btn-sm px-4 font-size-13 w-100 w-sm-auto custom-btn-height">
+                                        انصراف و بازگشت
+                                    </a>
+
+                                    <button class="btn-submit btn btn-dark btn-sm px-4 font-size-13 w-100 w-sm-auto custom-btn-height" type="submit" id="btnSubmitTicket">
+                                        <span class="btn-content-wrapper">
+                                            <i class="mdi mdi-check me-1"></i>
+                                            <span class="btn-text">ثبت و ارسال تیکت</span>
+                                        </span>
+                                        <span class="btn-spinner d-none">
+                                            <i class="mdi mdi-loading mdi-spin"></i>
+                                        </span>
+                                    </button>
+
+                                </div>
+                            </div>
                         </div>
                     </form>
                 </div>

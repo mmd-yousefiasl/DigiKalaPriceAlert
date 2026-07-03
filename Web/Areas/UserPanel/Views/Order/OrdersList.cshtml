@@ -62,7 +62,7 @@
                                 counter++;
                                 <tr>
                                     <td class="text-center text-muted">@counter</td>
-                                    <td class="text-muted">#@item.Id</td>
+                                    <td class="text-muted">@item.InvoiceId</td>
                                     <td class="text-muted">@item.PaidDate?.GetDateTime()</td>
                                     <td class="fw-medium text-dark">@item.PlanTitle</td>
                                     <td class="fw-bold text-dark">@item.PlanPrice?.ToToman()</td>
@@ -87,7 +87,7 @@
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <span class="fw-bold font-size-14 text-dark">@item.PlanPrice?.ToToman()</span>
                         <span class="badge bg-dark font-size-11 px-2 py-1">
-                            #@item.Id
+                            @item.InvoiceId
                         </span>
                     </div>
 

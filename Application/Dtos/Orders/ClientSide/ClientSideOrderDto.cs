@@ -5,5 +5,6 @@
         public decimal? PlanPrice { get; set; }
         public string? PlanTitle { get; set; }
         public DateTime? PaidDate { get; set; }
+        public string InvoiceId { get; set; }
     }
 }

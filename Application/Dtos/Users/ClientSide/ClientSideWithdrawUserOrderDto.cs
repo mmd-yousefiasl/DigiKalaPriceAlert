@@ -3,6 +3,6 @@
     public class ClientSideWithdrawUserOrderDto
     {
         public decimal Amount { get; set; }
-        public int OrderId { get; set; }
+        public string InvoiceId { get; set; }
     }
 }

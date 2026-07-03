@@ -2,7 +2,6 @@
 using Application.Dtos.BalanceTransaction.ClientSide;
 using Application.Dtos.Products.ClientSide;
 using Application.Dtos.Role.AdminSide;
-using Application.Dtos.SendSms.ClientSide;
 using Application.Dtos.Users.AdminSide;
 using Application.Dtos.Users.ClientSide;
 using Application.Dtos.UserValidation;
@@ -365,7 +364,7 @@ namespace Application.Services.Implementaions
                 Amount = dto.Amount,
                 TransId = null,
                 Type = BalanceTransactionTypeEnum.Debit,
-                Description = $"کاهش موجودی کیف پول جهت تسویه حساب سفارش #{dto.OrderId}"
+                Description = $"کاهش موجودی کیف پول جهت تسویه حساب سفارش {dto.InvoiceId}"
             });
 
             _context.Users.Update(user);

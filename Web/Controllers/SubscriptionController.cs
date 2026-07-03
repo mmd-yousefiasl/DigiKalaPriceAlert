@@ -57,10 +57,10 @@ namespace Web.Controllers
 
         [Authorize]
         [HttpGet("/subscription/invoice/{id}")]
-        public async Task<IActionResult> Invoice(int id)
+        public async Task<IActionResult> Invoice(string id)
         {
             ViewData["NoIndex"] = true;
-            if (id < 1)
+            if (string.IsNullOrWhiteSpace(id))
             {
                 return RedirectToAction(nameof(GetInvoice));
             }
@@ -116,7 +116,7 @@ namespace Web.Controllers
             var result = await _orderService.ClientSideVerifyOrder();
             if (result.IsFailure) return RedirectToAction(nameof(PaymentFailed));
 
-            return RedirectToAction(nameof(PaymentSuccess), new { orderId = result.Value });
+            return RedirectToAction(nameof(PaymentSuccess), new { id = result.Value });
         }
 
         [HttpGet("/subscription/pricing")]
@@ -126,11 +126,11 @@ namespace Web.Controllers
         }
 
         [Authorize]
-        [HttpGet("/subscription/payment/success")]
-        public IActionResult PaymentSuccess(int orderId)
+        [HttpGet("/subscription/payment/success/{id}")]
+        public IActionResult PaymentSuccess(string id)
         {
             ViewData["NoIndex"] = true;
-            return View(orderId);
+            return View(nameof(PaymentSuccess), id);
         }
 
         [Authorize]

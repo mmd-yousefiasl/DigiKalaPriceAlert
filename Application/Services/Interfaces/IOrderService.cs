@@ -7,17 +7,17 @@ namespace Application.Services.Interfaces
 {
     public interface IOrderService
     {
-        Task<Result<int>> ClientSideCreateNewPurchase(int planId);
+        Task<Result<string>> ClientSideCreateNewPurchase(int planId);
 
-        Task<Result<ClientSideInvoiceDto>> ClientSideGetInvoice(int orderId);
+        Task<Result<ClientSideInvoiceDto>> ClientSideGetInvoice(string invoiceId);
 
-        Task<Result<int>> ClientSideGetInvoiceId();
+        Task<Result<string>> ClientSideGetInvoiceId();
 
         Task<Result<ClientSideProceedToCheckoutDto>> ClientSideProceedToCheckout(bool useBalance);
 
         Task<Result> ClientSideCheckout(PaymentResultDto dto);
 
-        Task<Result<int>> ClientSideVerifyOrder();
+        Task<Result<string>> ClientSideVerifyOrder();
 
         Task<Result<ClientSideFilterOrdersDto>> ClientSideFilterOrders(ClientSideFilterOrdersDto filter);
 

@@ -20,6 +20,14 @@ namespace Data.Context.Configurations.Orders
                 .HasMaxLength(200)
                 .IsRequired(false);
 
+            builder.Property(o => o.InvoiceId)
+                .HasMaxLength(15)
+                .IsRequired(true);
+
+            builder.HasIndex(o => o.InvoiceId)
+                .HasFilter("\"InvoiceId\" IS NOT NULL")
+                .IsUnique();
+
             builder.HasOne(o => o.User)
                 .WithMany(u => u.Orders)
                 .HasForeignKey(o => o.UserId)

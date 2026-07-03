@@ -1,7 +1,8 @@
 ﻿namespace Application.Dtos.Orders.ClientSide
 {
-    public class ClientSideInvoiceDto : CommonDto
+    public class ClientSideInvoiceDto
     {
+        public string InvoiceId { get; set; }
         public decimal? PlanPrice { get; set; }
         public string? PlanTitle { get; set; }
         public string? ShortDescription { get; set; }

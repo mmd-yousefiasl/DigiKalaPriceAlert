@@ -10,6 +10,7 @@ namespace Domain.Models.Orders
         public decimal? PlanPrice { get; set; }
         public string? PlanTitle { get; set; }
         public DateTime? PaidDate { get; set; }
+        public string InvoiceId { get; set; }
 
         #region Relations
         public int SubscriptionPlanId { get; set; }

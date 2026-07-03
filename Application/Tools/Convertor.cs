@@ -58,15 +58,34 @@ namespace Application.Tools
             if (now > utcDateTime) return "منقضی شده";
 
             var timeSpan = utcDateTime - now;
+            var culture = new CultureInfo("fa-IR");
 
-            string result = timeSpan.TotalSeconds switch
+            if (timeSpan.TotalDays >= 1)
             {
-                < 3600 => $"{Math.Floor(timeSpan.TotalMinutes)} دقیقه",
-                < 86400 => $"{Math.Floor(timeSpan.TotalHours)} ساعت",
-                _ => $"{Math.Floor(timeSpan.TotalDays)} روز"
-            };
+                int days = (int)timeSpan.TotalDays;
+                int hours = timeSpan.Hours;
+                return hours > 0
+                    ? $"{days.ToString(culture)} روز و {hours.ToString(culture)} ساعت"
+                    : $"{days.ToString(culture)} روز";
+            }
 
-            return result;
+            if (timeSpan.TotalHours >= 1)
+            {
+                int hours = (int)timeSpan.TotalHours;
+                int minutes = timeSpan.Minutes;
+                return minutes > 0
+                    ? $"{hours.ToString(culture)} ساعت و {minutes.ToString(culture)} دقیقه"
+                    : $"{hours.ToString(culture)} ساعت";
+            }
+
+            int totalMinutes = (int)timeSpan.TotalMinutes;
+            int seconds = timeSpan.Seconds;
+
+            if (totalMinutes == 0) return $"{seconds.ToString(culture)} ثانیه";
+
+            return seconds > 0
+                ? $"{totalMinutes.ToString(culture)} دقیقه و {seconds.ToString(culture)} ثانیه"
+                : $"{totalMinutes.ToString(culture)} دقیقه";
         }
 
         public static string ToPersianRelativeTime(this DateTime utcDateTime)

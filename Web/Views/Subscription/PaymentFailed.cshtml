@@ -113,21 +113,21 @@
     <div class="payment-status-card">
         <div class="status-icon-box failed">✕</div>
 
-        <h2 class="failed-title">عملیات پرداخت ناموفق بود!</h2>
-        <p>متاسفانه تراکنش بانکی شما تکمیل نشد یا توسط کاربر لغو گردید.</p>
+        <h2 class="failed-title">پرداخت شما انجام نشد</h2>
+        <p>متأسفانه تراکنش بانکی با خطا مواجه شد و فرآیند خرید اشتراک تکمیل نگردید.</p>
 
         <div class="error-notice-box">
-            ⚠️ <strong>علت احتمالی:</strong>
-            @(TempData["ErrorMessage"] ?? "انصراف از پرداخت، عدم تکافوی موجودی یا اختلال در سوییچ شبکه بانکی.")
+            ⚠️ <strong>جزئیات خطا:</strong>
+            @(TempData["ErrorMessage"] ?? "انصراف کاربر، موجودی ناکافی یا بروز اختلال موقت در درگاه بانکی.")
         </div>
 
         <a asp-area="" asp-controller="Subscription" asp-action="GetInvoice" class="btn-payment-action failed-btn">
-            🔄 تلاش مجدد و بررسی فاکتور
+            🔄 پرداخت مجدد فاکتور
         </a>
 
         <div>
             <a asp-area="" asp-controller="Subscription" asp-action="Pricing" class="back-to-plans-link">
-                ← بازگشت به جدول پلن‌های اشتراک
+                ← مشاهده و تغییر پلن‌های اشتراک
             </a>
         </div>
     </div>
