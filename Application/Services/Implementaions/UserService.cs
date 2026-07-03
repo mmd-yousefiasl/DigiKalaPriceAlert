@@ -95,11 +95,12 @@ namespace Application.Services.Implementaions
 
             if (validation.HasActiveCode == false && !string.IsNullOrWhiteSpace(validation.Code))
             {
-                var smsResult = await _sendSmsService.ClientSideSendLoginCode(new ClientSideSendLoginCodeDto()
-                {
-                    Code = validation.Code,
-                    Mobile = loginUser.Mobile
-                });
+                /*                var smsResult = await _sendSmsService.ClientSideSendLoginCode(new ClientSideSendLoginCodeDto()
+                                {
+                                    Code = validation.Code,
+                                    Mobile = loginUser.Mobile
+                                });*/
+                Console.WriteLine(validation.Code);
             }
 
             return validation.CreatedDate;

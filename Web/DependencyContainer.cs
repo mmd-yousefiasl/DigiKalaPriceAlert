@@ -40,7 +40,9 @@ namespace Web
                 {
                     return new HttpClientHandler
                     {
-                        Proxy = new WebProxy("socks5://127.0.0.1:10809"),
+                        UseCookies = true,
+                        CookieContainer = new CookieContainer(),
+                        Proxy = new WebProxy("socks5://127.0.0.1:10808"),
                         UseProxy = false,
                         AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
                     };

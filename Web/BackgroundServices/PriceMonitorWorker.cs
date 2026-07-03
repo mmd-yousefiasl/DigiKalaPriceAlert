@@ -27,15 +27,31 @@ namespace Web.BackgroundServices
         {
             _logger.LogInformation("Price Monitor Worker Started...");
 
+            // Define your fixed execution window interval
+            TimeSpan cycleInterval = TimeSpan.FromMinutes(20);
+
             while (!stoppingToken.IsCancellationRequested)
             {
+                var watch = System.Diagnostics.Stopwatch.StartNew();
                 try
                 {
                     _logger.LogInformation("Starting a new price monitoring cycle at: {Time}", DateTimeOffset.Now);
                     await RunMonitoringCycleAsync(stoppingToken);
 
-                    _logger.LogInformation("Monitoring cycle finished. Sleeping for 20 min's...");
-                    await Task.Delay(TimeSpan.FromMinutes(20), stoppingToken);
+                    watch.Stop();
+
+                    // Calculate how long to sleep so the NEXT cycle starts exactly 20 minutes from now
+                    TimeSpan executionTime = watch.Elapsed;
+                    TimeSpan sleepTime = cycleInterval > executionTime ? cycleInterval - executionTime : TimeSpan.Zero;
+
+                    _logger.LogInformation("Cycle finished in {Duration} mins. Sleeping for {Sleep} mins...",
+                        executionTime.TotalMinutes.ToString("F1"),
+                        sleepTime.TotalMinutes.ToString("F1"));
+
+                    if (sleepTime > TimeSpan.Zero)
+                    {
+                        await Task.Delay(sleepTime, stoppingToken);
+                    }
                 }
                 catch (OperationCanceledException)
                 {
@@ -44,11 +60,11 @@ namespace Web.BackgroundServices
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, "An error occurred during the price monitoring cycle.");
-
                     await Task.Delay(TimeSpan.FromMinutes(5), stoppingToken);
                 }
             }
         }
+
 
         private async Task RunMonitoringCycleAsync(CancellationToken stoppingToken)
         {
@@ -103,7 +119,17 @@ namespace Web.BackgroundServices
                     await Task.Delay(delay, stoppingToken);
 
                     var scrapResult = await scraperService.GetProductDetails(product.DigiKalaId);
-                    if (scrapResult.IsFailure) continue;
+
+                    if (scrapResult.IsFailure)
+                    {
+                        // If the failure is due to a rate limit or firewall, KILL the loop immediately.
+                        if (scrapResult.Message!.Contains("RATE_LIMITED"))
+                        {
+                            _logger.LogCritical("Aborting monitoring loop prematurely to safeguard system IP.");
+                            break;
+                        }
+                        continue;
+                    }
 
                     decimal newPrice = scrapResult.Value.Price;
                     decimal oldPrice = product.NewPrice;
