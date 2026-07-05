@@ -49,5 +49,9 @@
         #region CacheManager
         public static int CachesDefaultExpirationTimeInMinutes { get; set; }
         #endregion
+
+        #region Mediator
+        public static string MediatorLicenceKey { get; set; }
+        #endregion
     }
 }

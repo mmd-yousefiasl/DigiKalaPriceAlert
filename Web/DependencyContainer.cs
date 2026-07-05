@@ -33,10 +33,13 @@ namespace Web
             });
             #endregion
 
+            #region Singleton Services  
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddSingleton<ISmsQueue, SmsQueue>();
             services.AddSingleton<ICacheManager, CacheManager>();
+            #endregion
 
+            #region HttpClient Services
             services.AddHttpClient<IDigiKalaService, DigiKalaService>()
                 .ConfigurePrimaryHttpMessageHandler(() =>
                 {
@@ -49,7 +52,9 @@ namespace Web
                         AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
                     };
                 });
+            #endregion
 
+            #region Scoped Services
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IRoleService, RoleService>();
             services.AddScoped<IPermissionService, PermissionService>();
@@ -72,9 +77,12 @@ namespace Web
             services.AddScoped<ISmsPanelService, SmsPanelService>();
             services.AddScoped<ISendSmsService, SendSmsService>();
             services.AddScoped<IMediatorHandler, MediatorHandler>();
+            #endregion
 
+            #region Background Services
             services.AddHostedService<PriceMonitorWorker>();
             services.AddHostedService<SmsConsumerWorker>();
+            #endregion
         }
     }
 }

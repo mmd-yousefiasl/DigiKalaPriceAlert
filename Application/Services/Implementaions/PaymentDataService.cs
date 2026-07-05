@@ -1,7 +1,9 @@
 ﻿using Application.Dtos.PaymentData;
+using Application.Mediator;
 using Application.Services.Interfaces;
 using Application.Tools;
 using Data.Context;
+using Domain.Events.PaymentData;
 using Domain.Shared;
 using Domain.Statics;
 using Microsoft.EntityFrameworkCore;
@@ -13,12 +15,18 @@ namespace Application.Services.Implementaions
     {
         #region Fields
         private readonly DigiKalaPriceAlertDbContext _context;
+        private readonly IMediatorHandler _mediator;
+        private readonly ICacheManager _cacheManager;
         #endregion
 
         #region Ctor
-        public PaymentDataService(DigiKalaPriceAlertDbContext context)
+        public PaymentDataService(DigiKalaPriceAlertDbContext context,
+            IMediatorHandler mediator,
+            ICacheManager cacheManager)
         {
             _context = context;
+            _mediator = mediator;
+            _cacheManager = cacheManager;
         }
         #endregion
 
@@ -61,29 +69,51 @@ namespace Application.Services.Implementaions
             _context.PaymentData.Update(data);
             await _context.SaveChangesAsync();
 
+            PaymentDataUpdatedEvent PaymentDataUpdatedEvent = new PaymentDataUpdatedEvent(
+            data.Id,
+            data.PaymentGatewayPin,
+            data.FileName,
+            data.Url);
+
+            await _mediator.PublishEvent(PaymentDataUpdatedEvent);
+
             return Result.Success();
         }
 
         public async Task<Result<ClientSidePaymentDataLogoDto>> ClientSideGetPaymentDataLogo()
         {
-            var data = await _context.PaymentData.Where(n => n.Id == 1).AsNoTracking().FirstOrDefaultAsync();
+            var data = await _cacheManager.GetAsync(CacheKeys.PaymentDataCacheKey, async () =>
+            {
+                return await _context.PaymentData
+                .AsNoTracking()
+                .Where(n => n.Id == 1)
+                .FirstOrDefaultAsync();
+            });
+
             if (data is null)
                 return Result.Failure<ClientSidePaymentDataLogoDto>(Messages.OperationFailedError);
 
             return new ClientSidePaymentDataLogoDto()
             {
-                FileName = data.FileName,
-                Url = data.Url
+                FileName = data.FileName ?? string.Empty,
+                Url = data.Url ?? string.Empty
             };
         }
 
         public async Task<Result<string>> GetPin()
         {
-            var data = await _context.PaymentData.Where(n => n.Id == 1).AsNoTracking().FirstOrDefaultAsync();
+            var data = await _cacheManager.GetAsync(CacheKeys.PaymentDataCacheKey, async () =>
+            {
+                return await _context.PaymentData
+                .AsNoTracking()
+                .Where(n => n.Id == 1)
+                .FirstOrDefaultAsync();
+            });
             if (data is null)
                 return Result.Failure<string>(Messages.OperationFailedError);
 
-            if (string.IsNullOrWhiteSpace(data.PaymentGatewayPin)) return Result.Failure<string>(Messages.OperationFailedError);
+            if (string.IsNullOrWhiteSpace(data.PaymentGatewayPin))
+                return Result.Failure<string>(Messages.OperationFailedError);
 
             return data.PaymentGatewayPin;
         }

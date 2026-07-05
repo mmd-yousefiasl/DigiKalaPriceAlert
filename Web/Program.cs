@@ -1,3 +1,4 @@
+using Application.Mediator;
 using Domain.Statics;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Diagnostics;
@@ -13,11 +14,11 @@ try
 {
     var builder = WebApplication.CreateBuilder(args);
 
-    // MVC
     builder.Services.AddControllersWithViews();
 
-    // SiteTools
+    #region SiteTools
     builder.Configuration.GetSection("SiteTools").Get<SiteTools>();
+    #endregion
 
     #region Data protection
     builder.Services.AddDataProtection()
@@ -28,19 +29,38 @@ try
             int.Parse(builder.Configuration.GetSection("MachineKeyLifetime").Value)));
     #endregion
 
-    // Authentication
+    #region Authentication
     builder.ConfigAuthentication();
+    #endregion
 
-    // Dependencies
+    #region Dependencies
     var connectionString = builder.Configuration.GetConnectionString("LocalConnectionString");
     DependencyContainer.RegisterDependencies(builder.Services, connectionString);
+    #endregion
 
-    // Logging
+    #region MediatR
+    builder.Services.AddMediatR(config =>
+    {
+        config.RegisterServicesFromAssembly(typeof(IMediatorHandler).Assembly);
+        config.LicenseKey = SiteTools.MediatorLicenceKey;
+    });
+    #endregion
+
+    #region Caching
+    builder.Services.AddEasyCaching(options =>
+    {
+        options.UseInMemory();
+    });
+    #endregion
+
+    #region Logging
     builder.Logging.ClearProviders();
     builder.Host.UseSerilog((ctx, lc) => lc.ReadFrom.Configuration(ctx.Configuration));
+    #endregion
 
-    // Compression
+    #region Compression
     builder.Services.AddResponseCompression();
+    #endregion
 
     var app = builder.Build();
 
