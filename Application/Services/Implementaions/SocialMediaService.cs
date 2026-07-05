@@ -1,8 +1,10 @@
 ﻿using Application.Dtos.Media.AdminSide;
 using Application.Dtos.Media.ClientSide;
+using Application.Mediator;
 using Application.Services.Interfaces;
 using Application.Tools;
 using Data.Context;
+using Domain.Events.SocialMedia;
 using Domain.Models.Media;
 using Domain.Shared;
 using Domain.Statics;
@@ -14,12 +16,18 @@ namespace Application.Services.Implementaions
     {
         #region Fields
         private readonly DigiKalaPriceAlertDbContext _context;
+        private readonly IMediatorHandler _mediator;
+        private readonly ICacheManager _cacheManager;
         #endregion
 
         #region Ctor
-        public SocialMediaService(DigiKalaPriceAlertDbContext context)
+        public SocialMediaService(DigiKalaPriceAlertDbContext context,
+            IMediatorHandler mediator,
+            ICacheManager cacheManager)
         {
             _context = context;
+            _mediator = mediator;
+            _cacheManager = cacheManager;
         }
         #endregion
 
@@ -44,6 +52,15 @@ namespace Application.Services.Implementaions
             _context.SocialMedia.Add(media);
             await _context.SaveChangesAsync();
 
+            SocialMediaCreatedEvent SocialMediaCreatedEvent = new SocialMediaCreatedEvent(
+            media.FileName,
+            media.Title,
+            media.Url,
+            media.Priority,
+            media.IsPublished);
+
+            await _mediator.PublishEvent(SocialMediaCreatedEvent);
+
             return Result.Success();
         }
 
@@ -58,6 +75,10 @@ namespace Application.Services.Implementaions
 
             _context.SocialMedia.Remove(media);
             await _context.SaveChangesAsync();
+
+            SocialMediaDeletedEvent SocialMediaDeletedEvent = new SocialMediaDeletedEvent(media.Id);
+
+            await _mediator.PublishEvent(SocialMediaDeletedEvent);
 
             return Result.Success();
         }
@@ -144,18 +165,32 @@ namespace Application.Services.Implementaions
             _context.SocialMedia.Update(media);
             await _context.SaveChangesAsync();
 
+            SocialMediaUpdatedEvent SocialMediaUpdatedEvent = new SocialMediaUpdatedEvent(
+            media.Id,
+            media.FileName,
+            media.Title,
+            media.Url,
+            media.Priority,
+            media.IsPublished);
+
+            await _mediator.PublishEvent(SocialMediaUpdatedEvent);
+
             return Result.Success();
         }
 
         public async Task<Result<List<ClientSideSocialMediaDto>>> ClientSideGetSocialMedia()
         {
-            var media = await _context.SocialMedia.Where(n => n.IsPublished).OrderBy(n => n.Priority)
+            var media = await _cacheManager.GetAsync(CacheKeys.SocialMediaCacheKey, async () =>
+            {
+                return await _context.SocialMedia.Where(n => n.IsPublished).OrderBy(n => n.Priority)
                 .Select(n => new ClientSideSocialMediaDto()
                 {
                     FileName = n.FileName,
                     Title = n.Title,
                     Url = n.Url
                 }).AsNoTracking().ToListAsync();
+            });
+
             if (!media?.Any() ?? true)
                 return Result.Failure<List<ClientSideSocialMediaDto>>(Messages.OperationFailedError);
 
