@@ -1,4 +1,5 @@
-﻿using Application.Services.Implementaions;
+﻿using Application.Mediator;
+using Application.Services.Implementaions;
 using Application.Services.Implementations;
 using Application.Services.Interfaces;
 using Data.Context;
@@ -34,6 +35,7 @@ namespace Web
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddSingleton<ISmsQueue, SmsQueue>();
+            services.AddSingleton<ICacheManager, CacheManager>();
 
             services.AddHttpClient<IDigiKalaService, DigiKalaService>()
                 .ConfigurePrimaryHttpMessageHandler(() =>
@@ -69,6 +71,7 @@ namespace Web
             services.AddScoped<ISiteMapService, SiteMapService>();
             services.AddScoped<ISmsPanelService, SmsPanelService>();
             services.AddScoped<ISendSmsService, SendSmsService>();
+            services.AddScoped<IMediatorHandler, MediatorHandler>();
 
             services.AddHostedService<PriceMonitorWorker>();
             services.AddHostedService<SmsConsumerWorker>();

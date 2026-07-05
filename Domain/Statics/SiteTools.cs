@@ -2,6 +2,7 @@
 {
     public class SiteTools
     {
+        #region GeneralInfo
         public static string SiteUrl { get; set; }
 
         public static string ENemadUrl { get; set; }
@@ -12,18 +13,23 @@
 
         public static string SiteName { get; set; }
 
-        public static string BlogFile { get; set; }
-
         public static string DefaultImage { get; set; }
 
-        public static string SocialMediaFile { get; set; }
-
         public static string PaymentLogo { get; set; }
+        #endregion
 
+        #region Blog
+        public static string BlogFile { get; set; }
+        #endregion
+
+        #region Social Media
+        public static string SocialMediaFile { get; set; }
+        #endregion
+
+        #region  Price Monitor
         public static int MaximumProductCount { get; set; }
-
         public static int PriceMonitorBatchSize { get; set; }
-
+        #endregion
 
         #region Tickets
         public static int MaxTicketAttachmentLength { get; set; }
@@ -38,6 +44,10 @@
         public static string StartPaymentURL { get; set; }
         public static string VerifyPaymentURL { get; set; }
 
+        #endregion
+
+        #region CacheManager
+        public static int CachesDefaultExpirationTimeInMinutes { get; set; }
         #endregion
     }
 }
