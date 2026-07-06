@@ -2,9 +2,11 @@
 using Application.Dtos.Blog.ClientSide;
 using Application.Dtos.BlogCategory.AdminSide;
 using Application.Dtos.BlogCategory.ClientSide;
+using Application.Mediator;
 using Application.Services.Interfaces;
 using Application.Tools;
 using Data.Context;
+using Domain.Events.Blogs;
 using Domain.Models.Blogs;
 using Domain.Shared;
 using Domain.Statics;
@@ -18,14 +20,20 @@ namespace Application.Services.Implementaions
         #region Fields
         private readonly DigiKalaPriceAlertDbContext _context;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IMediatorHandler _mediator;
+        private readonly ICacheManager _cacheManager;
         #endregion
 
         #region Ctor
         public BlogService(DigiKalaPriceAlertDbContext context,
-            IHttpContextAccessor httpContextAccessor)
+            IHttpContextAccessor httpContextAccessor,
+            IMediatorHandler mediator,
+            ICacheManager cacheManager)
         {
             _context = context;
             _httpContextAccessor = httpContextAccessor;
+            _mediator = mediator;
+            _cacheManager = cacheManager;
         }
         #endregion
 
@@ -59,6 +67,19 @@ namespace Application.Services.Implementaions
             _context.Blogs.Add(blog);
             await _context.SaveChangesAsync();
 
+            BlogCreatedEvent BlogCreatedEvent = new BlogCreatedEvent(
+            blog.FileName,
+            blog.Title,
+            blog.Slug,
+            blog.Description,
+            blog.Writer,
+            blog.StudyTime,
+            blog.Priority,
+            blog.IsPublished,
+            blog.CategoryId);
+
+            await _mediator.PublishEvent(BlogCreatedEvent);
+
             return Result.Success();
         }
 
@@ -73,6 +94,10 @@ namespace Application.Services.Implementaions
 
             _context.Blogs.Remove(blog);
             await _context.SaveChangesAsync();
+
+            BlogDeletedEvent BlogDeletedEvent = new BlogDeletedEvent(blog.Id);
+
+            await _mediator.PublishEvent(BlogDeletedEvent);
 
             return Result.Success();
         }
@@ -178,6 +203,20 @@ namespace Application.Services.Implementaions
             _context.Blogs.Update(blog);
             await _context.SaveChangesAsync();
 
+            BlogUpdatedEvent BlogUpdatedEvent = new BlogUpdatedEvent(
+            blog.Id,
+            blog.FileName,
+            blog.Title,
+            blog.Slug,
+            blog.Description,
+            blog.Writer,
+            blog.StudyTime,
+            blog.Priority,
+            blog.IsPublished,
+            blog.CategoryId);
+
+            await _mediator.PublishEvent(BlogUpdatedEvent);
+
             return Result.Success();
         }
 
@@ -242,7 +281,13 @@ namespace Application.Services.Implementaions
         {
             if (take < 1) return Result.Failure<List<ClientSideBlogDto>>(Messages.OperationFailedError);
 
-            var blogs = await _context.Blogs.Where(n => n.IsPublished).OrderBy(n => n.Priority).Take(take)
+            var blogs = await _cacheManager.GetAsync(CacheKeys.BlogCacheKey, async () =>
+            {
+                return await _context.Blogs
+                .AsNoTracking()
+                .Where(n => n.IsPublished)
+                .OrderBy(n => n.Priority)
+                .Take(take)
                 .Select(n => new ClientSideBlogDto()
                 {
                     Id = n.Id,
@@ -250,8 +295,10 @@ namespace Application.Services.Implementaions
                     Slug = n.Slug,
                     CreatedDate = n.CreatedDate,
                     FileName = n.FileName
-                }).AsNoTracking().ToListAsync();
-            if (!blogs.Any())
+                }).ToListAsync();
+            });
+
+            if (!blogs?.Any() ?? true)
                 return Result.Failure<List<ClientSideBlogDto>>(Messages.OperationFailedError);
 
             return blogs;
