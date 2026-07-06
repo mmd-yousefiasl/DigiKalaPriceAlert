@@ -6,6 +6,7 @@ using Application.Mediator;
 using Application.Services.Interfaces;
 using Application.Tools;
 using Data.Context;
+using Domain.Events.BlogCategories;
 using Domain.Events.Blogs;
 using Domain.Models.Blogs;
 using Domain.Shared;
@@ -358,6 +359,14 @@ namespace Application.Services.Implementaions
             _context.BlogCategories.Add(category);
             await _context.SaveChangesAsync();
 
+            BlogCategoryCreatedEvent BlogCategoryCreatedEvent = new BlogCategoryCreatedEvent(
+            category.Title,
+            category.Slug,
+            category.Priority,
+            category.IsPublished);
+
+            await _mediator.PublishEvent(BlogCategoryCreatedEvent);
+
             return Result.Success();
         }
 
@@ -375,6 +384,10 @@ namespace Application.Services.Implementaions
 
             _context.BlogCategories.Remove(category);
             await _context.SaveChangesAsync();
+
+            BlogCategoryDeletedEvent BlogCategoryDeletedEvent = new BlogCategoryDeletedEvent(category.Id);
+
+            await _mediator.PublishEvent(BlogCategoryDeletedEvent);
 
             return Result.Success();
         }
@@ -448,12 +461,23 @@ namespace Application.Services.Implementaions
             _context.BlogCategories.Update(category);
             await _context.SaveChangesAsync();
 
+            BlogCategoryUpdatedEvent BlogCategoryUpdatedEvent = new BlogCategoryUpdatedEvent(
+            category.Id,
+            category.Title,
+            category.Slug,
+            category.Priority,
+            category.IsPublished);
+
+            await _mediator.PublishEvent(BlogCategoryUpdatedEvent);
+
             return Result.Success();
         }
 
         public async Task<Result<List<ClientSideBlogCategoryDto>>> ClientSideGetCategories()
         {
-            var categories = await _context.BlogCategories
+            var categories = await _cacheManager.GetAsync(CacheKeys.BlogCategoryCacheKey, async () =>
+            {
+                return await _context.BlogCategories
                 .AsNoTracking()
                 .Where(n => n.IsPublished)
                 .OrderBy(n => n.Priority)
@@ -463,6 +487,7 @@ namespace Application.Services.Implementaions
                     Title = n.Title,
                     Slug = n.Slug,
                 }).ToListAsync();
+            });
 
             if (!categories?.Any() ?? true)
                 return Result.Failure<List<ClientSideBlogCategoryDto>>(Messages.OperationFailedError);
