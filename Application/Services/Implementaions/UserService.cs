@@ -47,7 +47,10 @@ namespace Application.Services.Implementaions
 
         public async Task<bool> CheckUserRoleIds(int userId, List<int> roleIds)
         {
-            if (await _context.Users.AnyAsync(user => user.Id == userId && user.UserRoleMapping.Any(mapping => roleIds.Contains(mapping.RoleId))))
+            if (await _context.Users
+                .AnyAsync(user => user.Id == userId && user.UserRoleMapping
+                .Any(mapping => roleIds
+                .Contains(mapping.RoleId))))
                 return true;
 
             return false;

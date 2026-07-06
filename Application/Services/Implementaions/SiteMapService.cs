@@ -1,9 +1,11 @@
 ﻿using Application.Dtos.SiteMap.AdminSide;
 using Application.Dtos.SiteMap.ClientSide;
+using Application.Mediator;
 using Application.Services.Interfaces;
 using Application.Tools;
 using Data.Context;
 using Domain.Enums.GeneralInfo;
+using Domain.Events.SiteMap;
 using Domain.Models.GeneralInfo;
 using Domain.Shared;
 using Domain.Statics;
@@ -16,14 +18,20 @@ namespace Application.Services.Implementaions
         #region Fields
         private readonly DigiKalaPriceAlertDbContext _context;
         private readonly IBlogService _blogService;
+        private readonly IMediatorHandler _mediator;
+        private readonly ICacheManager _cacheManger;
         #endregion
 
         #region Ctor
         public SiteMapService(DigiKalaPriceAlertDbContext context,
-            IBlogService blogService)
+            IBlogService blogService,
+            IMediatorHandler mediator,
+            ICacheManager cacheManager)
         {
             _context = context;
             _blogService = blogService;
+            _mediator = mediator;
+            _cacheManger = cacheManager;
         }
         #endregion
 
@@ -43,6 +51,15 @@ namespace Application.Services.Implementaions
             _context.SiteMap.Add(map);
             await _context.SaveChangesAsync();
 
+            SiteMapCreatedEvent SiteMapCreatedEvent = new SiteMapCreatedEvent(
+            map.Url,
+            map.ChangeFreq,
+            map.Priority,
+            map.IsDeleted,
+            map.Type);
+
+            await _mediator.PublishEvent(SiteMapCreatedEvent);
+
             return Result.Success();
         }
 
@@ -55,6 +72,10 @@ namespace Application.Services.Implementaions
 
             _context.SiteMap.Remove(map);
             await _context.SaveChangesAsync();
+
+            SiteMapDeletedEvent SiteMapDeletedEvent = new SiteMapDeletedEvent(map.Id);
+
+            await _mediator.PublishEvent(SiteMapDeletedEvent);
 
             return Result.Success();
         }
@@ -143,6 +164,16 @@ namespace Application.Services.Implementaions
             _context.SiteMap.Update(map);
             await _context.SaveChangesAsync();
 
+            SiteMapUpdatedEvent SiteMapUpdatedEvent = new SiteMapUpdatedEvent(
+            map.Id,
+            map.Url,
+            map.ChangeFreq,
+            map.Priority,
+            map.IsDeleted,
+            map.Type);
+
+            await _mediator.PublishEvent(SiteMapUpdatedEvent);
+
             return Result.Success();
         }
 
@@ -154,16 +185,32 @@ namespace Application.Services.Implementaions
             _context.SiteMap.RemoveRange(maps);
             await _context.SaveChangesAsync();
 
+            foreach (var item in maps)
+            {
+                SiteMapDeletedEvent SiteMapDeletedEvent = new SiteMapDeletedEvent(item.Id);
+
+                await _mediator.PublishEvent(SiteMapDeletedEvent);
+            }
+
             return Result.Success();
         }
 
         public async Task<Result> AdminSideDeleteAllExceptOtherPages()
         {
-            var maps = await _context.SiteMap.Where(n => n.Type != SiteMapTypeEnum.OtherPages).ToListAsync();
+            var maps = await _context.SiteMap
+                .Where(n => n.Type != SiteMapTypeEnum.OtherPages)
+                .ToListAsync();
             if (!maps.Any()) return Result.Failure(Messages.OperationFailedError);
 
             _context.SiteMap.RemoveRange(maps);
             await _context.SaveChangesAsync();
+
+            foreach (var item in maps)
+            {
+                SiteMapDeletedEvent SiteMapDeletedEvent = new SiteMapDeletedEvent(item.Id);
+
+                await _mediator.PublishEvent(SiteMapDeletedEvent);
+            }
 
             return Result.Success();
         }
@@ -182,7 +229,6 @@ namespace Application.Services.Implementaions
                 using var transaction = await _context.Database.BeginTransactionAsync();
                 try
                 {
-                    // Efficient Bulk Delete directly on Postgres (No in-memory loading)
                     await _context.SiteMap
                         .Where(n => n.Type == SiteMapTypeEnum.BlogCategory)
                         .ExecuteDeleteAsync();
@@ -200,6 +246,17 @@ namespace Application.Services.Implementaions
                     await _context.SaveChangesAsync();
 
                     await transaction.CommitAsync();
+
+                    SiteMapUpdatedEvent SiteMapUpdatedEvent = new SiteMapUpdatedEvent(
+                    1,
+                    "some mock test",
+                    ChangeFreqEnum.Weekly,
+                    1,
+                    true,
+                    SiteMapTypeEnum.BlogCategory);
+
+                    await _mediator.PublishEvent(SiteMapUpdatedEvent);
+
                     return Result.Success();
                 }
                 catch (Exception)
@@ -242,6 +299,17 @@ namespace Application.Services.Implementaions
                     await _context.SaveChangesAsync();
 
                     await transaction.CommitAsync();
+
+                    SiteMapUpdatedEvent SiteMapUpdatedEvent = new SiteMapUpdatedEvent(
+                    1,
+                    "some mock test",
+                    ChangeFreqEnum.Weekly,
+                    1,
+                    true,
+                    SiteMapTypeEnum.Blog);
+
+                    await _mediator.PublishEvent(SiteMapUpdatedEvent);
+
                     return Result.Success();
                 }
                 catch (Exception)
@@ -260,19 +328,35 @@ namespace Application.Services.Implementaions
             var blogResult = await UpdateBlogsSiteMap();
             if (blogResult.IsFailure) return Result.Failure(Messages.UpdateBlogSiteMapError);
 
+            SiteMapUpdatedEvent SiteMapUpdatedEvent = new SiteMapUpdatedEvent(
+            1,
+            "some mock test",
+            ChangeFreqEnum.Weekly,
+            1,
+            true,
+            SiteMapTypeEnum.OtherPages);
+
+            await _mediator.PublishEvent(SiteMapUpdatedEvent);
+
             return Result.Success();
         }
 
         public async Task<Result<List<ClientSideSiteMapDto>>> ClientSideGetSiteMap()
         {
-            var maps = await _context.SiteMap.Where(n => n.IsPublished).OrderByDescending(n => n.Priority)
+            var maps = await _cacheManger.GetAsync(CacheKeys.SiteMapCacheKey, async () =>
+            {
+                return await _context.SiteMap
+                .AsNoTracking()
+                .Where(n => n.IsPublished)
+                .OrderByDescending(n => n.Priority)
                 .Select(n => new ClientSideSiteMapDto()
                 {
                     Url = n.Url,
                     LastUpdateDate = n.LastUpdatedDate,
                     ChangeFreq = n.ChangeFreq,
                     Priority = n.Priority
-                }).AsNoTracking().ToListAsync();
+                }).ToListAsync();
+            });
 
             if (!maps?.Any() ?? true)
                 return Result.Failure<List<ClientSideSiteMapDto>>(Messages.OperationFailedError);

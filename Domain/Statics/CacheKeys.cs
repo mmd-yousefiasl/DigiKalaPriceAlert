@@ -6,5 +6,6 @@
         public const string SocialMediaCacheKey = "SocialMedia";
         public const string BlogCacheKey = "Blog";
         public const string BlogCategoryCacheKey = "BlogCategory";
+        public const string SiteMapCacheKey = "SiteMap";
     }
 }

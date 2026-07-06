@@ -31,7 +31,11 @@ namespace Application.Services.Implementaions
             if (await _userService.IsSuperAdmin(userId))
                 return true;
 
-            var roleIds = await _context.Roles.Where(role => role.RolePermissionMapping.Any(mapping => mapping.Permission.UniqueName == permission)).Select(n => n.Id).ToListAsync();
+            var roleIds = await _context.Roles
+                .Where(role => role.RolePermissionMapping
+                .Any(mapping => mapping.Permission.UniqueName == permission))
+                .Select(n => n.Id)
+                .ToListAsync();
             if (!roleIds?.Any() ?? true) return Result.Failure<bool>(Messages.OperationFailedError);
 
             return await _userService.CheckUserRoleIds(userId, roleIds);
