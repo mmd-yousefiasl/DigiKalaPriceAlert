@@ -29,25 +29,42 @@ namespace Web.TagHelpers
         [HtmlAttributeName("permission")]
         public string PermissionName { get; set; }
 
-        public override void Process(TagHelperContext context, TagHelperOutput output)
+        public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
         {
-            if (!ViewContextData.HttpContext.User.Identity.IsAuthenticated)
+            if (!ViewContextData.HttpContext.User.Identity?.IsAuthenticated ?? true)
+            {
+                output.SuppressOutput();
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(PermissionName))
+            {
+                output.SuppressOutput();
+                return;
+            }
+
+            var permissions = PermissionName
+                .Split(new[] { "||" }, StringSplitOptions.RemoveEmptyEntries)
+                .Select(n => n.Trim())
+                .ToList();
+
+            if (!permissions.Any())
             {
                 output.SuppressOutput();
                 return;
             }
 
             var userId = ViewContextData.HttpContext.User.GetUserId();
-            var permissions = PermissionName
-                .Split("||")
-                .Select(n => n.Trim())
-                .ToList();
 
-            if (permissions == null || !permissions.Any())
-                return;
+            foreach (var permission in permissions)
+            {
+                var result = await _roleService.CheckUserAccess(userId, permission);
 
-            if (permissions.Any(permission => _roleService.CheckUserAccess(userId, permission).Result))
-                return;
+                if (result.IsSuccess)
+                {
+                    return;
+                }
+            }
 
             output.SuppressOutput();
         }

@@ -23,7 +23,7 @@ namespace Web.Attributes
                 var userId = context.HttpContext.User.GetUserId();
                 var userHasPermissionResult = await _roleService.UserCanAccessThisPermissions(userId, _permissionName);
 
-                if (userHasPermissionResult.IsFailure || userHasPermissionResult.Value == false)
+                if (userHasPermissionResult.IsFailure)
                 {
                     context.Result = new RedirectResult("/403");
                 }

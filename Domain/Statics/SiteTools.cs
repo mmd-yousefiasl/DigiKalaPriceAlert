@@ -48,6 +48,7 @@
 
         #region CacheManager
         public static int CachesDefaultExpirationTimeInMinutes { get; set; }
+        public static int UserPermissionCacheExpirationTimeInMinutes { get; set; }
         #endregion
 
         #region Mediator

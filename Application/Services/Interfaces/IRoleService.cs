@@ -5,9 +5,9 @@ namespace Application.Services.Interfaces
 {
     public interface IRoleService
     {
-        Task<Result<bool>> UserCanAccessThisPermissions(int userId, string permission);
+        Task<Result> UserCanAccessThisPermissions(int userId, string permission);
 
-        Task<bool> CheckUserAccess(int userId, string permission);
+        Task<Result> CheckUserAccess(int userId, string permission);
 
         Task<Result<List<AdminSideRoleDto>>> AdminSideGetAllRolesForUserCRUD();
 
@@ -20,5 +20,7 @@ namespace Application.Services.Interfaces
         Task<Result<AdminSideUpdateRoleDto>> AdminSideGetRoleForUpdate(int id);
 
         Task<Result> AdminSideUpdateRole(AdminSideUpdateRoleDto model);
+
+        Task<Result<List<int>>> GetRoleIdsForPermission(string permission);
     }
 }

@@ -6,10 +6,12 @@ using Application.Dtos.SendSms.ClientSide;
 using Application.Dtos.Users.AdminSide;
 using Application.Dtos.Users.ClientSide;
 using Application.Dtos.UserValidation;
+using Application.Mediator;
 using Application.Services.Interfaces;
 using Application.Tools;
 using Data.Context;
 using Domain.Enums.Users;
+using Domain.Events.Users;
 using Domain.Models.Users;
 using Domain.Shared;
 using Domain.Statics;
@@ -24,36 +26,73 @@ namespace Application.Services.Implementaions
         private protected DigiKalaPriceAlertDbContext _context;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ISendSmsService _sendSmsService;
+        private readonly IMediatorHandler _mediator;
+        private readonly ICacheManager _cacheManager;
         #endregion
 
         #region Ctor
         public UserService(DigiKalaPriceAlertDbContext context,
             IHttpContextAccessor httpContextAccessor,
-            ISendSmsService sendSmsService)
+            ISendSmsService sendSmsService,
+            IMediatorHandler mediator,
+            ICacheManager cacheManager)
         {
             _context = context;
             _httpContextAccessor = httpContextAccessor;
             _sendSmsService = sendSmsService;
+            _mediator = mediator;
+            _cacheManager = cacheManager;
         }
         #endregion
 
-        public async Task<bool> IsSuperAdmin(int userId)
+        public async Task<Result> IsSuperAdmin(int userId)
         {
-            if (await _context.Users.AnyAsync(user => user.Id == userId && user.UserRoleMapping.Any(mapping => mapping.RoleId == 1)))
-                return true;
+            var key = string.Format(CacheKeys.IsSuperAdminCacheKey, userId);
 
-            return false;
+            var result = await _cacheManager.GetAsync(key, async () =>
+            {
+                return await _context.Users
+                .AsNoTracking()
+                .AnyAsync(user => user.Id == userId && user.UserRoleMapping.Any(mapping => mapping.RoleId == 1));
+            }, TimeSpan.FromMinutes(SiteTools.UserPermissionCacheExpirationTimeInMinutes));
+
+            if (result)
+            {
+                return Result.Success();
+            }
+            else
+            {
+                return Result.Failure(Messages.OperationFailedError);
+            }
         }
 
-        public async Task<bool> CheckUserRoleIds(int userId, List<int> roleIds)
+        public async Task<Result> CheckUserRoleIds(int userId, List<int> roleIds)
         {
-            if (await _context.Users
-                .AnyAsync(user => user.Id == userId && user.UserRoleMapping
-                .Any(mapping => roleIds
-                .Contains(mapping.RoleId))))
-                return true;
+            if (!roleIds?.Any() ?? true)
+                return Result.Failure(Messages.OperationFailedError);
 
-            return false;
+            var key = string.Format(CacheKeys.UserRoleIdsCacheKey, userId);
+            var userRoleIds = await _cacheManager.GetAsync(key, async () =>
+            {
+                return await _context.UserRoleMapping
+                .AsNoTracking()
+                .Where(n => n.UserId == userId)
+                .Select(n => n.RoleId)
+                .ToListAsync();
+            }, TimeSpan.FromMinutes(SiteTools.UserPermissionCacheExpirationTimeInMinutes));
+
+            if (!userRoleIds?.Any() ?? true)
+                return Result.Failure(Messages.OperationFailedError);
+
+            var result = userRoleIds!.Any(roleId => roleIds!.Contains(roleId));
+            if (result)
+            {
+                return Result.Success();
+            }
+            else
+            {
+                return Result.Failure(Messages.OperationFailedError);
+            }
         }
 
         public async Task<Result<DateTime>> SendUserLoginCode(ClientSideLoginDto model)
@@ -213,6 +252,10 @@ namespace Application.Services.Implementaions
             _context.Users.Update(user);
             await _context.SaveChangesAsync();
 
+            UserDeletedEvent UserDeletedEvent = new UserDeletedEvent(user.Id);
+
+            await _mediator.PublishEvent(UserDeletedEvent);
+
             return Result.Success();
         }
 
@@ -267,6 +310,10 @@ namespace Application.Services.Implementaions
 
             _context.Users.Update(user);
             await _context.SaveChangesAsync();
+
+            UserUpdatedEvent UserUpdatedEvent = new UserUpdatedEvent(user.Id);
+
+            await _mediator.PublishEvent(UserUpdatedEvent);
 
             return Result.Success();
         }

@@ -10,9 +10,9 @@ namespace Application.Services.Interfaces
 {
     public interface IUserService
     {
-        Task<bool> IsSuperAdmin(int userId);
+        Task<Result> IsSuperAdmin(int userId);
 
-        Task<bool> CheckUserRoleIds(int userId, List<int> roleIds);
+        Task<Result> CheckUserRoleIds(int userId, List<int> roleIds);
 
         Task<Result<DateTime>> SendUserLoginCode(ClientSideLoginDto model);
 

@@ -1,9 +1,13 @@
-﻿using Application.Dtos.Role.AdminSide;
+﻿using Application.Dtos.Permission;
+using Application.Dtos.Role.AdminSide;
+using Application.Mediator;
 using Application.Services.Interfaces;
 using Application.Tools;
 using Data.Context;
+using Domain.Events.Roles;
 using Domain.Models.Identity;
 using Domain.Shared;
+using Domain.Statics;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Services.Implementaions
@@ -13,45 +17,53 @@ namespace Application.Services.Implementaions
         #region Fields
         private protected DigiKalaPriceAlertDbContext _context;
         private readonly IUserService _userService;
+        private readonly IMediatorHandler _mediator;
+        private readonly ICacheManager _cacheManager;
         #endregion
 
         #region Ctor
         public RoleService(DigiKalaPriceAlertDbContext context,
-            IUserService userService)
+            IUserService userService,
+            IMediatorHandler mediator,
+            ICacheManager cacheManager)
         {
             _context = context;
             _userService = userService;
+            _cacheManager = cacheManager;
+            _mediator = mediator;
         }
         #endregion
 
-        public async Task<Result<bool>> UserCanAccessThisPermissions(int userId, string permission)
+        public async Task<Result> UserCanAccessThisPermissions(int userId, string permission)
         {
-            if (userId < 1 || permission is null) return Result.Failure<bool>(Messages.OperationFailedError);
+            if (userId < 1 || string.IsNullOrWhiteSpace(permission))
+                return Result.Failure(Messages.OperationFailedError);
 
-            if (await _userService.IsSuperAdmin(userId))
-                return true;
+            var superAdminResult = await _userService.IsSuperAdmin(userId);
+            if (superAdminResult.IsSuccess)
+                return Result.Success();
 
-            var roleIds = await _context.Roles
-                .Where(role => role.RolePermissionMapping
-                .Any(mapping => mapping.Permission.UniqueName == permission))
-                .Select(n => n.Id)
-                .ToListAsync();
-            if (!roleIds?.Any() ?? true) return Result.Failure<bool>(Messages.OperationFailedError);
+            var roleIdsResult = await GetRoleIdsForPermission(permission);
+            if (roleIdsResult.IsFailure)
+                return Result.Failure(Messages.OperationFailedError);
 
-            return await _userService.CheckUserRoleIds(userId, roleIds);
+            return await _userService.CheckUserRoleIds(userId, roleIdsResult.Value);
         }
 
-        public async Task<bool> CheckUserAccess(int userId, string permission)
+        public async Task<Result> CheckUserAccess(int userId, string permission)
         {
-            if (userId < 1 || permission is null) return false;
+            if (userId < 1 || string.IsNullOrWhiteSpace(permission))
+                return Result.Failure(Messages.OperationFailedError);
 
-            if (await _userService.IsSuperAdmin(userId))
-                return true;
+            var superAdminResult = await _userService.IsSuperAdmin(userId);
+            if (superAdminResult.IsSuccess)
+                return Result.Success();
 
-            var roleIds = await _context.Roles.Where(role => role.RolePermissionMapping.Any(mapping => mapping.Permission.UniqueName == permission)).Select(n => n.Id).ToListAsync();
-            if (!roleIds?.Any() ?? true) return false;
+            var roleIdsResult = await GetRoleIdsForPermission(permission);
+            if (roleIdsResult.IsFailure)
+                return Result.Failure(Messages.OperationFailedError);
 
-            return await _userService.CheckUserRoleIds(userId, roleIds);
+            return await _userService.CheckUserRoleIds(userId, roleIdsResult.Value);
         }
 
         public async Task<Result<List<AdminSideRoleDto>>> AdminSideGetAllRolesForUserCRUD()
@@ -126,6 +138,12 @@ namespace Application.Services.Implementaions
             _context.Roles.Add(role);
             await _context.SaveChangesAsync();
 
+            RoleCreatedEvent RoleCreatedEvent = new RoleCreatedEvent(
+            role.Title,
+            role.UniqueName);
+
+            await _mediator.PublishEvent(RoleCreatedEvent);
+
             return Result.Success(Messages.SuccessfullyDone);
         }
 
@@ -141,6 +159,10 @@ namespace Application.Services.Implementaions
 
             _context.Roles.Update(role);
             await _context.SaveChangesAsync();
+
+            RoleDeletedEvent RoleDeletedEvent = new RoleDeletedEvent(role.Id);
+
+            await _mediator.PublishEvent(RoleDeletedEvent);
 
             return Result.Success();
         }
@@ -198,7 +220,49 @@ namespace Application.Services.Implementaions
             _context.Roles.Update(role);
             await _context.SaveChangesAsync();
 
+            RoleUpdatedEvent RoleUpdatedEvent = new RoleUpdatedEvent(
+            role.Id,
+            role.Title,
+            role.UniqueName);
+
+            await _mediator.PublishEvent(RoleUpdatedEvent);
+
             return Result.Success(Messages.SuccessfullyDone);
+        }
+
+        public async Task<Result<List<int>>> GetRoleIdsForPermission(string permission)
+        {
+            if (string.IsNullOrWhiteSpace(permission))
+                return Result.Failure<List<int>>(Messages.OperationFailedError);
+
+            var permissionsRoleIds = await _cacheManager.GetAsync(CacheKeys.PermissionsRoleIdsCacheKey, async () =>
+            {
+                var rawData = await _context.RolePermissionMapping
+                .AsNoTracking()
+                .Select(mapping => new
+                {
+                    PermissionName = mapping.Permission.UniqueName,
+                    RoleId = mapping.RoleId
+                }).ToListAsync();
+
+                return rawData
+                .GroupBy(x => x.PermissionName)
+                .Select(g => new PermissionRoleIdsDto
+                {
+                    UniqueName = g.Key,
+                    RoleIds = g.Select(x => x.RoleId).ToList()
+                }).ToList();
+            });
+
+            if (!permissionsRoleIds?.Any() ?? true)
+                return Result.Failure<List<int>>(Messages.OperationFailedError);
+
+            var matchedPermission = permissionsRoleIds!
+                .FirstOrDefault(p => p.UniqueName == permission);
+            if (matchedPermission is null || (!matchedPermission.RoleIds?.Any() ?? true))
+                return Result.Failure<List<int>>(Messages.OperationFailedError);
+
+            return matchedPermission.RoleIds;
         }
     }
 }
