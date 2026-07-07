@@ -227,6 +227,8 @@ namespace Application.Services.Implementaions
 
             var conditions = Filter.GenerateConditions<Blog>();
 
+            conditions.Add(n => n.IsPublished == true);
+
             if (!string.IsNullOrWhiteSpace(filter.Category))
             {
                 conditions.Add(n => n.Category.Slug == filter.Category);

@@ -14,6 +14,7 @@ namespace Data.Context.Configurations.Blogs
             builder.HasOne(n => n.Blog)
                 .WithMany(n => n.Views)
                 .HasForeignKey(n => n.BlogId)
+                .OnDelete(DeleteBehavior.Cascade)
                 .IsRequired(false);
         }
     }
