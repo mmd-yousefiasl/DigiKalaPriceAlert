@@ -6,9 +6,9 @@ namespace Application.Tools
 {
     public static class Convertor
     {
-        public static long CalculateKB(this int mb)
+        public static long CalculateKB(this int kb)
         {
-            return mb * 1024;
+            return kb * 1024;
         }
 
         private static readonly string[] PersianMonthNames =

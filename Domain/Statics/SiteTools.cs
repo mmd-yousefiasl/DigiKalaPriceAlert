@@ -54,5 +54,10 @@
         #region Mediator
         public static string MediatorLicenceKey { get; set; }
         #endregion
+
+        #region Medium
+        public static string MediumFile { get; set; }
+        public static int MaxMediumFileLength { get; set; }
+        #endregion
     }
 }
