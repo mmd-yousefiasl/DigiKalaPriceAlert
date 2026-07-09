@@ -9,7 +9,7 @@
     string pageUrl = (SiteTools.SiteUrl + "b/" + Model.Id);
 }
 
-<main class="mt-0 md:mt-8">
+<main class="mt-5">
     <div class="flex flex-col lg:flex-row px-4 md:px-10 gap-5 pb-20">
         @await Component.InvokeAsync("RelatedBlogs", new { blogId = Model.Id, categoryId = Model.CategoryId })
         <!-- main blog -->
