@@ -61,6 +61,7 @@ namespace Data.Context
         public DbSet<Faq> Faqs => Set<Faq>();
 
         public DbSet<SocialMedia> SocialMedia => Set<SocialMedia>();
+        public DbSet<Medium> Media => Set<Medium>();
 
         public DbSet<Order> Orders => Set<Order>();
 
