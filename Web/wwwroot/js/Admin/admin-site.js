@@ -120,10 +120,11 @@ $(document).ready(function () {
 document.addEventListener('DOMContentLoaded', function () {
     tinymce.init({
         selector: 'textarea.ck-editor',
-        plugins: 'anchor autolink charmap codesample emoticons link lists media searchreplace table visualblocks wordcount image',
-        toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image table | align lineheight | numlist bullist indent outdent | emoticons charmap | removeformat',
+        // Added 'code' to plugins
+        plugins: 'anchor autolink charmap codesample emoticons link lists media searchreplace table visualblocks wordcount image code',
+        // Added 'code' to the toolbar (placed it near undo/redo)
+        toolbar: 'code undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image table | align lineheight | numlist bullist indent outdent | emoticons charmap | removeformat',
 
-        // Prevents TinyMCE from converting full URLs to relative paths (../files/)
         relative_urls: false,
         remove_script_host: false,
 
@@ -131,13 +132,11 @@ document.addEventListener('DOMContentLoaded', function () {
         language: "fa",
         directionality: "rtl",
 
-        // Optional: allow inserting external images by URL
         image_title: true,
         automatic_uploads: false,
         file_picker_types: 'image',
         file_picker_callback: function (cb, value, meta) {
             if (meta.filetype === 'image') {
-                // Prompt user for an image URL
                 var url = prompt('Enter image URL:');
                 if (url) {
                     cb(url, { title: 'User provided image' });
