@@ -7,8 +7,8 @@ namespace Application.Services.Interfaces
     {
         Task<Result<AdminSideFilterMediaDto>> AdminSideFilterMedia(AdminSideFilterMediaDto filter);
 
-        Task<Result> AdminSideCreateNewMedia(AdminSideCreateNewMediumDto dto);
+        Task<Result> AdminSideCreateNewMedium(AdminSideCreateNewMediumDto dto);
 
-        Task<Result> AdminSideDeleteMedia(int id);
+        Task<Result> AdminSideDeleteMedium(int id);
     }
 }

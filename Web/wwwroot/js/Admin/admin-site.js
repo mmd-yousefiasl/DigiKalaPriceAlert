@@ -175,7 +175,7 @@ function showSuccessMessage(message) {
     })
 }
 
-function handleMediaUpload() {
+function handleMediumUpload() {
     const form = document.getElementById('imageForm');
     const formData = new FormData(form);
 
@@ -186,7 +186,7 @@ function handleMediaUpload() {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                ReloadMediaList();
+                ReloadMedia();
                 showSuccessMessage(data.message);
             } else {
                 showErrorMessage(data.message);
@@ -198,12 +198,12 @@ function handleMediaUpload() {
         });
 }
 
-function ReloadMediaList() {
+function ReloadMedia() {
     const page = document.getElementById("media-page").value;
     $("#LargeModalBody").load("/admin/media-list?page=" + page);
 }
 
-function remoMedia(formElement) {
+function removeMedium(formElement) {
     event.preventDefault();
 
     Swal.fire({
@@ -225,7 +225,7 @@ function remoMedia(formElement) {
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        ReloadMediaList(); // optionally pass productId if needed
+                        ReloadMedia(); // optionally pass productId if needed
                         showSuccessMessage(data.message);
                     } else {
                         showErrorMessage(data.message);
@@ -252,7 +252,7 @@ function CopyUrlToClipboard(inputUrl) {
 function CustomFillPageId(id) {
     $("#media-page").val(id);
 
-    ReloadMediaList();
+    ReloadMedia();
 }
 
 document.addEventListener('DOMContentLoaded', function () {

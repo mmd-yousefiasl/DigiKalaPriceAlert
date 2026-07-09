@@ -489,9 +489,40 @@ namespace Domain.Statics
                 UniqueName = "DeleteSmsPanel"
             },
             #endregion
+
+            #region Medium
+            new Permission
+            {
+                Id = 64,
+                ParentId = 1,
+                Title = "مدیریت رسانه ها",
+                UniqueName = "ManageMedia"
+            },
+            new Permission
+            {
+                Id = 65,
+                ParentId = 64,
+                Title = "لیست رسانه ها",
+                UniqueName = "MediaList"
+            },
+            new Permission
+            {
+                Id = 66,
+                ParentId = 64,
+                Title = "افزودن رسانه جدید",
+                UniqueName = "CreateNewMedium"
+            },
+            new Permission
+            {
+                Id = 67,
+                ParentId = 64,
+                Title = "حذف رسانه",
+                UniqueName = "DeleteMedium"
+            },
+            #endregion
         };
 
-        //Last used id ==> 63
+        //Last used id ==> 67
         public static List<Permission> Permissions = _permissions;
     }
 }

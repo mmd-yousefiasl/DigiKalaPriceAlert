@@ -21,7 +21,7 @@ namespace Application.Services.Implementaions
         }
         #endregion
 
-        public async Task<Result> AdminSideCreateNewMedia(AdminSideCreateNewMediumDto dto)
+        public async Task<Result> AdminSideCreateNewMedium(AdminSideCreateNewMediumDto dto)
         {
             if (dto is null)
                 return Result.Failure(Messages.OperationFailedError);
@@ -46,7 +46,7 @@ namespace Application.Services.Implementaions
             return Result.Success();
         }
 
-        public async Task<Result> AdminSideDeleteMedia(int id)
+        public async Task<Result> AdminSideDeleteMedium(int id)
         {
             if (id < 1) return Result.Failure(Messages.OperationFailedError);
 
