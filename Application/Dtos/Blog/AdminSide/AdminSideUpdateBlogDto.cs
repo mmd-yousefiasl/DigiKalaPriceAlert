@@ -24,6 +24,11 @@ namespace Application.Dtos.Blog.AdminSide
         [MaxLength(200, ErrorMessage = Messages.MaxLengthError)]
         public string Slug { get; set; }
 
+        [Display(Name = "توضیحات متا")]
+        [Required(ErrorMessage = Messages.RequiredError)]
+        [MaxLength(200, ErrorMessage = Messages.MaxLengthError)]
+        public string MetaDescription { get; set; }
+
         [Display(Name = "توضیحات")]
         [Required(ErrorMessage = Messages.RequiredError)]
         public string Description { get; set; }

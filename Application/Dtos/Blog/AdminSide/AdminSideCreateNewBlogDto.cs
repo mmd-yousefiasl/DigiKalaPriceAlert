@@ -15,6 +15,11 @@ namespace Application.Dtos.Blog.AdminSide
         [MaxLength(100, ErrorMessage = Messages.MaxLengthError)]
         public string Title { get; set; }
 
+        [Display(Name = "توضیحات متا")]
+        [Required(ErrorMessage = Messages.RequiredError)]
+        [MaxLength(200, ErrorMessage = Messages.MaxLengthError)]
+        public string MetaDescription { get; set; }
+
         [Display(Name = "عنوان در مرورگر")]
         [Required(ErrorMessage = Messages.RequiredError)]
         [MaxLength(200, ErrorMessage = Messages.MaxLengthError)]

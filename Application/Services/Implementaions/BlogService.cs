@@ -62,7 +62,8 @@ namespace Application.Services.Implementaions
                 CategoryId = model.CategoryId,
                 StudyTime = model.StudyTime,
                 Writer = model.Writer,
-                Slug = slug
+                Slug = slug,
+                MetaDescription = model.MetaDescription,
             };
 
             _context.Blogs.Add(blog);
@@ -149,7 +150,9 @@ namespace Application.Services.Implementaions
             if (id < 1)
                 return Result.Failure<AdminSideUpdateBlogDto>(Messages.OperationFailedError);
 
-            var blog = await _context.Blogs.Where(n => n.Id == id)
+            var blog = await _context.Blogs
+                .AsNoTracking()
+                .Where(n => n.Id == id)
                 .Select(n => new AdminSideUpdateBlogDto()
                 {
                     Id = n.Id,
@@ -162,7 +165,8 @@ namespace Application.Services.Implementaions
                     Priority = n.Priority,
                     Writer = n.Writer,
                     Slug = n.Slug,
-                }).AsNoTracking().FirstOrDefaultAsync();
+                    MetaDescription = n.MetaDescription,
+                }).FirstOrDefaultAsync();
             if (blog is null)
                 return Result.Failure<AdminSideUpdateBlogDto>(Messages.OperationFailedError);
 
@@ -187,6 +191,7 @@ namespace Application.Services.Implementaions
             blog.IsPublished = model.IsPublished;
             blog.CategoryId = model.CategoryId;
             blog.Slug = slug;
+            blog.MetaDescription = model.MetaDescription;
             blog.LastUpdatedDate = DateTime.UtcNow;
 
             if (model.File is not null)
@@ -258,7 +263,9 @@ namespace Application.Services.Implementaions
         {
             if (id < 1) return Result.Failure<ClientSideBlogDetailsDto>(Messages.OperationFailedError);
 
-            var blog = await _context.Blogs.Where(n => n.Id == id && n.IsPublished)
+            var blog = await _context.Blogs
+                .AsNoTracking()
+                .Where(n => n.Id == id && n.IsPublished)
                 .Select(n => new ClientSideBlogDetailsDto()
                 {
                     Id = n.Id,
@@ -272,8 +279,9 @@ namespace Application.Services.Implementaions
                     StudyTime = n.StudyTime,
                     FileName = n.FileName,
                     Writer = n.Writer,
+                    MetaDescription = n.MetaDescription,
                     ViewsCount = n.Views.Count()
-                }).AsNoTracking().FirstOrDefaultAsync();
+                }).FirstOrDefaultAsync();
             if (blog is null)
                 return Result.Failure<ClientSideBlogDetailsDto>(Messages.OperationFailedError);
 
@@ -309,7 +317,9 @@ namespace Application.Services.Implementaions
 
         public async Task<Result<List<ClientSideBlogDto>>> ClientSideGetRelatedBlogs(int blogId, int categoryId)
         {
-            var blogs = await _context.Blogs.Where(n => n.IsPublished && n.Id != blogId && n.CategoryId == categoryId)
+            var blogs = await _context.Blogs
+                .AsNoTracking()
+                .Where(n => n.IsPublished && n.Id != blogId && n.CategoryId == categoryId)
                 .OrderBy(n => n.Priority)
                 .Take(5)
                 .Select(n => new ClientSideBlogDto()
@@ -319,7 +329,7 @@ namespace Application.Services.Implementaions
                     Slug = n.Slug,
                     FileName = n.FileName,
                     Title = n.Title
-                }).AsNoTracking().ToListAsync();
+                }).ToListAsync();
             if (!blogs.Any())
                 return Result.Failure<List<ClientSideBlogDto>>(Messages.OperationFailedError);
 

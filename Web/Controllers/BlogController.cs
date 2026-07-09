@@ -57,6 +57,9 @@ namespace Web.Controllers
             }
             await _blogService.ClientSideAddBlogView(result.Value.Id);
 
+            ViewData["MetaAuthor"] = result.Value.Writer;
+            ViewData["MetaDescription"] = result.Value.MetaDescription;
+
             return View(result.Value);
         }
 
@@ -75,6 +78,9 @@ namespace Web.Controllers
                 return RedirectToAction(nameof(BlogsList));
             }
             await _blogService.ClientSideAddBlogView(result.Value.Id);
+
+            ViewData["MetaAuthor"] = result.Value.Writer;
+            ViewData["MetaDescription"] = result.Value.MetaDescription;
 
             return View(result.Value);
         }

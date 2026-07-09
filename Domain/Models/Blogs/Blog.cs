@@ -7,6 +7,7 @@
         public string Slug { get; set; }
         public string Description { get; set; }
         public string Writer { get; set; }
+        public string MetaDescription { get; set; }
         public string StudyTime { get; set; }
         public int Priority { get; set; }
         public bool IsPublished { get; set; }

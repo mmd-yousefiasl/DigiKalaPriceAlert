@@ -1,6 +1,15 @@
-﻿<meta charset="utf-8">
+﻿@{
+    // Define the default fallbacks if pages don't specify them
+    var metaAuthor = ViewData["MetaAuthor"] as string
+        ?? "سیستم هوشمند پایش قیمت رقبا در دیجی‌کالا؛ سریع، خودکار و شبانه‌روزی!";
+
+    var metaDescription = ViewData["MetaDescription"] as string
+            ?? "به عنوان فروشنده دیجی‌کالا، نوسان قیمت رقبا مستقیماً روی برنده شدن در بای‌باکس و حجم فروش شما تأثیر می‌گذارد. با دیجیتو، کافیست لینک محصول را در پنل خود ثبت کنید تا سیستم به صورت خودکار قیمت‌ها را بررسی کند. به محض کوچک‌ترین تغییر قیمت، فوراً از طریق پیامک (SMS) همراه با لینک مستقیم کالا باخبر شوید و سهم بازار خود را حفظ کنید.";
+}
+
+<meta charset="utf-8">
 <meta http-equiv="x-ua-compatible" content="ie=edge">
 <meta name="robots" content="@(ViewData["NoIndex"] is true ? "noindex, follow" : "index, follow")" />
-<meta name="author" content="سیستم هوشمند پایش قیمت رقبا در دیجی‌کالا؛ سریع، خودکار و شبانه‌روزی!">
-<meta name="description" content="به عنوان فروشنده دیجی‌کالا، نوسان قیمت رقبا مستقیماً روی برنده شدن در بای‌باکس و حجم فروش شما تأثیر می‌گذارد. با دیجیتو، کافیست لینک محصول را در پنل خود ثبت کنید تا سیستم به صورت خودکار قیمت‌ها را بررسی کند. به محض کوچک‌ترین تغییر قیمت، فوراً از طریق پیامک (SMS) همراه با لینک مستقیم کالا باخبر شوید و سهم بازار خود را حفظ کنید." />
+<meta name="author" content="@metaAuthor">
+<meta name="description" content="@metaDescription" />
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">

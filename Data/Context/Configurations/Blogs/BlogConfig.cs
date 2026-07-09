@@ -21,6 +21,7 @@ namespace Data.Context.Configurations.Blogs
             builder.Property(n => n.FileName).HasMaxLength(50);
             builder.Property(n => n.Writer).HasMaxLength(100);
             builder.Property(n => n.StudyTime).HasMaxLength(50);
+            builder.Property(n => n.MetaDescription).HasMaxLength(200);
 
             builder.HasOne(n => n.Category)
                 .WithMany(n => n.Blogs)
