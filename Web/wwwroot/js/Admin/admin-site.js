@@ -122,7 +122,12 @@ document.addEventListener('DOMContentLoaded', function () {
         selector: 'textarea.ck-editor',
         plugins: 'anchor autolink charmap codesample emoticons link lists media searchreplace table visualblocks wordcount image',
         toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image table | align lineheight | numlist bullist indent outdent | emoticons charmap | removeformat',
-        language_url: '/adminAssets/tinymce/js/tinymce/langs/fa.js',
+
+        // Prevents TinyMCE from converting full URLs to relative paths (../files/)
+        relative_urls: false,
+        remove_script_host: false,
+
+        language_url: '/lexaAssets/tinymce/js/tinymce/langs/fa.js',
         language: "fa",
         directionality: "rtl",
 
