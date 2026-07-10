@@ -297,7 +297,7 @@ namespace Application.Services.Implementaions
                 return await _context.Blogs
                 .AsNoTracking()
                 .Where(n => n.IsPublished)
-                .OrderBy(n => n.Priority)
+                .OrderByDescending(n => n.Id)
                 .Take(take)
                 .Select(n => new ClientSideBlogDto()
                 {
