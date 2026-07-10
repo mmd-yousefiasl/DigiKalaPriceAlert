@@ -17,9 +17,10 @@
     <!-- new blogs slider -->
     @await Component.InvokeAsync("LatestBlogs")
     <!-- blogs and category -->
-    <div class="flex flex-col lg:flex-row px-4 md:px-20 mt-10 gap-5 pb-20">
+    <div class="flex flex-col lg:flex-row lg:items-start md:items-start px-4 md:px-20 mt-10 gap-5 pb-20">
         <!-- category -->
         @await Component.InvokeAsync("BlogCategories")
+
         <!-- blogs -->
         <div class="lg:w-9/12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             @if (Model?.Entities?.Any() ?? false)
@@ -35,7 +36,6 @@
             {
                 <partial name="_NotFoundPartial" />
             }
-
         </div>
     </div>
     @if (Model?.Entities?.Any() ?? false)
