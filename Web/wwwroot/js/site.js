@@ -16,3 +16,13 @@
         element.innerText = innerText;
     }, 3000);
 }
+
+function FillPageId(id) {
+    $("#Page").val(id);
+
+    searchForm();
+}
+
+function searchForm() {
+    document.getElementById("search-form").submit();
+}
