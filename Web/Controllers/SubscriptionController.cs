@@ -122,6 +122,8 @@ namespace Web.Controllers
         [HttpGet("/subscription/pricing")]
         public IActionResult Pricing()
         {
+            ViewData["MetaAuthor"] = "تیم استراتژی و فنی دیجی‌پرایس‌الرت";
+            ViewData["MetaDescription"] = "تعرفه اشتراک و قیمت پکیج‌های پایش قیمت. با انتخاب پلن هوشمند، از رقابت فرسایشی جلوگیری کرده و حاشیه سود خالص خود را در دیجی‌کالا تضمین کنید. ";
             return View();
         }
 

@@ -26,6 +26,8 @@ namespace Web.Controllers
         [HttpGet("")]
         public IActionResult Index()
         {
+            ViewData["MetaAuthor"] = "تیم استراتژی و فنی دیجی‌پرایس‌الرت";
+            ViewData["MetaDescription"] = "پایش قیمت رقبا و مدیریت هوشمند بای‌باکس دیجی‌کالا. دریافت هشدار تغییر قیمت در کمتر از ۱۵ دقیقه با پیامک برای حفظ سهم ۸۰ درصدی فروش در بازار.";
             return View();
         }
 
@@ -63,12 +65,16 @@ namespace Web.Controllers
         [HttpGet("/features")]
         public IActionResult Features()
         {
+            ViewData["MetaAuthor"] = "تیم استراتژی و فنی دیجی‌پرایس‌الرت";
+            ViewData["MetaDescription"] = "امکانات سامانه دیجی‌پرایس‌الرت: اعلان آنی تغییر قیمت رقیب، ردیابی وضعیت بای‌باکس و جلوگیری از غیرفعال شدن کالا به دلیل نقض قوانین قیمت مرجع. ";
             return View();
         }
 
         [HttpGet("/about-us")]
         public IActionResult AboutUs()
         {
+            ViewData["MetaAuthor"] = "تیم استراتژی و فنی دیجی‌پرایس‌الرت";
+            ViewData["MetaDescription"] = "درباره ما؛ دیجی‌پرایس‌الرت راهکاری هوشمند برای توانمندسازی فروشندگان دیجی‌کالا است که با اتوماسیون داده‌ها، زمان شما را برای تمرکز بر تأمین کالا آزاد می‌کند.";
             return View();
         }
 

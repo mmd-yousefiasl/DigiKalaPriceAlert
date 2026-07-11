@@ -20,6 +20,8 @@ namespace Web.Controllers
         [HttpGet("/contact-us")]
         public IActionResult ContactUs()
         {
+            ViewData["MetaAuthor"] = "تیم استراتژی و فنی دیجی‌پرایس‌الرت";
+            ViewData["MetaDescription"] = "تماس با ما؛ برای مشاوره رایگان جهت بهینه‌سازی استراتژی قیمت‌گذاری و مدیریت حرفه‌ای پنل فروشندگان دیجی‌کالا، با کارشناسان ما در ارتباط باشید. ";
             return View();
         }
 
@@ -27,12 +29,18 @@ namespace Web.Controllers
         public async Task<IActionResult> ContactUs(ClientSideSendNewContactUsFormDto dto)
         {
             if (!ModelState.IsValid)
+            {
+                ViewData["MetaAuthor"] = "تیم استراتژی و فنی دیجی‌پرایس‌الرت";
+                ViewData["MetaDescription"] = "تماس با ما؛ برای مشاوره رایگان جهت بهینه‌سازی استراتژی قیمت‌گذاری و مدیریت حرفه‌ای پنل فروشندگان دیجی‌کالا، با کارشناسان ما در ارتباط باشید. ";
                 return View(dto);
+            }
 
             var result = await _contactUsFormService.ClientSideSendNewContactUsForm(dto);
             if (result.IsFailure)
             {
                 TempData[TemporaryErrorMessage] = result.Message;
+                ViewData["MetaAuthor"] = "تیم استراتژی و فنی دیجی‌پرایس‌الرت";
+                ViewData["MetaDescription"] = "تماس با ما؛ برای مشاوره رایگان جهت بهینه‌سازی استراتژی قیمت‌گذاری و مدیریت حرفه‌ای پنل فروشندگان دیجی‌کالا، با کارشناسان ما در ارتباط باشید. ";
                 return View(dto);
             }
             TempData[TemporarySuccessMessage] = result.Message;
