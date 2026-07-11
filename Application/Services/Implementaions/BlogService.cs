@@ -234,9 +234,16 @@ namespace Application.Services.Implementaions
 
             conditions.Add(n => n.IsPublished == true);
 
-            if (!string.IsNullOrWhiteSpace(filter.Category))
+            if (!string.IsNullOrWhiteSpace(filter.CategorySlug))
             {
-                conditions.Add(n => n.Category.Slug == filter.Category);
+                var categoryResult = await ClientSideGetCategoryBySlug(filter.CategorySlug);
+                if (categoryResult.IsSuccess)
+                {
+                    filter.CategoryMetaDescription = categoryResult.Value.MetaDescription;
+                    filter.CategoryTitle = categoryResult.Value.Title;
+                }
+
+                conditions.Add(n => n.Category.Slug == filter.CategorySlug);
             }
 
             IQueryable<Blog> query = _context.Blogs;
@@ -366,6 +373,7 @@ namespace Application.Services.Implementaions
                 Slug = model.Slug.Replace(" ", "-"),
                 IsPublished = model.IsPublished,
                 Priority = model.Priority,
+                MetaDescription = model.MetaDescription,
             };
 
             _context.BlogCategories.Add(category);
@@ -374,6 +382,7 @@ namespace Application.Services.Implementaions
             BlogCategoryCreatedEvent BlogCategoryCreatedEvent = new BlogCategoryCreatedEvent(
             category.Title,
             category.Slug,
+            category.MetaDescription,
             category.Priority,
             category.IsPublished);
 
@@ -446,6 +455,7 @@ namespace Application.Services.Implementaions
                 Slug = n.Slug,
                 Priority = n.Priority,
                 IsPublished = n.IsPublished,
+                MetaDescription = n.MetaDescription,
             }).AsNoTracking().FirstOrDefaultAsync();
             if (category is null)
                 return Result.Failure<AdminSideUpdateBlogCategoryDto>(Messages.OperationFailedError);
@@ -469,6 +479,7 @@ namespace Application.Services.Implementaions
             category.Slug = model.Slug.Replace(" ", "-");
             category.IsPublished = model.IsPublished;
             category.Priority = model.Priority;
+            category.MetaDescription = model.MetaDescription;
 
             _context.BlogCategories.Update(category);
             await _context.SaveChangesAsync();
@@ -477,6 +488,7 @@ namespace Application.Services.Implementaions
             category.Id,
             category.Title,
             category.Slug,
+            category.MetaDescription,
             category.Priority,
             category.IsPublished);
 
@@ -498,6 +510,7 @@ namespace Application.Services.Implementaions
                     Id = n.Id,
                     Title = n.Title,
                     Slug = n.Slug,
+                    MetaDescription = n.MetaDescription
                 }).ToListAsync();
             });
 
@@ -505,6 +518,42 @@ namespace Application.Services.Implementaions
                 return Result.Failure<List<ClientSideBlogCategoryDto>>(Messages.OperationFailedError);
 
             return categories;
+        }
+
+        public async Task<Result<ClientSideBlogCategoryDto>> ClientSideGetCategoryBySlug(string slug)
+        {
+            if (string.IsNullOrWhiteSpace(slug))
+                return Result.Failure<ClientSideBlogCategoryDto>(Messages.OperationFailedError);
+
+            var categories = await _cacheManager.GetAsync(CacheKeys.BlogCategoryCacheKey, async () =>
+            {
+                return await _context.BlogCategories
+                .AsNoTracking()
+                .Where(n => n.IsPublished)
+                .OrderBy(n => n.Priority)
+                .Select(n => new ClientSideBlogCategoryDto()
+                {
+                    Id = n.Id,
+                    Title = n.Title,
+                    Slug = n.Slug,
+                    MetaDescription = n.MetaDescription
+                }).ToListAsync();
+            });
+
+            if (!categories?.Any() ?? true)
+                return Result.Failure<ClientSideBlogCategoryDto>(Messages.OperationFailedError);
+
+            var category = categories!.FirstOrDefault(n => n.Slug == slug);
+            if (category is null)
+                return Result.Failure<ClientSideBlogCategoryDto>(Messages.OperationFailedError);
+
+            return new ClientSideBlogCategoryDto()
+            {
+                Id = category.Id,
+                Title = category.Title,
+                Slug = category.Slug,
+                MetaDescription = category.MetaDescription
+            };
         }
 
         public async Task<Result<List<AdminSideBlogCategoryAsOptionDto>>> AdminSideGetCategoriesAsOptions()

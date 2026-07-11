@@ -32,11 +32,20 @@ namespace Web.Controllers
                 ViewData["NoIndex"] = true;
             }
 
-            filter.Category = category;
+            filter.CategorySlug = category;
             filter.TakeEntity = 9;
 
             var result = await _blogService.ClientSideFilterBlogs(filter);
             if (result.IsFailure) return View(new ClientSideFilterBlogsDto());
+
+            if (string.IsNullOrWhiteSpace(category))
+            {
+                ViewData["MetaDescription"] = "مجله تخصصی فروشندگان دیجی‌کالا؛ جدیدترین استراتژی‌های مدیریت بای‌باکس، پایش قیمت رقبا و راهکارهای عملی برای افزایش سود و سهم بازار در مارکت‌پلیس.";
+            }
+            else
+            {
+                ViewData["MetaDescription"] = result.Value.CategoryMetaDescription;
+            }
 
             return View(result.Value);
         }

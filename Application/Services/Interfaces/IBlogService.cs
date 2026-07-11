@@ -40,6 +40,8 @@ namespace Application.Services.Interfaces
 
         Task<Result<List<ClientSideBlogCategoryDto>>> ClientSideGetCategories();
 
+        Task<Result<ClientSideBlogCategoryDto>> ClientSideGetCategoryBySlug(string slug);
+
         Task<Result<List<AdminSideBlogCategoryAsOptionDto>>> AdminSideGetCategoriesAsOptions();
 
         Task<Result> ClientSideAddBlogView(int blogId);

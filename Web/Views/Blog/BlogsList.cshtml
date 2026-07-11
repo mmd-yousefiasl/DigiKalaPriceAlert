@@ -3,16 +3,19 @@
 @model ClientSideFilterBlogsDto
 
 @{
-    ViewData["Title"] = (!string.IsNullOrWhiteSpace(Model.Category) ? Model.Category : "وبلاگ");
-    if (!string.IsNullOrWhiteSpace(Model.Category))
+    ViewData["Title"] = (!string.IsNullOrWhiteSpace(Model.CategoryTitle) ? Model.CategoryTitle : "وبلاگ");
+    if (!string.IsNullOrWhiteSpace(Model.CategorySlug))
     {
-        ViewData["CanonicalOverride"] = (SiteTools.SiteUrl + "blogs/" + Model.Category);
+        ViewData["CanonicalOverride"] = (SiteTools.SiteUrl + "blogs/" + Model.CategorySlug);
     }
 }
 
 <main class="mt-0 md:mt-8">
     <form asp-area="" asp-controller="Blog" asp-action="BlogsList" method="get" id="search-form">
         <input type="hidden" asp-for="Page" id="Page" />
+        <input type="hidden" asp-for="CategorySlug" />
+        <input type="hidden" asp-for="CategoryTitle" />
+        <input type="hidden" asp-for="CategoryMetaDescription" />
     </form>
     <!-- new blogs slider -->
     @await Component.InvokeAsync("LatestBlogs")

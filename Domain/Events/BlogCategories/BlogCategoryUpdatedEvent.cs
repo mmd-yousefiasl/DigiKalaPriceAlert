@@ -6,6 +6,7 @@ namespace Domain.Events.BlogCategories
     int Id,
     string Title,
     string Slug,
+    string MetaDescription,
     int Priority,
     bool IsPublished
     ) : INotification;
