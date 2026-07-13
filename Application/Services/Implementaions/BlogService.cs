@@ -575,18 +575,36 @@ namespace Application.Services.Implementaions
 
         public async Task<Result> ClientSideAddBlogView(int blogId)
         {
-            var userId = _httpContextAccessor.HttpContext.User.GetUserId();
-            var userIP = _httpContextAccessor.HttpContext.GetUserIP();
-
-            if (await _context.BlogViews.AnyAsync(n => (n.UserId == userId || n.UserIP == userIP) && n.BlogId == blogId))
+            var httpContext = _httpContextAccessor.HttpContext;
+            if (httpContext == null)
                 return Result.Failure(Messages.OperationFailedError);
 
-            BlogView view = new BlogView()
+            var userId = httpContext.User.GetUserId();
+            var userIP = httpContext.GetUserIP();
+
+            bool alreadyViewed;
+
+            if (userId > 0)
+            {
+                // Logged-in user: check by UserId only
+                alreadyViewed = await _context.BlogViews
+                    .AnyAsync(n => n.BlogId == blogId && n.UserId == userId);
+            }
+            else
+            {
+                alreadyViewed = await _context.BlogViews
+                    .AnyAsync(n => n.BlogId == blogId && n.UserId == null && n.UserIP == userIP);
+            }
+
+            if (alreadyViewed)
+                return Result.Success();
+
+            var view = new BlogView
             {
                 BlogId = blogId,
-                UserIP = userIP
+                UserIP = userIP,
+                UserId = userId > 0 ? userId : null
             };
-            if (userId > 0) view.UserId = userId;
 
             _context.BlogViews.Add(view);
             await _context.SaveChangesAsync();
