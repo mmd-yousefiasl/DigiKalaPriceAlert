@@ -354,6 +354,16 @@ new SiteMap()
     IsPublished = true,
     Type = SiteMapTypeEnum.OtherPages,
     IsDeleted = false
+},
+new SiteMap()
+{
+    Id = 8,
+    Url = $"{SiteUrl}calculator",
+    ChangeFreq = ChangeFreqEnum.Weekly,
+    Priority = 0.9m,
+    IsPublished = true,
+    Type = SiteMapTypeEnum.OtherPages,
+    IsDeleted = false
 }};
 
             modelBuilder.Entity<SiteMap>().HasData(siteMaps);

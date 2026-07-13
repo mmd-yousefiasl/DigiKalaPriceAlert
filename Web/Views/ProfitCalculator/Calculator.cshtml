@@ -1,0 +1,432 @@
+﻿@{
+    ViewData["Title"] = "محاسبه‌گر رایگان سود و زیان فروشندگان دیجی‌کالا | دیجیتو";
+    ViewData["Description"] = "سود خالص فروش در دیجی‌کالا را با احتساب کمیسیون، مالیات بر ارزش افزوده، هزینه ارسال و مرجوعی به صورت آنلاین محاسبه کنید. ابزار رایگان دیجی‌پرایس‌الرت.";
+}
+
+@section HeaderReferences {
+    <link rel="stylesheet" type="text/css" href="/css/calculator.css" asp-append-version="true" />
+}
+
+
+<main class="calc-main-container" dir="rtl">
+
+    <!-- ═══════════════════════════════════════
+         HERO SECTION
+    ═══════════════════════════════════════ -->
+    <section class="section-wrapper calc-hero-section">
+        <div class="container">
+            <div class="hero-flex">
+
+                <div class="hero-text">
+                    <h1>محاسبه‌گر رایگان <span>سود و زیان</span> فروشندگان دیجی‌کالا</h1>
+
+                    <p>
+                        آیا واقعاً سود می‌کنید؟ بسیاری از فروشندگان دیجی‌کالا بعد از کسر کمیسیون، مالیات بر ارزش افزوده، هزینه ارسال و مرجوعی، متوجه می‌شوند که سود واقعی‌شان بسیار کمتر از تصورشان بوده یا حتی در ضرر هستند. با این ابزار رایگان، سود خالص هر سفارش خود را به دقت محاسبه کنید و قیمت کف را بشناسید.
+                    </p>
+
+                    <div class="hero-badges">
+                        <span class="hero-badge">
+                            <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" /></svg>
+                            کاملاً رایگان
+                        </span>
+                        <span class="hero-badge">
+                            <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" /></svg>
+                            محاسبه کمیسیون خودکار
+                        </span>
+                        <span class="hero-badge">
+                            <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" /></svg>
+                            تعیین قیمت کف
+                        </span>
+                        <span class="hero-badge">
+                            <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" /></svg>
+                            محاسبه ذخیره مرجوعی
+                        </span>
+                    </div>
+                </div>
+
+                <div class="hero-visual">
+                    <div class="hero-mini-mockup" role="img" aria-label="نمونه خروجی محاسبه‌گر سود فروشنده دیجی‌کالا">
+                        <div class="mini-mockup-header">
+                            <div class="icon-circle">
+                                <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z" /></svg>
+                            </div>
+                            <span>خروجی محاسبه‌گر دیجیتو</span>
+                        </div>
+                        <div class="mini-mockup-row">
+                            <span class="label">قیمت فروش</span>
+                            <span class="value">۱,۲۰۰,۰۰۰ تومان</span>
+                        </div>
+                        <div class="mini-mockup-row">
+                            <span class="label">کمیسیون دیجی‌کالا (۸٪)</span>
+                            <span class="value value-red">−۹۶,۰۰۰</span>
+                        </div>
+                        <div class="mini-mockup-row">
+                            <span class="label">مالیات ارزش افزوده</span>
+                            <span class="value value-red">−۹,۶۰۰</span>
+                        </div>
+                        <div class="mini-mockup-row">
+                            <span class="label">هزینه ارسال و بسته‌بندی</span>
+                            <span class="value value-red">−۲۲,۵۰۰</span>
+                        </div>
+                        <div class="mini-mockup-row">
+                            <span class="label">ذخیره مرجوعی</span>
+                            <span class="value value-red">−۲۰,۰۰۰</span>
+                        </div>
+                        <div class="mini-mockup-row">
+                            <span class="label">💰 سود خالص</span>
+                            <span class="value value-green" style="font-size: 12pt;">+۲۵۱,۹۰۰ تومان</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ═══════════════════════════════════════
+         CALCULATOR SECTION
+    ═══════════════════════════════════════ -->
+    <section id="calculator" class="section-wrapper bg-alt-section">
+        <div class="container">
+            <div class="center-title">
+                <h2>محاسبه دقیق سود خالص فروش در دیجی‌کالا</h2>
+                <p>اطلاعات محصول خود را وارد کنید تا سود واقعی هر سفارش با احتساب تمام هزینه‌های پنهان محاسبه شود</p>
+            </div>
+
+            <div class="calc-flex">
+
+                <!-- ── Form Panel ── -->
+                <div class="calc-panel-form">
+                    <div class="calc-form-card">
+                        <div class="form-card-title">📝 اطلاعات محصول</div>
+                        <div class="form-card-subtitle">فیلدهای ستاره‌دار (*) الزامی هستند</div>
+
+                        <div class="form-group">
+                            <label>
+                                قیمت تمام‌شده خرید کالا (تومان) *
+                                <span class="label-hint">قیمت خرید از تأمین‌کننده</span>
+                            </label>
+                            <input type="text" class="form-input" id="purchasePrice"
+                                   placeholder="مثلاً ۸۰۰,۰۰۰" inputmode="numeric" autocomplete="off">
+                        </div>
+
+                        <div class="form-group">
+                            <label>
+                                قیمت فروش در دیجی‌کالا (تومان) *
+                                <span class="label-hint">قیمتی که خریدار پرداخت می‌کند</span>
+                            </label>
+                            <input type="text" class="form-input" id="sellingPrice"
+                                   placeholder="مثلاً ۱,۲۰۰,۰۰۰" inputmode="numeric" autocomplete="off">
+                        </div>
+
+                        <hr class="form-separator">
+                        <div class="form-section-label">📦 دسته‌بندی و ارسال</div>
+
+                        <div class="form-group">
+                            <label>دسته‌بندی کالا *</label>
+                            <select class="form-select" id="categorySelect">
+                                <option value="" disabled selected>انتخاب دسته‌بندی...</option>
+                                <option value="5">موبایل و تبلت (۵٪)</option>
+                                <option value="5">لپ‌تاپ و کامپیوتر (۵٪)</option>
+                                <option value="7">لوازم جانبی موبایل (۷٪)</option>
+                                <option value="8">پوشاک و مد (۸٪)</option>
+                                <option value="10">آرایشی و بهداشتی (۱۰٪)</option>
+                                <option value="8">لوازم خانگی (۸٪)</option>
+                                <option value="10">مواد غذایی (۱۰٪)</option>
+                                <option value="12">کتاب و لوازم‌التحریر (۱۲٪)</option>
+                                <option value="7">ابزارآلات (۷٪)</option>
+                                <option value="8">اسباب‌بازی و کودک (۸٪)</option>
+                                <option value="10">ورزش و سفر (۱۰٪)</option>
+                                <option value="7">سایر دسته‌بندی‌ها (۷٪ میانگین)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-row-2col">
+                            <div class="form-row-cell">
+                                <div class="form-group">
+                                    <label>وزن تقریبی بسته (گرم)</label>
+                                    <input type="text" class="form-input" id="packageWeight"
+                                           placeholder="مثلاً ۵۰۰" inputmode="numeric" autocomplete="off">
+                                </div>
+                            </div>
+                            <div class="form-row-cell">
+                                <div class="form-group">
+                                    <label>نوع ارسال</label>
+                                    <select class="form-select" id="shippingType">
+                                        <option value="seller" selected>توسط فروشنده</option>
+                                        <option value="fbd">FBD (انبار دیجی‌کالا)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="form-separator">
+                        <div class="form-section-label">⚙️ تنظیمات پیشرفته (اختیاری)</div>
+
+                        <div class="form-row-2col">
+                            <div class="form-row-cell">
+                                <div class="form-group">
+                                    <label>
+                                        هزینه بسته‌بندی و ارسال
+                                        <span class="label-hint">(تومان)</span>
+                                    </label>
+                                    <input type="text" class="form-input" id="shippingCost"
+                                           placeholder="پیش‌فرض: ۲۲,۵۰۰" inputmode="numeric" autocomplete="off">
+                                </div>
+                            </div>
+                            <div class="form-row-cell">
+                                <div class="form-group">
+                                    <label>
+                                        ذخیره مرجوعی هر سفارش
+                                        <span class="label-hint">(تومان)</span>
+                                    </label>
+                                    <input type="text" class="form-input" id="returnReserve"
+                                           placeholder="پیش‌فرض: ۲۰,۰۰۰" inputmode="numeric" autocomplete="off">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>
+                                نرخ مالیات بر ارزش افزوده خدمات
+                                <span class="label-hint">(درصد از کمیسیون)</span>
+                            </label>
+                            <input type="text" class="form-input" id="vatRate"
+                                   placeholder="پیش‌فرض: ۱۰٪" inputmode="numeric" autocomplete="off">
+                        </div>
+
+                        <button type="button" class="btn-calc" id="calculateBtn" onclick="calculateProfit()">
+                            🧮 محاسبه سود خالص
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ── Result Panel ── -->
+                <div class="calc-panel-result">
+                    <div class="calc-result-card">
+                        <div class="result-card-title">📊 نتایج محاسبه</div>
+
+                        <div class="result-placeholder" id="resultPlaceholder">
+                            <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z" /></svg>
+                            <p>اطلاعات محصول را وارد کنید و دکمه<br>«محاسبه سود خالص» را بزنید.</p>
+                        </div>
+
+                        <div class="result-content" id="resultContent">
+
+                            <div class="result-profit-box" id="profitBox">
+                                <div class="profit-label" id="profitLabel">سود خالص هر سفارش</div>
+                                <span class="profit-amount" id="profitAmount">۰ تومان</span>
+                                <span class="profit-margin-tag" id="profitMargin">مارجین: ۰٪</span>
+                            </div>
+
+                            <div class="cost-visual-bar">
+                                <div class="cost-bar-track">
+                                    <div class="cost-bar-segment" id="barCommission" style="background-color: #ef4056; width:0%;"></div>
+                                    <div class="cost-bar-segment" id="barVat" style="background-color: #f5a623; width:0%;"></div>
+                                    <div class="cost-bar-segment" id="barShipping" style="background-color: #3b82f6; width:0%;"></div>
+                                    <div class="cost-bar-segment" id="barReturn" style="background-color: #8b5cf6; width:0%;"></div>
+                                    <div class="cost-bar-segment" id="barProfit" style="background-color: #00a049; width:0%;"></div>
+                                </div>
+                                <div class="cost-bar-legend">
+                                    <span class="legend-item"><span class="legend-dot" style="background:#ef4056;"></span>کمیسیون</span>
+                                    <span class="legend-item"><span class="legend-dot" style="background:#f5a623;"></span>مالیات</span>
+                                    <span class="legend-item"><span class="legend-dot" style="background:#3b82f6;"></span>ارسال</span>
+                                    <span class="legend-item"><span class="legend-dot" style="background:#8b5cf6;"></span>مرجوعی</span>
+                                    <span class="legend-item"><span class="legend-dot" style="background:#00a049;"></span>سود خالص</span>
+                                </div>
+                            </div>
+
+                            <div class="result-breakdown">
+                                <div class="breakdown-row">
+                                    <span class="bd-label"><span class="bd-dot dot-green"></span> قیمت فروش</span>
+                                    <span class="bd-value" id="bdSelling">—</span>
+                                </div>
+                                <div class="breakdown-row">
+                                    <span class="bd-label"><span class="bd-dot dot-red"></span> قیمت خرید</span>
+                                    <span class="bd-value" id="bdPurchase">—</span>
+                                </div>
+                                <div class="breakdown-row">
+                                    <span class="bd-label"><span class="bd-dot dot-red"></span> کمیسیون دیجی‌کالا</span>
+                                    <span class="bd-value" id="bdCommission">—</span>
+                                </div>
+                                <div class="breakdown-row">
+                                    <span class="bd-label"><span class="bd-dot dot-orange"></span> مالیات ارزش افزوده</span>
+                                    <span class="bd-value" id="bdVat">—</span>
+                                </div>
+                                <div class="breakdown-row">
+                                    <span class="bd-label"><span class="bd-dot dot-blue"></span> هزینه ارسال</span>
+                                    <span class="bd-value" id="bdShipping">—</span>
+                                </div>
+                                <div class="breakdown-row">
+                                    <span class="bd-label"><span class="bd-dot dot-purple"></span> ذخیره مرجوعی</span>
+                                    <span class="bd-value" id="bdReturn">—</span>
+                                </div>
+                            </div>
+
+                            <div class="price-floor-box">
+                                <div class="floor-label">⛔ حداقل قیمت فروش (قیمت کف) برای جلوگیری از ضرر:</div>
+                                <div class="floor-value" id="priceFloorValue">—</div>
+                                <div class="floor-hint">زیر این قیمت، هر سفارش برای شما ضرر خالص خواهد بود.</div>
+                            </div>
+
+                            <div class="result-cta-box" id="resultCta">
+                                <p>
+                                    ⚠️ اگر رقیب شما قیمت خود را فقط
+                                    <span class="cta-highlight" id="ctaDiffPercent">۳٪</span>
+                                    کاهش دهد، سود شما به
+                                    <span class="cta-highlight" id="ctaNewProfit">صفر</span>
+                                    می‌رسد!
+                                    <br>
+                                    با <strong>ربات پایش قیمت دیجیتو</strong>، لحظه‌ای از تغییر قیمت رقبا باخبر شوید.
+                                </p>
+                                <a asp-area="" asp-controller="Subscription" asp-action="Purchase" asp-route-planId="1"
+                                   class="btn-cta-sm" title="شروع تست رایگان ربات پایش قیمت">
+                                    🚀 شروع تست رایگان ۷ روزه
+                                </a>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ═══════════════════════════════════════
+         WHY THIS MATTERS
+    ═══════════════════════════════════════ -->
+    <section class="section-wrapper">
+        <div class="container">
+            <div class="center-title">
+                <h2>چرا محاسبه دقیق سود برای فروشندگان دیجی‌کالا حیاتی است؟</h2>
+                <p>هزینه‌های پنهان فروشندگی در مارکت‌پلیس، بزرگ‌ترین دلیل ضرر ناخواسته است</p>
+            </div>
+            <div class="grid-3-flex">
+                <article class="grid-card">
+                    <div class="icon-container">
+                        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" /></svg>
+                    </div>
+                    <h3>کمیسیون‌های متفاوت</h3>
+                    <p>کمیسیون دیجی‌کالا بسته به دسته‌بندی کالا از ۵٪ تا ۱۲٪ متغیر است. بسیاری از فروشندگان بدون آگاهی از نرخ دقیق، سود کمتری دارند.</p>
+                </article>
+                <article class="grid-card">
+                    <div class="icon-container">
+                        <svg viewBox="0 0 24 24"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z" /></svg>
+                    </div>
+                    <h3>مالیات و هزینه‌های پنهان</h3>
+                    <p>۱۰٪ مالیات بر ارزش افزوده روی کمیسیون، هزینه پردازش حداقل ۲۲,۵۰۰ تومانی و ضرر مرجوعی‌ها اغلب نادیده گرفته می‌شوند.</p>
+                </article>
+                <article class="grid-card">
+                    <div class="icon-container">
+                        <svg viewBox="0 0 24 24"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z" /></svg>
+                    </div>
+                    <h3>جنگ قیمت‌ها</h3>
+                    <p>بدون دانستن قیمت کف، ممکن است در رقابت بر سر بای‌باکس، قیمت را تا حدی کاهش دهید که هر فروش برایتان ضرر خالص باشد.</p>
+                </article>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ═══════════════════════════════════════
+         STATS BAR
+    ═══════════════════════════════════════ -->
+    <section class="stats-bar">
+        <div class="container">
+            <div class="stats-flex">
+                <div class="stat-node">
+                    <span class="number">۸۰٪</span>
+                    <span class="desc">سهم بای‌باکس از کل فروش هر محصول</span>
+                </div>
+                <div class="stat-node">
+                    <span class="number">۹۰٪</span>
+                    <span class="desc">وزن قیمت در الگوریتم بای‌باکس</span>
+                </div>
+                <div class="stat-node">
+                    <span class="number">۵ تا ۱۲٪</span>
+                    <span class="desc">محدوده نرخ کمیسیون دیجی‌کالا</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ═══════════════════════════════════════
+         FAQ SECTION
+    ═══════════════════════════════════════ -->
+    <section class="section-wrapper">
+        <div class="container">
+            <div class="center-title">
+                <h2>سوالات متداول درباره محاسبه سود فروشندگی دیجی‌کالا</h2>
+                <p>پاسخ به رایج‌ترین سوالات فروشندگان درباره هزینه‌ها، کمیسیون و سودآوری</p>
+            </div>
+            <div class="faq-block">
+
+                <div class="faq-row">
+                    <h3>کمیسیون دیجی‌کالا چگونه محاسبه می‌شود؟</h3>
+                    <p>دیجی‌کالا درصدی از قیمت فروش هر کالا را به عنوان کمیسیون کسر می‌کند. این نرخ بسته به دسته‌بندی محصول متفاوت است؛ برای موبایل حدود ۵٪ و برای کتاب تا ۱۲٪. میانگین کمیسیون حدود ۷ تا ۸ درصد است.</p>
+                </div>
+
+                <div class="faq-row">
+                    <h3>مالیات بر ارزش افزوده چطور روی سود تأثیر می‌گذارد؟</h3>
+                    <p>دیجی‌کالا علاوه بر کمیسیون، ۱۰٪ مالیات بر ارزش افزوده را روی مبلغ کمیسیون محاسبه و کسر می‌کند. اگر کمیسیون ۱۰۰ هزار تومان باشد، ۱۰ هزار تومان اضافه بابت مالیات کسر خواهد شد.</p>
+                </div>
+
+                <div class="faq-row">
+                    <h3>منظور از «ذخیره مرجوعی» چیست؟</h3>
+                    <p>درصدی از سفارشات مرجوع می‌شوند و علاوه بر از دست رفتن فروش، هزینه ارسال رفت و برگشت بر عهده فروشنده است. توصیه می‌شود مبلغی (مثلاً ۲۰,۰۰۰ تومان) به عنوان ذخیره مرجوعی در محاسبات لحاظ شود.</p>
+                </div>
+
+                <div class="faq-row">
+                    <h3>قیمت کف (Price Floor) چیست؟</h3>
+                    <p>قیمت کف پایین‌ترین قیمتی است که می‌توانید کالا را بفروشید بدون ضرر. این عدد شامل قیمت خرید به اضافه تمام هزینه‌هاست. دانستن این عدد در جنگ قیمت‌ها و رقابت بر سر بای‌باکس حیاتی است.</p>
+                </div>
+
+                <div class="faq-row">
+                    <h3>تفاوت هزینه ارسال FBD و ارسال توسط فروشنده چیست؟</h3>
+                    <p>در مدل FBD کالا در انبار دیجی‌کالا نگهداری شده و هزینه بیشتری کسر می‌شود. در ارسال توسط فروشنده، هزینه حداقلی پردازش (معمولاً ۲۲,۵۰۰ تومان) اعمال می‌شود.</p>
+                </div>
+
+                <div class="faq-row">
+                    <h3>آیا این محاسبه‌گر برای تمام دسته‌بندی‌ها کار می‌کند؟</h3>
+                    <p>بله، نرخ کمیسیون رایج‌ترین دسته‌بندی‌ها به صورت خودکار اعمال می‌شود. همچنین امکان تنظیم دستی هزینه ارسال، ذخیره مرجوعی و نرخ مالیات وجود دارد.</p>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ═══════════════════════════════════════
+         FINAL CTA
+    ═══════════════════════════════════════ -->
+    <section class="final-cta-section">
+        <div class="container">
+            <h2>سود خود را محاسبه کردید؟ حالا آن را <span>محافظت</span> کنید!</h2>
+            <p>
+                دانستن سود واقعی فقط نیمی از راه است. با ربات پایش قیمت دیجیتو، لحظه‌ای از تغییر قیمت رقبا باخبر شوید و بای‌باکس را از دست ندهید.
+            </p>
+            <div class="cta-buttons">
+                <a asp-area="" asp-controller="Subscription" asp-action="Purchase" asp-route-planId="1"
+                   class="btn-cta-large btn-filled" title="شروع تست رایگان ربات پایش قیمت دیجی‌کالا">
+                    🚀 شروع تست رایگان ۷ روزه
+                </a>
+                <a asp-area="" asp-controller="Subscription" asp-action="Pricing"
+                   class="btn-cta-large btn-ghost" title="مشاهده پلن‌ها و تعرفه‌های اشتراک">
+                    💰 مشاهده تعرفه‌ها
+                </a>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+@await Component.InvokeAsync("LatestBlogs")
+
+
+@section FooterReferences {
+    <script src="/js/calculator.js" asp-append-version="true"></script>
+}
