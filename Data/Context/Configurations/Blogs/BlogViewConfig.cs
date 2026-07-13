@@ -11,6 +11,15 @@ namespace Data.Context.Configurations.Blogs
             builder.ToTable("BlogViews");
             builder.HasKey(n => n.Id);
 
+            builder.HasIndex(n => new { n.BlogId, n.VisitorId })
+                .IsUnique();
+
+            builder.Property(n => n.UserIP)
+                .HasMaxLength(50);
+
+            builder.Property(n => n.VisitorId)
+                .HasMaxLength(50);
+
             builder.HasOne(n => n.Blog)
                 .WithMany(n => n.Views)
                 .HasForeignKey(n => n.BlogId)

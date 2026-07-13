@@ -78,6 +78,7 @@ namespace Web
             services.AddScoped<ISendSmsService, SendSmsService>();
             services.AddScoped<IMediatorHandler, MediatorHandler>();
             services.AddScoped<IMediumService, MediumService>();
+            services.AddScoped<IVisitorService, VisitorService>();
             #endregion
 
             #region Background Services

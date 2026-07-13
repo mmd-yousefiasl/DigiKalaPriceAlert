@@ -23,18 +23,21 @@ namespace Application.Services.Implementaions
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IMediatorHandler _mediator;
         private readonly ICacheManager _cacheManager;
+        private readonly IVisitorService _visitorService;
         #endregion
 
         #region Ctor
         public BlogService(DigiKalaPriceAlertDbContext context,
             IHttpContextAccessor httpContextAccessor,
             IMediatorHandler mediator,
-            ICacheManager cacheManager)
+            ICacheManager cacheManager,
+            IVisitorService visitorService)
         {
             _context = context;
             _httpContextAccessor = httpContextAccessor;
             _mediator = mediator;
             _cacheManager = cacheManager;
+            _visitorService = visitorService;
         }
         #endregion
 
@@ -575,35 +578,23 @@ namespace Application.Services.Implementaions
 
         public async Task<Result> ClientSideAddBlogView(int blogId)
         {
-            var httpContext = _httpContextAccessor.HttpContext;
-            if (httpContext == null)
-                return Result.Failure(Messages.OperationFailedError);
+            var visitorId = _visitorService.GetOrCreateVisitorId();
+            var userId = _httpContextAccessor.HttpContext.User.GetUserId();
+            var userIP = _httpContextAccessor.HttpContext.GetUserIP();
 
-            var userId = httpContext.User.GetUserId();
-            var userIP = httpContext.GetUserIP();
-
-            bool alreadyViewed;
-
-            if (userId > 0)
-            {
-                // Logged-in user: check by UserId only
-                alreadyViewed = await _context.BlogViews
-                    .AnyAsync(n => n.BlogId == blogId && n.UserId == userId);
-            }
-            else
-            {
-                alreadyViewed = await _context.BlogViews
-                    .AnyAsync(n => n.BlogId == blogId && n.UserId == null && n.UserIP == userIP);
-            }
+            var alreadyViewed = await _context.BlogViews
+                .AsNoTracking()
+                .AnyAsync(n => n.BlogId == blogId && n.VisitorId == visitorId);
 
             if (alreadyViewed)
                 return Result.Success();
 
-            var view = new BlogView
+            var view = new BlogView()
             {
                 BlogId = blogId,
+                UserId = userId > 0 ? userId : null,
                 UserIP = userIP,
-                UserId = userId > 0 ? userId : null
+                VisitorId = visitorId,
             };
 
             _context.BlogViews.Add(view);

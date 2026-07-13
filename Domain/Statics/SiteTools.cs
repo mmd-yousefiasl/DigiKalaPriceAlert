@@ -59,5 +59,10 @@
         public static string MediumFile { get; set; }
         public static int MaxMediumFileLength { get; set; }
         #endregion
+
+        #region Visior
+        public static string VisitorKeyName { get; set; }
+        public static int VisitorExpirationDays { get; set; }
+        #endregion
     }
 }
