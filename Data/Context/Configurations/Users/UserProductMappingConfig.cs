@@ -1,4 +1,5 @@
-﻿using Domain.Models.Users;
+﻿using Domain.Enums.Products;
+using Domain.Models.Users;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -8,23 +9,51 @@ namespace Data.Context.Configurations.Users
     {
         public void Configure(EntityTypeBuilder<UserProductMapping> builder)
         {
-            builder.ToTable("UserProductMapping");
+            builder.ToTable("UserProductMappings");
 
-            builder.HasKey(upm => new { upm.UserId, upm.ProductId });
+            builder.HasKey(up => up.Id);
 
-            builder.HasIndex(upm => new { upm.UserId, upm.ProductId })
-                .IncludeProperties(upm => upm.IsRead);
+            builder.HasQueryFilter(up => !up.IsDeleted);
 
-            builder.HasIndex(upm => upm.ProductId);
+            builder.Property(up => up.IsRead)
+                .HasDefaultValue(false);
 
-            builder.HasOne(upm => upm.User)
+            builder.Property(up => up.WatchMode)
+                .IsRequired()
+                .HasConversion<int>()
+                .HasDefaultValue(WatchMode.AllVariants);
+
+            builder.Property(up => up.NotifyOnPriceChange)
+                .HasDefaultValue(true);
+
+            builder.Property(up => up.NotifyOnBuyBoxChange)
+                .HasDefaultValue(true);
+
+            builder.Property(up => up.NotifyOnNewSeller)
+                .HasDefaultValue(false);
+
+            builder.Property(up => up.NotifyOnSellerLeft)
+                .HasDefaultValue(false);
+
+            builder.Property(up => up.MinPriceChangeThreshold)
+                .HasColumnType("decimal(18,0)");
+
+            builder.HasIndex(up => new { up.UserId, up.ProductId })
+                .IsUnique();
+
+            builder.HasIndex(up => up.UserId);
+
+            builder.HasIndex(up => up.ProductId);
+
+            builder.HasOne(up => up.User)
                 .WithMany(u => u.Products)
-                .HasForeignKey(upm => upm.UserId)
-                .IsRequired(false);
+                .HasForeignKey(up => up.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
 
-            builder.HasOne(upm => upm.Product)
+            builder.HasOne(up => up.Product)
                 .WithMany(p => p.Users)
-                .HasForeignKey(upm => upm.ProductId);
+                .HasForeignKey(up => up.ProductId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

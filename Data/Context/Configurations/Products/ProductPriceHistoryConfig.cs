@@ -8,18 +8,37 @@ namespace Data.Context.Configurations.Products
     {
         public void Configure(EntityTypeBuilder<ProductPriceHistory> builder)
         {
-            builder.ToTable("ProductPriceHistory");
+            builder.HasKey(ph => ph.Id);
 
-            builder.HasKey(pph => pph.Id);
+            builder.Property(ph => ph.OldPrice)
+                .IsRequired()
+                .HasColumnType("decimal(18,0)");
 
-            builder.HasIndex(pph => new { pph.ProductId, pph.CreatedDate });
+            builder.Property(ph => ph.NewPrice)
+                .IsRequired()
+                .HasColumnType("decimal(18,0)");
 
-            builder.Property(pph => pph.Price)
-                .HasColumnType("numeric(18,0)");
+            builder.Property(ph => ph.ChangePercent)
+                .IsRequired()
+                .HasColumnType("decimal(8,4)");
 
-            builder.HasOne(pph => pph.Product)
-                .WithMany(p => p.PriceHistory)
-                .HasForeignKey(pph => pph.ProductId);
+            builder.Property(ph => ph.BuyBoxChanged)
+                .HasDefaultValue(false);
+
+            builder.Property(ph => ph.IsBuyBoxWinner)
+                .HasDefaultValue(false);
+
+            builder.HasIndex(ph => new { ph.ProductVariantSellerId, ph.CreatedDate });
+
+            builder.HasIndex(ph => ph.CreatedDate);
+
+            builder.HasIndex(ph => ph.BuyBoxChanged)
+                .HasFilter("\"BuyBoxChanged\" = true");
+
+            builder.HasOne(ph => ph.VariantSeller)
+                .WithMany(vs => vs.PriceHistory)
+                .HasForeignKey(ph => ph.ProductVariantSellerId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

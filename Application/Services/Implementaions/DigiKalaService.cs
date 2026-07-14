@@ -92,24 +92,5 @@ namespace Application.Services.Implementations
             var match = Regex.Match(url, @"dkp-(\d+)", RegexOptions.IgnoreCase);
             return match.Success ? match.Groups[1].Value : (long.TryParse(url.Trim(), out _) ? url.Trim() : Result.Failure<string>(Messages.OperationFailedError));
         }
-
-        public async Task<Result<DigiKalaProductResultDto>> GetCurrentPublicIpAsync()
-        {
-            int retries = 3;
-            while (retries > 0)
-            {
-                try
-                {
-                    Console.WriteLine(await _httpClient.GetStringAsync("https://api.ipify.org"));
-                    return Result.Failure<DigiKalaProductResultDto>(Messages.OperationFailedError);
-                }
-                catch (HttpRequestException)
-                {
-                    retries--;
-                    await Task.Delay(2000);
-                }
-            }
-            return Result.Failure<DigiKalaProductResultDto>(Messages.OperationFailedError);
-        }
     }
 }

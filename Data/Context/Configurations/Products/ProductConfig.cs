@@ -12,36 +12,25 @@ namespace Data.Context.Configurations.Products
 
             builder.HasKey(p => p.Id);
 
+            builder.HasQueryFilter(p => !p.IsDeleted);
+
             builder.Property(p => p.DigiKalaId)
                 .IsRequired()
                 .HasMaxLength(50);
-
-            builder.HasIndex(p => p.DigiKalaId)
-                .IsUnique();
 
             builder.Property(p => p.Title)
                 .IsRequired()
                 .HasMaxLength(500);
 
-            builder.Property(p => p.OldPrice)
-                .HasColumnType("numeric(18,0)");
-
-            builder.Property(p => p.NewPrice)
-                .HasColumnType("numeric(18,0)");
-
-            builder.Property(p => p.ChangePercent)
-                .HasColumnType("numeric(18,2)")
-                .IsRequired(false);
-
-            builder.Property(p => p.ImageFileName)
-                .HasMaxLength(200);
-
             builder.Property(p => p.ImageUrl)
-                 .HasMaxLength(200);
+                 .HasMaxLength(1000);
 
             builder.Property(p => p.Url)
                 .IsRequired()
                 .HasMaxLength(1000);
+
+            builder.HasIndex(p => p.DigiKalaId)
+                .IsUnique();
         }
     }
 }

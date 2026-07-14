@@ -2,11 +2,15 @@
 {
     public class ProductPriceHistory : AuditBaseEntity<int>
     {
-        public decimal Price { get; set; }
+        public decimal OldPrice { get; set; }
+        public decimal NewPrice { get; set; }
+        public decimal ChangePercent { get; set; }
+        public bool BuyBoxChanged { get; set; }
+        public bool IsBuyBoxWinner { get; set; }
 
         #region Relations
-        public int ProductId { get; set; }
-        public Product Product { get; set; }
+        public int ProductVariantSellerId { get; set; }
+        public ProductVariantSeller VariantSeller { get; set; }
         #endregion
     }
 }

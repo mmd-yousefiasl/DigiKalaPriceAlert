@@ -132,7 +132,7 @@ namespace Web.BackgroundServices
                     }
 
                     decimal newPrice = scrapResult.Value.Price;
-                    decimal oldPrice = product.NewPrice;
+                    decimal oldPrice = 666;
 
                     if (newPrice != oldPrice)
                     {

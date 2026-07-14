@@ -8,7 +8,5 @@ namespace Application.Services.Interfaces
         Result<string> ExtractProductIdFromUrl(string url);
 
         Task<Result<DigiKalaProductResultDto>> GetProductDetails(string digiKalaId);
-
-        Task<Result<DigiKalaProductResultDto>> GetCurrentPublicIpAsync();
     }
 }

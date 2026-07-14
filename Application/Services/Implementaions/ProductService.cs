@@ -1,13 +1,9 @@
 ﻿using Application.Dtos.Products.ClientSide;
 using Application.Services.Interfaces;
-using Application.Tools;
 using Data.Context;
-using Domain.Enums.Products;
 using Domain.Models.Products;
-using Domain.Models.Users;
 using Domain.Shared;
 using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace Application.Services.Implementaions
@@ -37,308 +33,343 @@ namespace Application.Services.Implementaions
         }
         #endregion
 
-        public async Task<Result<int>> ClientSideCreateNewProduct(ClientSideCreateNewProductDto dto)
-        {
-            if (dto is null || string.IsNullOrWhiteSpace(dto.Url))
-                return Result.Failure<int>(Messages.OperationFailedError);
-
-            var userId = _httpContextAccessor.HttpContext.User.GetUserId();
-            if (userId < 1)
-                return Result.Failure<int>(Messages.OperationFailedError);
-
-            var userResult = await _userService.ClientSideCanUserAddProduct();
-            if (userResult.IsFailure)
-                return Result.Failure<int>(userResult.Message!);
-
-            var productIdResult = _digiKalaService.ExtractProductIdFromUrl(dto.Url);
-            if (productIdResult.IsFailure)
-                return Result.Failure<int>(Messages.InvalidDigiKalaProductUrlError);
-
-            var digiKalaId = productIdResult.Value;
-
-            var existingProductId = await _context.Products
-                .AsNoTracking()
-                .Where(n => n.DigiKalaId == digiKalaId)
-                .Select(n => n.Id)
-                .FirstOrDefaultAsync();
-
-            if (existingProductId > 0)
-            {
-                var isAlreadyMapped = await _context.UserProductMapping
-                    .AnyAsync(m => m.UserId == userId && m.ProductId == existingProductId);
-
-                if (isAlreadyMapped)
-                    return existingProductId;
-
-                var userProductMapping = new UserProductMapping
+        /*        public async Task<Result<int>> ClientSideCreateNewProduct(ClientSideCreateNewProductDto dto)
                 {
-                    UserId = userId,
-                    ProductId = existingProductId
-                };
+                    if (dto is null || string.IsNullOrWhiteSpace(dto.Url))
+                        return Result.Failure<int>(Messages.OperationFailedError);
 
-                _context.UserProductMapping.Add(userProductMapping);
-                await _context.SaveChangesAsync();
+                    var userId = _httpContextAccessor.HttpContext.User.GetUserId();
+                    if (userId < 1)
+                        return Result.Failure<int>(Messages.OperationFailedError);
 
-                return existingProductId;
-            }
-            else
-            {
-                var digiKalaResult = await _digiKalaService.GetProductDetails(digiKalaId);
-                if (digiKalaResult.IsFailure)
-                    return Result.Failure<int>(Messages.InvalidDigiKalaProductUrlError);
+                    var userResult = await _userService.ClientSideCanUserAddProduct();
+                    if (userResult.IsFailure)
+                        return Result.Failure<int>(userResult.Message!);
 
-                var digiKala = digiKalaResult.Value;
+                    var productIdResult = _digiKalaService.ExtractProductIdFromUrl(dto.Url);
+                    if (productIdResult.IsFailure)
+                        return Result.Failure<int>(Messages.InvalidDigiKalaProductUrlError);
 
-                var product = new Product
-                {
-                    Title = digiKala.Title,
-                    DigiKalaId = digiKalaId,
-                    ImageUrl = digiKala.ImageUrl,
-                    OldPrice = 0,
-                    NewPrice = digiKala.Price,
-                    Url = digiKalaId.GetDigiKalaProductUrl(),
-                    Users = new List<UserProductMapping>{
-                        new UserProductMapping()
+                    var digiKalaId = productIdResult.Value;
+
+                    var existingProductId = await _context.Products
+                        .AsNoTracking()
+                        .Where(n => n.DigiKalaId == digiKalaId)
+                        .Select(n => n.Id)
+                        .FirstOrDefaultAsync();
+
+                    if (existingProductId > 0)
+                    {
+                        var isAlreadyMapped = await _context.UserProductMapping
+                            .AnyAsync(m => m.UserId == userId && m.ProductId == existingProductId);
+
+                        if (isAlreadyMapped)
+                            return existingProductId;
+
+                        var userProductMapping = new UserProductMapping
                         {
                             UserId = userId,
-                        },
-                    },
-                    PriceHistory = new List<ProductPriceHistory>{
-                        new ProductPriceHistory()
+                            ProductId = existingProductId
+                        };
+
+                        _context.UserProductMapping.Add(userProductMapping);
+                        await _context.SaveChangesAsync();
+
+                        return existingProductId;
+                    }
+                    else
+                    {
+                        var digiKalaResult = await _digiKalaService.GetProductDetails(digiKalaId);
+                        if (digiKalaResult.IsFailure)
+                            return Result.Failure<int>(Messages.InvalidDigiKalaProductUrlError);
+
+                        var digiKala = digiKalaResult.Value;
+
+                        var product = new Product
                         {
-                            Price = digiKala.Price,
-                        }}
-                };
+                            Title = digiKala.Title,
+                            DigiKalaId = digiKalaId,
+                            ImageUrl = digiKala.ImageUrl,
+                            OldPrice = 0,
+                            NewPrice = digiKala.Price,
+                            Url = digiKalaId.GetDigiKalaProductUrl(),
+                            Users = new List<UserProductMapping>{
+                                new UserProductMapping()
+                                {
+                                    UserId = userId,
+                                },
+                            },
+                            PriceHistory = new List<ProductPriceHistory>{
+                                new ProductPriceHistory()
+                                {
+                                    Price = digiKala.Price,
+                                }}
+                        };
 
-                _context.Products.Add(product);
-                await _context.SaveChangesAsync();
+                        _context.Products.Add(product);
+                        await _context.SaveChangesAsync();
 
-                return product.Id;
-            }
-        }
+                        return product.Id;
+                    }
+                }
 
-        public async Task<Result<ClientSideProductDetailsDto>> ClientSideGetProductDetails(int id)
-        {
-            if (id < 1)
-                return Result.Failure<ClientSideProductDetailsDto>(Messages.OperationFailedError);
-
-            var userId = _httpContextAccessor.HttpContext.User.GetUserId();
-            if (userId < 1)
-                return Result.Failure<ClientSideProductDetailsDto>(Messages.OperationFailedError);
-
-            var todayUtc = DateTime.UtcNow.Date;
-
-            var product = await _context.Products
-                .AsNoTracking()
-                .Where(n => n.Id == id && n.Users.Any(u => u.UserId == userId))
-                .Select(n => new ClientSideProductDetailsDto()
+                public async Task<Result<ClientSideProductDetailsDto>> ClientSideGetProductDetails(int id)
                 {
-                    Id = n.Id,
-                    Title = n.Title,
-                    DigiKalaId = n.DigiKalaId,
-                    ImageUrl = n.ImageUrl,
-                    NewPrice = n.NewPrice,
-                    OldPrice = n.OldPrice,
-                    Url = n.Url,
-                    CreatedDate = n.CreatedDate,
-                    LastUpdatedDate = n.LastUpdatedDate,
-                    ChangePercent = n.ChangePercent,
+                    if (id < 1)
+                        return Result.Failure<ClientSideProductDetailsDto>(Messages.OperationFailedError);
 
-                    AllTimeMaxPrice = n.PriceHistory.Max(ph => (decimal?)ph.Price) ?? 0,
-                    AllTimeMinPrice = n.PriceHistory.Min(ph => (decimal?)ph.Price) ?? 0,
+                    var userId = _httpContextAccessor.HttpContext.User.GetUserId();
+                    if (userId < 1)
+                        return Result.Failure<ClientSideProductDetailsDto>(Messages.OperationFailedError);
 
-                    TodayPriceChangesCount = n.PriceHistory.Count(ph => ph.CreatedDate >= todayUtc),
+                    var todayUtc = DateTime.UtcNow.Date;
 
-                    History = n.PriceHistory
-                        .OrderByDescending(ph => ph.CreatedDate)
-                        .Select(ph => new ClientSideProductPriceHistoryDto()
+                    var product = await _context.Products
+                        .AsNoTracking()
+                        .Where(n => n.Id == id && n.Users.Any(u => u.UserId == userId))
+                        .Select(n => new ClientSideProductDetailsDto()
                         {
-                            Id = ph.Id,
-                            Price = ph.Price,
-                            CreatedDate = ph.CreatedDate
-                        }).Take(50)
-                        .ToList()
-                }).FirstOrDefaultAsync();
+                            Id = n.Id,
+                            Title = n.Title,
+                            DigiKalaId = n.DigiKalaId,
+                            ImageUrl = n.ImageUrl,
+                            NewPrice = n.NewPrice,
+                            OldPrice = n.OldPrice,
+                            Url = n.Url,
+                            CreatedDate = n.CreatedDate,
+                            LastUpdatedDate = n.LastUpdatedDate,
+                            ChangePercent = n.ChangePercent,
 
-            if (product is null)
-                return Result.Failure<ClientSideProductDetailsDto>(Messages.OperationFailedError);
+                            AllTimeMaxPrice = n.PriceHistory.Max(ph => (decimal?)ph.Price) ?? 0,
+                            AllTimeMinPrice = n.PriceHistory.Min(ph => (decimal?)ph.Price) ?? 0,
 
-            return product;
-        }
+                            TodayPriceChangesCount = n.PriceHistory.Count(ph => ph.CreatedDate >= todayUtc),
 
-        public async Task<Result<ClientSideFilterProductsDto>> ClientSideFilterProducts(ClientSideFilterProductsDto filter)
-        {
-            if (filter is null)
-                return Result.Failure<ClientSideFilterProductsDto>(Messages.OperationFailedError);
+                            History = n.PriceHistory
+                                .OrderByDescending(ph => ph.CreatedDate)
+                                .Select(ph => new ClientSideProductPriceHistoryDto()
+                                {
+                                    Id = ph.Id,
+                                    Price = ph.Price,
+                                    CreatedDate = ph.CreatedDate
+                                }).Take(50)
+                                .ToList()
+                        }).FirstOrDefaultAsync();
 
-            var userId = _httpContextAccessor.HttpContext.User.GetUserId();
-            if (userId < 1)
-                return Result.Failure<ClientSideFilterProductsDto>(Messages.OperationFailedError);
+                    if (product is null)
+                        return Result.Failure<ClientSideProductDetailsDto>(Messages.OperationFailedError);
 
-            var conditions = Filter.GenerateConditions<Product>();
+                    return product;
+                }
 
-            conditions.Add(n => n.Users.Any(u => u.UserId == userId));
-
-            if (!string.IsNullOrWhiteSpace(filter.Search))
-            {
-                conditions.Add(n => n.Title.Contains(filter.Search));
-            }
-
-            if (filter.SortType == ProductSortTypeEnum.UnreadOnly)
-            {
-                conditions.Add(n => n.Users.Any(u => u.UserId == userId && !u.IsRead));
-            }
-
-            IQueryable<Product> query = _context.Products;
-
-            foreach (var item in conditions)
-            {
-                query = query.Where(item);
-            }
-
-            var projectedQuery = query.Select(n => new ClientSideProductDto()
-            {
-                Id = n.Id,
-                ImageUrl = n.ImageUrl,
-                Title = n.Title,
-                LastUpdatedDate = n.LastUpdatedDate,
-                NewPrice = n.NewPrice,
-                OldPrice = n.OldPrice,
-                Url = n.Url,
-                ChangePercent = n.ChangePercent,
-                IsRead = n.Users.Where(u => u.UserId == userId).Select(u => u.IsRead).FirstOrDefault()
-            });
-
-            IOrderedQueryable<ClientSideProductDto> sortedQuery;
-
-            switch (filter.SortType)
-            {
-                case ProductSortTypeEnum.OldestUpdate:
-                    sortedQuery = projectedQuery.OrderBy(n => n.LastUpdatedDate);
-                    break;
-
-                case ProductSortTypeEnum.HighestPrice:
-                    sortedQuery = projectedQuery.OrderByDescending(n => n.NewPrice);
-                    break;
-
-                case ProductSortTypeEnum.LowestPrice:
-                    sortedQuery = projectedQuery.OrderBy(n => n.NewPrice);
-                    break;
-
-                case ProductSortTypeEnum.HighestPriceDrop:
-                    sortedQuery = projectedQuery.OrderBy(n => n.ChangePercent);
-                    break;
-
-                case ProductSortTypeEnum.UnreadOnly:
-                    sortedQuery = projectedQuery.OrderByDescending(n => n.LastUpdatedDate);
-                    break;
-
-                case ProductSortTypeEnum.NewestUpdate:
-                default:
-                    sortedQuery = projectedQuery.OrderBy(n => n.IsRead).ThenByDescending(n => n.LastUpdatedDate);
-                    break;
-            }
-
-            await filter.Paging(sortedQuery);
-
-            return filter;
-        }
-
-        public async Task<Result> ClientSideDeleteUserProduct(int id)
-        {
-            if (id < 1)
-                return Result.Failure(Messages.OperationFailedError);
-
-            var userId = _httpContextAccessor.HttpContext.User.GetUserId();
-            if (userId < 1)
-                return Result.Failure(Messages.OperationFailedError);
-
-            var userProduct = await _context.UserProductMapping
-                .FirstOrDefaultAsync(n => n.UserId == userId && n.ProductId == id);
-            if (userProduct is null)
-                return Result.Failure(Messages.OperationFailedError);
-
-            _context.UserProductMapping.Remove(userProduct);
-            await _context.SaveChangesAsync();
-
-            return Result.Success();
-        }
-
-        public async Task<List<Product>> GetProductsBatchForMonitoringAsync(ClientSideGetProductsBatchForMonitoringDto dto)
-        {
-            return await _context.Products
-                .AsNoTracking()
-                .Where(p => dto.ProductIds.Contains(p.Id))
-                .ToListAsync(dto.CancellationToken);
-        }
-
-        public async Task<Result> ClientSideUpdateProductPrices(ClientSideUpdateProductPricesDto dto)
-        {
-            var strategy = _context.Database.CreateExecutionStrategy();
-
-            return await strategy.ExecuteAsync(async () =>
-            {
-                using var transaction = await _context.Database.BeginTransactionAsync(dto.CancellationToken);
-                try
+                public async Task<Result<ClientSideFilterProductsDto>> ClientSideFilterProducts(ClientSideFilterProductsDto filter)
                 {
-                    decimal? calculatedPercent = dto.OldPrice.CalculateChangePercent(dto.NewPrice);
+                    if (filter is null)
+                        return Result.Failure<ClientSideFilterProductsDto>(Messages.OperationFailedError);
 
-                    var rowsAffected = await _context.Products
-                        .Where(p => p.Id == dto.ProductId)
-                        .ExecuteUpdateAsync(s => s
-                            .SetProperty(p => p.OldPrice, p => p.NewPrice)
-                            .SetProperty(p => p.NewPrice, dto.NewPrice)
-                            .SetProperty(p => p.LastUpdatedDate, DateTime.UtcNow)
-                            .SetProperty(p => p.ChangePercent, calculatedPercent),
-                        dto.CancellationToken);
+                    var userId = _httpContextAccessor.HttpContext.User.GetUserId();
+                    if (userId < 1)
+                        return Result.Failure<ClientSideFilterProductsDto>(Messages.OperationFailedError);
+
+                    var conditions = Filter.GenerateConditions<Product>();
+
+                    conditions.Add(n => n.Users.Any(u => u.UserId == userId));
+
+                    if (!string.IsNullOrWhiteSpace(filter.Search))
+                    {
+                        conditions.Add(n => n.Title.Contains(filter.Search));
+                    }
+
+                    if (filter.SortType == ProductSortTypeEnum.UnreadOnly)
+                    {
+                        conditions.Add(n => n.Users.Any(u => u.UserId == userId && !u.IsRead));
+                    }
+
+                    IQueryable<Product> query = _context.Products;
+
+                    foreach (var item in conditions)
+                    {
+                        query = query.Where(item);
+                    }
+
+                    var projectedQuery = query.Select(n => new ClientSideProductDto()
+                    {
+                        Id = n.Id,
+                        ImageUrl = n.ImageUrl,
+                        Title = n.Title,
+                        LastUpdatedDate = n.LastUpdatedDate,
+                        NewPrice = n.NewPrice,
+                        OldPrice = n.OldPrice,
+                        Url = n.Url,
+                        ChangePercent = n.ChangePercent,
+                        IsRead = n.Users.Where(u => u.UserId == userId).Select(u => u.IsRead).FirstOrDefault()
+                    });
+
+                    IOrderedQueryable<ClientSideProductDto> sortedQuery;
+
+                    switch (filter.SortType)
+                    {
+                        case ProductSortTypeEnum.OldestUpdate:
+                            sortedQuery = projectedQuery.OrderBy(n => n.LastUpdatedDate);
+                            break;
+
+                        case ProductSortTypeEnum.HighestPrice:
+                            sortedQuery = projectedQuery.OrderByDescending(n => n.NewPrice);
+                            break;
+
+                        case ProductSortTypeEnum.LowestPrice:
+                            sortedQuery = projectedQuery.OrderBy(n => n.NewPrice);
+                            break;
+
+                        case ProductSortTypeEnum.HighestPriceDrop:
+                            sortedQuery = projectedQuery.OrderBy(n => n.ChangePercent);
+                            break;
+
+                        case ProductSortTypeEnum.UnreadOnly:
+                            sortedQuery = projectedQuery.OrderByDescending(n => n.LastUpdatedDate);
+                            break;
+
+                        case ProductSortTypeEnum.NewestUpdate:
+                        default:
+                            sortedQuery = projectedQuery.OrderBy(n => n.IsRead).ThenByDescending(n => n.LastUpdatedDate);
+                            break;
+                    }
+
+                    await filter.Paging(sortedQuery);
+
+                    return filter;
+                }
+
+                public async Task<Result> ClientSideDeleteUserProduct(int id)
+                {
+                    if (id < 1)
+                        return Result.Failure(Messages.OperationFailedError);
+
+                    var userId = _httpContextAccessor.HttpContext.User.GetUserId();
+                    if (userId < 1)
+                        return Result.Failure(Messages.OperationFailedError);
+
+                    var userProduct = await _context.UserProductMapping
+                        .FirstOrDefaultAsync(n => n.UserId == userId && n.ProductId == id);
+                    if (userProduct is null)
+                        return Result.Failure(Messages.OperationFailedError);
+
+                    _context.UserProductMapping.Remove(userProduct);
+                    await _context.SaveChangesAsync();
+
+                    return Result.Success();
+                }
+
+                public async Task<List<Product>> GetProductsBatchForMonitoringAsync(ClientSideGetProductsBatchForMonitoringDto dto)
+                {
+                    return await _context.Products
+                        .AsNoTracking()
+                        .Where(p => dto.ProductIds.Contains(p.Id))
+                        .ToListAsync(dto.CancellationToken);
+                }
+
+                public async Task<Result> ClientSideUpdateProductPrices(ClientSideUpdateProductPricesDto dto)
+                {
+                    var strategy = _context.Database.CreateExecutionStrategy();
+
+                    return await strategy.ExecuteAsync(async () =>
+                    {
+                        using var transaction = await _context.Database.BeginTransactionAsync(dto.CancellationToken);
+                        try
+                        {
+                            decimal? calculatedPercent = dto.OldPrice.CalculateChangePercent(dto.NewPrice);
+
+                            var rowsAffected = await _context.Products
+                                .Where(p => p.Id == dto.ProductId)
+                                .ExecuteUpdateAsync(s => s
+                                    .SetProperty(p => p.OldPrice, p => p.NewPrice)
+                                    .SetProperty(p => p.NewPrice, dto.NewPrice)
+                                    .SetProperty(p => p.LastUpdatedDate, DateTime.UtcNow)
+                                    .SetProperty(p => p.ChangePercent, calculatedPercent),
+                                dto.CancellationToken);
+
+                            if (rowsAffected == 0)
+                                return Result.Failure(Messages.OperationFailedError);
+
+                            await _context.UserProductMapping
+                                .Where(upm => upm.ProductId == dto.ProductId)
+                                .ExecuteUpdateAsync(s => s
+                                    .SetProperty(upm => upm.IsRead, false),
+                                dto.CancellationToken);
+
+                            var history = new ProductPriceHistory
+                            {
+                                ProductId = dto.ProductId,
+                                Price = dto.NewPrice,
+                            };
+                            _context.ProductPriceHistory.Add(history);
+
+                            await _context.SaveChangesAsync(dto.CancellationToken);
+                            await transaction.CommitAsync(dto.CancellationToken);
+
+                            return Result.Success();
+                        }
+                        catch (Exception ex)
+                        {
+                            await transaction.RollbackAsync(dto.CancellationToken);
+                            _logger.LogError(ex, "Error updating prices and notification flags for product {ProductId}", dto.ProductId);
+                            throw;
+                        }
+                    });
+                }
+
+                public async Task<Result> ClientSideSetProductAsReadForUser(int id)
+                {
+                    if (id < 1)
+                        return Result.Failure(Messages.OperationFailedError);
+
+                    var userId = _httpContextAccessor.HttpContext.User.GetUserId();
+                    if (userId < 1)
+                        return Result.Failure(Messages.OperationFailedError);
+
+                    var rowsAffected = await _context.UserProductMapping
+                        .Where(n => n.UserId == userId && n.ProductId == id)
+                        .ExecuteUpdateAsync(s => s.SetProperty(upm => upm.IsRead, true));
 
                     if (rowsAffected == 0)
                         return Result.Failure(Messages.OperationFailedError);
 
-                    await _context.UserProductMapping
-                        .Where(upm => upm.ProductId == dto.ProductId)
-                        .ExecuteUpdateAsync(s => s
-                            .SetProperty(upm => upm.IsRead, false),
-                        dto.CancellationToken);
-
-                    var history = new ProductPriceHistory
-                    {
-                        ProductId = dto.ProductId,
-                        Price = dto.NewPrice,
-                    };
-                    _context.ProductPriceHistory.Add(history);
-
-                    await _context.SaveChangesAsync(dto.CancellationToken);
-                    await transaction.CommitAsync(dto.CancellationToken);
-
                     return Result.Success();
-                }
-                catch (Exception ex)
-                {
-                    await transaction.RollbackAsync(dto.CancellationToken);
-                    _logger.LogError(ex, "Error updating prices and notification flags for product {ProductId}", dto.ProductId);
-                    throw;
-                }
-            });
+                }*/
+
+        public Task<Result<int>> ClientSideCreateNewProduct(ClientSideCreateNewProductDto dto)
+        {
+            throw new NotImplementedException();
         }
 
-        public async Task<Result> ClientSideSetProductAsReadForUser(int id)
+        public Task<Result<ClientSideProductDetailsDto>> ClientSideGetProductDetails(int id)
         {
-            if (id < 1)
-                return Result.Failure(Messages.OperationFailedError);
+            throw new NotImplementedException();
+        }
 
-            var userId = _httpContextAccessor.HttpContext.User.GetUserId();
-            if (userId < 1)
-                return Result.Failure(Messages.OperationFailedError);
+        public Task<Result<ClientSideFilterProductsDto>> ClientSideFilterProducts(ClientSideFilterProductsDto filter)
+        {
+            throw new NotImplementedException();
+        }
 
-            var rowsAffected = await _context.UserProductMapping
-                .Where(n => n.UserId == userId && n.ProductId == id)
-                .ExecuteUpdateAsync(s => s.SetProperty(upm => upm.IsRead, true));
+        public Task<Result> ClientSideDeleteUserProduct(int id)
+        {
+            throw new NotImplementedException();
+        }
 
-            if (rowsAffected == 0)
-                return Result.Failure(Messages.OperationFailedError);
+        public Task<List<Product>> GetProductsBatchForMonitoringAsync(ClientSideGetProductsBatchForMonitoringDto dto)
+        {
+            throw new NotImplementedException();
+        }
 
-            return Result.Success();
+        public Task<Result> ClientSideUpdateProductPrices(ClientSideUpdateProductPricesDto dto)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Result> ClientSideSetProductAsReadForUser(int id)
+        {
+            throw new NotImplementedException();
         }
     }
 }
