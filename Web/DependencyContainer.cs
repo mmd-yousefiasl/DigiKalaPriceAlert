@@ -41,16 +41,11 @@ namespace Web
 
             #region HttpClient Services
             services.AddHttpClient<IDigiKalaService, DigiKalaService>()
-                .ConfigurePrimaryHttpMessageHandler(() =>
+                .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
                 {
-                    return new HttpClientHandler
-                    {
-                        UseCookies = true,
-                        CookieContainer = new CookieContainer(),
-                        //Proxy = new WebProxy("socks5://127.0.0.1:10808"),
-                        //UseProxy = false,
-                        AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
-                    };
+                    UseCookies = true,
+                    CookieContainer = new CookieContainer(),
+                    AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate | DecompressionMethods.Brotli
                 });
             #endregion
 

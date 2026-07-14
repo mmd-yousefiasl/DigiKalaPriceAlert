@@ -27,7 +27,7 @@ namespace Data.Context
         }
 
         public DbSet<User> Users => Set<User>();
-        public DbSet<UserProductMapping> UserProductMapping => Set<UserProductMapping>();
+        public DbSet<UserProductMapping> UserProductMappings => Set<UserProductMapping>();
         public DbSet<BalanceTransaction> BalanceTransactions => Set<BalanceTransaction>();
         public DbSet<UserRoleMapping> UserRoleMapping => Set<UserRoleMapping>();
         public DbSet<UserValidation> UserValidation => Set<UserValidation>();

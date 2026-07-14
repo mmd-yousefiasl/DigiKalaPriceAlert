@@ -483,7 +483,7 @@ namespace Application.Services.Implementaions
             if (userId < 1)
                 return Result.Failure(Messages.OperationFailedError);
 
-            if (await _context.UserProductMapping.CountAsync(n => n.UserId == userId) >= SiteTools.MaximumProductCount)
+            if (await _context.UserProductMappings.CountAsync(n => n.UserId == userId) >= SiteTools.MaximumProductCount)
                 return Result.Failure(Messages.UserReachedMaximumProductsError);
 
             return Result.Success();
@@ -506,7 +506,7 @@ namespace Application.Services.Implementaions
         {
             var now = DateTime.UtcNow;
 
-            var result = await _context.UserProductMapping
+            var result = await _context.UserProductMappings
                 .AsNoTracking()
                 .Where(upm => upm.User.SubscriptionEndDate > now)
                 .GroupBy(upm => upm.ProductId)
@@ -533,7 +533,7 @@ namespace Application.Services.Implementaions
         {
             var now = DateTime.UtcNow;
 
-            return await _context.UserProductMapping
+            return await _context.UserProductMappings
                 .AsNoTracking()
                 .Where(up => up.ProductId == dto.ProductId && up.User.SubscriptionEndDate > now)
                 .Select(up => up.User.Mobile)

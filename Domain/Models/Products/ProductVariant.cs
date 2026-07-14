@@ -13,9 +13,9 @@
         public int ProductId { get; set; }
         public Product Product { get; set; }
 
-        public ICollection<ProductVariantSeller> Sellers { get; set; }
+        public ICollection<ProductVariantSeller> Sellers { get; set; } = new List<ProductVariantSeller>();
 
-        public ICollection<UserVariantWatch> UserWatches { get; set; }
+        public ICollection<UserVariantWatch> UserWatches { get; set; } = new List<UserVariantWatch>();
         #endregion
     }
 }

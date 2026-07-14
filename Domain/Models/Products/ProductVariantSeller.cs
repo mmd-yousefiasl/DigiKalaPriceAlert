@@ -15,7 +15,7 @@
         public int ProductVariantId { get; set; }
         public ProductVariant Variant { get; set; }
 
-        public ICollection<ProductPriceHistory> PriceHistory { get; set; }
+        public ICollection<ProductPriceHistory> PriceHistory { get; set; } = new List<ProductPriceHistory>();
         #endregion
     }
 }

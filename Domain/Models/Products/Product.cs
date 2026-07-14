@@ -10,8 +10,8 @@ namespace Domain.Models.Products
         public string? ImageUrl { get; set; }
 
         #region Relations
-        public ICollection<UserProductMapping>? Users { get; set; }
-        public ICollection<ProductVariant> Variants { get; set; }
+        public ICollection<UserProductMapping> Users { get; set; } = new List<UserProductMapping>();
+        public ICollection<ProductVariant> Variants { get; set; } = new List<ProductVariant>();
         #endregion
     }
 }

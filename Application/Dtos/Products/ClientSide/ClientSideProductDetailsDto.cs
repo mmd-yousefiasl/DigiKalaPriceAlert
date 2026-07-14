@@ -3,20 +3,21 @@
     public class ClientSideProductDetailsDto : CommonDto
     {
         public string Title { get; set; }
+        public string DigiKalaId { get; set; }
         public string Url { get; set; }
         public string? ImageUrl { get; set; }
-        public string DigiKalaId { get; set; }
-        public decimal OldPrice { get; set; }
-        public decimal NewPrice { get; set; }
-        public decimal? ChangePercent { get; set; }
-
-        public decimal? AllTimeMinPrice { get; set; }
-        public decimal? AllTimeMaxPrice { get; set; }
-        public int TodayPriceChangesCount { get; set; }
-
         public DateTime CreatedDate { get; set; }
         public DateTime LastUpdatedDate { get; set; }
 
-        public List<ClientSideProductPriceHistoryDto>? History { get; set; }
+        public decimal LowestCurrentPrice { get; set; }
+        public decimal HighestCurrentPrice { get; set; }
+        public int TotalVariantsCount { get; set; }
+        public int TotalSellersCount { get; set; }
+
+        public string? BuyBoxSellerName { get; set; }
+        public decimal? BuyBoxPrice { get; set; }
+        public string? BuyBoxColorName { get; set; }
+
+        public List<ClientSideVariantDetailsDto> Variants { get; set; } = [];
     }
 }
