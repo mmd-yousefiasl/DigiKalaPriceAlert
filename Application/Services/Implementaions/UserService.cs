@@ -840,5 +840,21 @@ namespace Application.Services.Implementaions
 
             return Result.Success(Messages.YourProfileUpdatedSuccessfully);
         }
+
+        public async Task<List<ClientSideUserToNotifyDto>> GetUserContactsAsync(List<int> userIds, CancellationToken ct)
+        {
+            if (userIds is null || userIds.Count == 0)
+                return new List<ClientSideUserToNotifyDto>();
+
+            return await _context.Users
+                .AsNoTracking()
+                .Where(u => userIds.Contains(u.Id) && !u.IsUserBanned)
+                .Select(u => new ClientSideUserToNotifyDto
+                {
+                    Mobile = u.Mobile,
+                    FirstName = u.FirstName ?? "کاربر"
+                })
+                .ToListAsync(ct);
+        }
     }
 }

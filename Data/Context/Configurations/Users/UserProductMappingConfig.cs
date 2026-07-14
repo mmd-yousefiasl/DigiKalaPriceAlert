@@ -19,9 +19,7 @@ namespace Data.Context.Configurations.Users
                 .HasDefaultValue(false);
 
             builder.Property(up => up.WatchMode)
-                .IsRequired()
-                .HasConversion<int>()
-                .HasDefaultValue(WatchMode.AllVariants);
+                .HasSentinel(WatchMode.AllVariants);
 
             builder.Property(up => up.NotifyOnPriceChange)
                 .HasDefaultValue(true);

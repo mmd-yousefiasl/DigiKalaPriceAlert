@@ -1,5 +1,4 @@
 ﻿using Application.Dtos.Products.ClientSide;
-using Domain.Models.Products;
 using Domain.Shared;
 
 namespace Application.Services.Interfaces
@@ -14,10 +13,12 @@ namespace Application.Services.Interfaces
 
         Task<Result> ClientSideDeleteUserProduct(int id);
 
-        Task<List<Product>> GetProductsBatchForMonitoringAsync(ClientSideGetProductsBatchForMonitoringDto dto);
+        Task<List<ProductMonitoringTargetDto>> GetAllProductsForMonitoringAsync(CancellationToken ct);
 
         Task<Result> ClientSideUpdateProductPrices(ClientSideUpdateProductPricesDto dto);
 
         Task<Result> ClientSideSetProductAsReadForUser(int id);
+
+        Task<List<int>> SyncProductAndDetectChangesAsync(ProductMonitoringTargetDto target, ClientSideScrapedProductDto scraped, CancellationToken ct);
     }
 }

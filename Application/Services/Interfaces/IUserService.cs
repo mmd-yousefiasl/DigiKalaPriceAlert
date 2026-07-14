@@ -65,5 +65,7 @@ namespace Application.Services.Interfaces
         Task<Result> ClientSideIsUserProfileCompleted(int userId);
 
         Task<Result> ClientSideUpdateUserProfile(ClientSideUpdateProfileDto dto);
+
+        Task<List<ClientSideUserToNotifyDto>> GetUserContactsAsync(List<int> userIds, CancellationToken ct);
     }
 }

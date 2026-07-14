@@ -10,6 +10,8 @@ namespace Data.Context.Configurations.Products
         {
             builder.HasKey(ph => ph.Id);
 
+            builder.HasQueryFilter(ph => !ph.IsDeleted);
+
             builder.Property(ph => ph.OldPrice)
                 .IsRequired()
                 .HasColumnType("decimal(18,0)");

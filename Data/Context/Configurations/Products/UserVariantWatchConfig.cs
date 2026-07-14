@@ -10,6 +10,8 @@ namespace Data.Context.Configurations.Products
         {
             builder.ToTable("UserVariantWatches");
 
+            builder.HasQueryFilter(vw => !vw.IsDeleted);
+
             builder.HasKey(vw => vw.Id);
 
             builder.Property(vw => vw.UserOwnSellerIdOnVariant)

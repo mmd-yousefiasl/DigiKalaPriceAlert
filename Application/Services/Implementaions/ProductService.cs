@@ -37,275 +37,6 @@ namespace Application.Services.Implementaions
         }
         #endregion
 
-        /*        public async Task<Result<int>> ClientSideCreateNewProduct(ClientSideCreateNewProductDto dto)
-                {
-                    if (dto is null || string.IsNullOrWhiteSpace(dto.Url))
-                        return Result.Failure<int>(Messages.OperationFailedError);
-
-                    var userId = _httpContextAccessor.HttpContext.User.GetUserId();
-                    if (userId < 1)
-                        return Result.Failure<int>(Messages.OperationFailedError);
-
-                    var userResult = await _userService.ClientSideCanUserAddProduct();
-                    if (userResult.IsFailure)
-                        return Result.Failure<int>(userResult.Message!);
-
-                    var productIdResult = _digiKalaService.ExtractProductIdFromUrl(dto.Url);
-                    if (productIdResult.IsFailure)
-                        return Result.Failure<int>(Messages.InvalidDigiKalaProductUrlError);
-
-                    var digiKalaId = productIdResult.Value;
-
-                    var existingProductId = await _context.Products
-                        .AsNoTracking()
-                        .Where(n => n.DigiKalaId == digiKalaId)
-                        .Select(n => n.Id)
-                        .FirstOrDefaultAsync();
-
-                    if (existingProductId > 0)
-                    {
-                        var isAlreadyMapped = await _context.UserProductMapping
-                            .AnyAsync(m => m.UserId == userId && m.ProductId == existingProductId);
-
-                        if (isAlreadyMapped)
-                            return existingProductId;
-
-                        var userProductMapping = new UserProductMapping
-                        {
-                            UserId = userId,
-                            ProductId = existingProductId
-                        };
-
-                        _context.UserProductMapping.Add(userProductMapping);
-                        await _context.SaveChangesAsync();
-
-                        return existingProductId;
-                    }
-                    else
-                    {
-                        var digiKalaResult = await _digiKalaService.GetProductDetails(digiKalaId);
-                        if (digiKalaResult.IsFailure)
-                            return Result.Failure<int>(Messages.InvalidDigiKalaProductUrlError);
-
-                        var digiKala = digiKalaResult.Value;
-
-                        var product = new Product
-                        {
-                            Title = digiKala.Title,
-                            DigiKalaId = digiKalaId,
-                            ImageUrl = digiKala.ImageUrl,
-                            OldPrice = 0,
-                            NewPrice = digiKala.Price,
-                            Url = digiKalaId.GetDigiKalaProductUrl(),
-                            Users = new List<UserProductMapping>{
-                                new UserProductMapping()
-                                {
-                                    UserId = userId,
-                                },
-                            },
-                            PriceHistory = new List<ProductPriceHistory>{
-                                new ProductPriceHistory()
-                                {
-                                    Price = digiKala.Price,
-                                }}
-                        };
-
-                        _context.Products.Add(product);
-                        await _context.SaveChangesAsync();
-
-                        return product.Id;
-                    }
-                }
-
-                public async Task<Result<ClientSideProductDetailsDto>> ClientSideGetProductDetails(int id)
-                {
-                    if (id < 1)
-                        return Result.Failure<ClientSideProductDetailsDto>(Messages.OperationFailedError);
-
-                    var userId = _httpContextAccessor.HttpContext.User.GetUserId();
-                    if (userId < 1)
-                        return Result.Failure<ClientSideProductDetailsDto>(Messages.OperationFailedError);
-
-                    var todayUtc = DateTime.UtcNow.Date;
-
-                    var product = await _context.Products
-                        .AsNoTracking()
-                        .Where(n => n.Id == id && n.Users.Any(u => u.UserId == userId))
-                        .Select(n => new ClientSideProductDetailsDto()
-                        {
-                            Id = n.Id,
-                            Title = n.Title,
-                            DigiKalaId = n.DigiKalaId,
-                            ImageUrl = n.ImageUrl,
-                            NewPrice = n.NewPrice,
-                            OldPrice = n.OldPrice,
-                            Url = n.Url,
-                            CreatedDate = n.CreatedDate,
-                            LastUpdatedDate = n.LastUpdatedDate,
-                            ChangePercent = n.ChangePercent,
-
-                            AllTimeMaxPrice = n.PriceHistory.Max(ph => (decimal?)ph.Price) ?? 0,
-                            AllTimeMinPrice = n.PriceHistory.Min(ph => (decimal?)ph.Price) ?? 0,
-
-                            TodayPriceChangesCount = n.PriceHistory.Count(ph => ph.CreatedDate >= todayUtc),
-
-                            History = n.PriceHistory
-                                .OrderByDescending(ph => ph.CreatedDate)
-                                .Select(ph => new ClientSideProductPriceHistoryDto()
-                                {
-                                    Id = ph.Id,
-                                    Price = ph.Price,
-                                    CreatedDate = ph.CreatedDate
-                                }).Take(50)
-                                .ToList()
-                        }).FirstOrDefaultAsync();
-
-                    if (product is null)
-                        return Result.Failure<ClientSideProductDetailsDto>(Messages.OperationFailedError);
-
-                    return product;
-                }
-
-                public async Task<Result<ClientSideFilterProductsDto>> ClientSideFilterProducts(ClientSideFilterProductsDto filter)
-                {
-                    if (filter is null)
-                        return Result.Failure<ClientSideFilterProductsDto>(Messages.OperationFailedError);
-
-                    var userId = _httpContextAccessor.HttpContext.User.GetUserId();
-                    if (userId < 1)
-                        return Result.Failure<ClientSideFilterProductsDto>(Messages.OperationFailedError);
-
-                    var conditions = Filter.GenerateConditions<Product>();
-
-                    conditions.Add(n => n.Users.Any(u => u.UserId == userId));
-
-                    if (!string.IsNullOrWhiteSpace(filter.Search))
-                    {
-                        conditions.Add(n => n.Title.Contains(filter.Search));
-                    }
-
-                    if (filter.SortType == ProductSortTypeEnum.UnreadOnly)
-                    {
-                        conditions.Add(n => n.Users.Any(u => u.UserId == userId && !u.IsRead));
-                    }
-
-                    IQueryable<Product> query = _context.Products;
-
-                    foreach (var item in conditions)
-                    {
-                        query = query.Where(item);
-                    }
-
-                    var projectedQuery = query.Select(n => new ClientSideProductDto()
-                    {
-                        Id = n.Id,
-                        ImageUrl = n.ImageUrl,
-                        Title = n.Title,
-                        LastUpdatedDate = n.LastUpdatedDate,
-                        NewPrice = n.NewPrice,
-                        OldPrice = n.OldPrice,
-                        Url = n.Url,
-                        ChangePercent = n.ChangePercent,
-                        IsRead = n.Users.Where(u => u.UserId == userId).Select(u => u.IsRead).FirstOrDefault()
-                    });
-
-                    IOrderedQueryable<ClientSideProductDto> sortedQuery;
-
-                    switch (filter.SortType)
-                    {
-                        case ProductSortTypeEnum.OldestUpdate:
-                            sortedQuery = projectedQuery.OrderBy(n => n.LastUpdatedDate);
-                            break;
-
-                        case ProductSortTypeEnum.HighestPrice:
-                            sortedQuery = projectedQuery.OrderByDescending(n => n.NewPrice);
-                            break;
-
-                        case ProductSortTypeEnum.LowestPrice:
-                            sortedQuery = projectedQuery.OrderBy(n => n.NewPrice);
-                            break;
-
-                        case ProductSortTypeEnum.HighestPriceDrop:
-                            sortedQuery = projectedQuery.OrderBy(n => n.ChangePercent);
-                            break;
-
-                        case ProductSortTypeEnum.UnreadOnly:
-                            sortedQuery = projectedQuery.OrderByDescending(n => n.LastUpdatedDate);
-                            break;
-
-                        case ProductSortTypeEnum.NewestUpdate:
-                        default:
-                            sortedQuery = projectedQuery.OrderBy(n => n.IsRead).ThenByDescending(n => n.LastUpdatedDate);
-                            break;
-                    }
-
-                    await filter.Paging(sortedQuery);
-
-                    return filter;
-                }
-
-              
-
-                public async Task<List<Product>> GetProductsBatchForMonitoringAsync(ClientSideGetProductsBatchForMonitoringDto dto)
-                {
-                    return await _context.Products
-                        .AsNoTracking()
-                        .Where(p => dto.ProductIds.Contains(p.Id))
-                        .ToListAsync(dto.CancellationToken);
-                }
-
-                public async Task<Result> ClientSideUpdateProductPrices(ClientSideUpdateProductPricesDto dto)
-                {
-                    var strategy = _context.Database.CreateExecutionStrategy();
-
-                    return await strategy.ExecuteAsync(async () =>
-                    {
-                        using var transaction = await _context.Database.BeginTransactionAsync(dto.CancellationToken);
-                        try
-                        {
-                            decimal? calculatedPercent = dto.OldPrice.CalculateChangePercent(dto.NewPrice);
-
-                            var rowsAffected = await _context.Products
-                                .Where(p => p.Id == dto.ProductId)
-                                .ExecuteUpdateAsync(s => s
-                                    .SetProperty(p => p.OldPrice, p => p.NewPrice)
-                                    .SetProperty(p => p.NewPrice, dto.NewPrice)
-                                    .SetProperty(p => p.LastUpdatedDate, DateTime.UtcNow)
-                                    .SetProperty(p => p.ChangePercent, calculatedPercent),
-                                dto.CancellationToken);
-
-                            if (rowsAffected == 0)
-                                return Result.Failure(Messages.OperationFailedError);
-
-                            await _context.UserProductMapping
-                                .Where(upm => upm.ProductId == dto.ProductId)
-                                .ExecuteUpdateAsync(s => s
-                                    .SetProperty(upm => upm.IsRead, false),
-                                dto.CancellationToken);
-
-                            var history = new ProductPriceHistory
-                            {
-                                ProductId = dto.ProductId,
-                                Price = dto.NewPrice,
-                            };
-                            _context.ProductPriceHistory.Add(history);
-
-                            await _context.SaveChangesAsync(dto.CancellationToken);
-                            await transaction.CommitAsync(dto.CancellationToken);
-
-                            return Result.Success();
-                        }
-                        catch (Exception ex)
-                        {
-                            await transaction.RollbackAsync(dto.CancellationToken);
-                            _logger.LogError(ex, "Error updating prices and notification flags for product {ProductId}", dto.ProductId);
-                            throw;
-                        }
-                    });
-                }
-
-             */
-
         public async Task<Result<int>> ClientSideCreateNewProduct(ClientSideCreateNewProductDto dto)
         {
             if (dto is null)
@@ -560,18 +291,18 @@ namespace Application.Services.Implementaions
 
                             // ✅ OrderBy + Take now happen in memory
                             RecentHistory = x.Seller.History
-                                .OrderByDescending(h => h.CreatedDate)
-                                .Take(20)
-                                .Select(h => new ClientSideSellerPriceHistoryDto
-                                {
-                                    OldPrice = h.OldPrice,
-                                    NewPrice = h.NewPrice,
-                                    ChangePercent = h.ChangePercent,
-                                    BuyBoxChanged = h.BuyBoxChanged,
-                                    IsBuyBoxWinner = h.IsBuyBoxWinner,
-                                    CreatedDate = h.CreatedDate
-                                })
-                                .ToList()
+    .Where(h => h.OldPrice != h.NewPrice || h.BuyBoxChanged) // ← only real changes
+    .OrderByDescending(h => h.CreatedDate)
+    .Take(20)
+    .Select(h => new ClientSideSellerPriceHistoryDto
+    {
+        OldPrice = h.OldPrice,
+        NewPrice = h.NewPrice,
+        ChangePercent = h.ChangePercent,
+        BuyBoxChanged = h.BuyBoxChanged,
+        IsBuyBoxWinner = h.IsBuyBoxWinner,
+        CreatedDate = h.CreatedDate
+    }).ToList()
                         }
                     })
                     .ToList()
@@ -687,11 +418,6 @@ namespace Application.Services.Implementaions
             return Result.Success();
         }
 
-        public Task<List<Product>> GetProductsBatchForMonitoringAsync(ClientSideGetProductsBatchForMonitoringDto dto)
-        {
-            throw new NotImplementedException();
-        }
-
         public Task<Result> ClientSideUpdateProductPrices(ClientSideUpdateProductPricesDto dto)
         {
             throw new NotImplementedException();
@@ -714,6 +440,319 @@ namespace Application.Services.Implementaions
                 return Result.Failure(Messages.OperationFailedError);
 
             return Result.Success();
+        }
+
+        public async Task<List<ProductMonitoringTargetDto>> GetAllProductsForMonitoringAsync(CancellationToken ct)
+        {
+            var now = DateTime.UtcNow;
+
+            return await _context.Products
+                .AsNoTracking()
+                .AsSplitQuery()
+                .Where(p => !p.IsDeleted &&
+                            p.Users.Any(upm =>
+                                !upm.IsDeleted &&
+                                !upm.User.IsUserBanned &&
+                                upm.User.SubscriptionEndDate > now))
+                .Select(p => new ProductMonitoringTargetDto
+                {
+                    ProductId = p.Id,
+                    DigiKalaId = p.DigiKalaId,
+                    Watchers = p.Users
+                        .Where(upm =>
+                            !upm.IsDeleted &&
+                            !upm.User.IsUserBanned &&
+                            upm.User.SubscriptionEndDate > now)
+                        .Select(upm => new ProductWatcherDto
+                        {
+                            UserId = upm.UserId,
+                            Mobile = upm.User.Mobile,
+                            FirstName = upm.User.FirstName,
+                            WatchMode = upm.WatchMode,
+                            NotifyOnPriceChange = upm.NotifyOnPriceChange,
+                            NotifyOnBuyBoxChange = upm.NotifyOnBuyBoxChange,
+                            MinPriceChangeThreshold = upm.MinPriceChangeThreshold,
+                            WatchedVariantIds = upm.VariantWatches
+                                .Select(vw => vw.ProductVariantId)
+                                .ToList()
+                        })
+                        .ToList()
+                })
+                .ToListAsync(ct);
+        }
+
+        public async Task<List<int>> SyncProductAndDetectChangesAsync(ProductMonitoringTargetDto target, ClientSideScrapedProductDto scraped, CancellationToken ct)
+        {
+            var strategy = _context.Database.CreateExecutionStrategy();
+
+            return await strategy.ExecuteAsync(async () =>
+            {
+                await using var transaction = await _context.Database.BeginTransactionAsync(ct);
+
+                try
+                {
+                    var now = DateTime.UtcNow;
+                    var affectedUserIds = new HashSet<int>();
+                    var anyChangeDetected = false;
+
+                    // ── Load current DB state for this product ───────────────────
+                    var dbProduct = await _context.Products
+                    .AsSplitQuery()
+                        .Include(p => p.Variants.Where(v => !v.IsDeleted))
+                            .ThenInclude(v => v.Sellers.Where(s => !s.IsDeleted))
+                        .FirstOrDefaultAsync(p => p.Id == target.ProductId && !p.IsDeleted, ct);
+
+                    if (dbProduct is null)
+                        return new List<int>();
+
+                    // ── Build lookup maps ───────────────────────────────────────
+                    var dbVariantMap = dbProduct.Variants
+                        .ToDictionary(v => v.DigiKalaVariantId);
+
+                    var dbSellerMap = dbProduct.Variants
+                        .SelectMany(v => v.Sellers.Select(s => new
+                        {
+                            VariantId = v.Id,
+                            VariantDigiKalaId = v.DigiKalaVariantId,
+                            Seller = s
+                        }))
+                        .ToDictionary(
+                            x => (x.VariantDigiKalaId, x.Seller.DigiKalaSellerId),
+                            x => x.Seller);
+
+                    // Track existing seller keys from scrape
+                    var scrapedSellerKeys = new HashSet<(long VariantDigiKalaId, string SellerId)>();
+
+                    // ── Process scraped variants ────────────────────────────────
+                    foreach (var scrapedVariant in scraped.Variants)
+                    {
+                        var scrapedSellerId = scrapedVariant.SellerId.ToString();
+                        scrapedSellerKeys.Add((scrapedVariant.DigiKalaVariantId, scrapedSellerId));
+
+                        // ── Find or create variant ──────────────────────────────
+                        ProductVariant dbVariant;
+
+                        if (dbVariantMap.TryGetValue(scrapedVariant.DigiKalaVariantId, out var existingVariant))
+                        {
+                            dbVariant = existingVariant;
+
+                            if (dbVariant.IsActive != scrapedVariant.IsMarketable)
+                            {
+                                dbVariant.IsActive = scrapedVariant.IsMarketable;
+                                dbVariant.LastUpdatedDate = now;
+                            }
+
+                            // keep metadata fresh
+                            dbVariant.ColorName = scrapedVariant.ColorName;
+                            dbVariant.ColorHex = scrapedVariant.ColorHex;
+                        }
+                        else
+                        {
+                            // New variant → create full graph including seller + initial history
+                            dbVariant = new ProductVariant
+                            {
+                                ProductId = dbProduct.Id,
+                                DigiKalaVariantId = scrapedVariant.DigiKalaVariantId,
+                                ColorName = scrapedVariant.ColorName,
+                                ColorHex = scrapedVariant.ColorHex,
+                                IsActive = scrapedVariant.IsMarketable,
+                                CreatedDate = now,
+                                LastUpdatedDate = now,
+                                Sellers = new List<ProductVariantSeller>
+                        {
+                            new ProductVariantSeller
+                            {
+                                DigiKalaSellerId = scrapedSellerId,
+                                SellerName = scrapedVariant.SellerName,
+                                CurrentPrice = scrapedVariant.Price,
+                                PreviousPrice = null,
+                                IsBuyBoxWinner = scrapedVariant.IsBuyBoxWinner,
+                                WasBuyBoxWinner = scrapedVariant.IsBuyBoxWinner,
+                                SellerRating = scrapedVariant.SellerRating,
+                                IsActive = true,
+                                CreatedDate = now,
+                                LastUpdatedDate = now,
+                                PriceHistory = new List<ProductPriceHistory>
+                                {
+                                    new ProductPriceHistory
+                                    {
+                                        OldPrice = scrapedVariant.Price,
+                                        NewPrice = scrapedVariant.Price,
+                                        ChangePercent = 0,
+                                        BuyBoxChanged = false,
+                                        IsBuyBoxWinner = scrapedVariant.IsBuyBoxWinner,
+                                        CreatedDate = now,
+                                        LastUpdatedDate = now
+                                    }
+                                }
+                            }
+                        }
+                            };
+
+                            dbProduct.Variants.Add(dbVariant);
+                            anyChangeDetected = true;
+
+                            continue;
+                        }
+
+                        // ── Find or create seller on existing variant ──────────
+                        if (dbSellerMap.TryGetValue((scrapedVariant.DigiKalaVariantId, scrapedSellerId), out var dbSeller))
+                        {
+                            var oldPrice = dbSeller.CurrentPrice;
+                            var oldBuyBox = dbSeller.IsBuyBoxWinner;
+
+                            var priceChanged = oldPrice != scrapedVariant.Price;
+                            var buyBoxChanged = oldBuyBox != scrapedVariant.IsBuyBoxWinner;
+
+                            // keep metadata fresh even if no price change
+                            dbSeller.SellerName = scrapedVariant.SellerName;
+                            dbSeller.SellerRating = scrapedVariant.SellerRating;
+                            dbSeller.IsActive = true;
+
+                            if (priceChanged || buyBoxChanged)
+                            {
+                                dbSeller.PreviousPrice = oldPrice;
+                                dbSeller.CurrentPrice = scrapedVariant.Price;
+                                dbSeller.WasBuyBoxWinner = oldBuyBox;
+                                dbSeller.IsBuyBoxWinner = scrapedVariant.IsBuyBoxWinner;
+                                dbSeller.LastUpdatedDate = now;
+
+                                var changePercent = oldPrice > 0
+                                    ? Math.Round((scrapedVariant.Price - oldPrice) / oldPrice * 100, 4)
+                                    : 0;
+
+                                dbSeller.PriceHistory.Add(new ProductPriceHistory
+                                {
+                                    OldPrice = oldPrice,
+                                    NewPrice = scrapedVariant.Price,
+                                    ChangePercent = changePercent,
+                                    BuyBoxChanged = buyBoxChanged,
+                                    IsBuyBoxWinner = scrapedVariant.IsBuyBoxWinner,
+                                    CreatedDate = now,
+                                    LastUpdatedDate = now
+                                });
+
+                                anyChangeDetected = true;
+
+                                foreach (var watcher in target.Watchers)
+                                {
+                                    if (ShouldNotifyUser(
+                                        watcher,
+                                        dbVariant.Id,
+                                        priceChanged,
+                                        buyBoxChanged,
+                                        scrapedVariant.Price,
+                                        oldPrice))
+                                    {
+                                        affectedUserIds.Add(watcher.UserId);
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            // New seller on existing variant
+                            dbVariant.Sellers.Add(new ProductVariantSeller
+                            {
+                                DigiKalaSellerId = scrapedSellerId,
+                                SellerName = scrapedVariant.SellerName,
+                                CurrentPrice = scrapedVariant.Price,
+                                PreviousPrice = null,
+                                IsBuyBoxWinner = scrapedVariant.IsBuyBoxWinner,
+                                WasBuyBoxWinner = scrapedVariant.IsBuyBoxWinner,
+                                SellerRating = scrapedVariant.SellerRating,
+                                IsActive = true,
+                                CreatedDate = now,
+                                LastUpdatedDate = now,
+                                PriceHistory = new List<ProductPriceHistory>
+                        {
+                            new ProductPriceHistory
+                            {
+                                OldPrice = scrapedVariant.Price,
+                                NewPrice = scrapedVariant.Price,
+                                ChangePercent = 0,
+                                BuyBoxChanged = false,
+                                IsBuyBoxWinner = scrapedVariant.IsBuyBoxWinner,
+                                CreatedDate = now,
+                                LastUpdatedDate = now
+                            }
+                        }
+                            });
+
+                            anyChangeDetected = true;
+                        }
+                    }
+
+                    // ── Mark disappeared sellers as inactive ────────────────────
+                    foreach (var dbVariant in dbProduct.Variants)
+                    {
+                        foreach (var dbSeller in dbVariant.Sellers.Where(s => s.IsActive))
+                        {
+                            var sellerKey = (dbVariant.DigiKalaVariantId, dbSeller.DigiKalaSellerId);
+
+                            if (!scrapedSellerKeys.Contains(sellerKey))
+                            {
+                                dbSeller.IsActive = false;
+                                dbSeller.LastUpdatedDate = now;
+                                anyChangeDetected = true;
+                            }
+                        }
+                    }
+
+                    // ── Update product + IsRead flags if anything changed ───────
+                    if (anyChangeDetected)
+                    {
+                        dbProduct.LastUpdatedDate = now;
+
+                        await _context.UserProductMappings
+                            .Where(m => m.ProductId == target.ProductId && !m.IsDeleted)
+                            .ExecuteUpdateAsync(s => s.SetProperty(m => m.IsRead, false), ct);
+                    }
+
+                    await _context.SaveChangesAsync(ct);
+                    await transaction.CommitAsync(ct);
+
+                    return affectedUserIds.ToList();
+                }
+                catch
+                {
+                    await transaction.RollbackAsync(ct);
+                    throw;
+                }
+            });
+        }
+
+        private static bool ShouldNotifyUser(ProductWatcherDto watcher, int variantId, bool priceChanged, bool buyBoxChanged, decimal newPrice, decimal oldPrice)
+        {
+            var variantIsWatched = watcher.WatchMode switch
+            {
+                WatchMode.AllVariants => true,
+                WatchMode.SpecificVariants => watcher.WatchedVariantIds.Contains(variantId),
+                WatchMode.MyShopVariantsOnly => watcher.WatchedVariantIds.Contains(variantId),
+                _ => false
+            };
+
+            if (!variantIsWatched)
+                return false;
+
+            if (priceChanged && watcher.NotifyOnPriceChange)
+            {
+                if (watcher.MinPriceChangeThreshold.HasValue)
+                {
+                    var diff = Math.Abs(newPrice - oldPrice);
+                    if (diff >= watcher.MinPriceChangeThreshold.Value)
+                        return true;
+                }
+                else
+                {
+                    return true;
+                }
+            }
+
+            if (buyBoxChanged && watcher.NotifyOnBuyBoxChange)
+                return true;
+
+            return false;
         }
     }
 }

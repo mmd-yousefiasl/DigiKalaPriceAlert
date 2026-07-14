@@ -299,7 +299,7 @@
         </div>
     </div>
 
-    @if (Model.Variants.Any(v => v.Seller.RecentHistory.Count > 1))
+    @if (Model.Variants.Any(v => v.Seller.RecentHistory.Any(h => h.OldPrice != h.NewPrice || h.BuyBoxChanged)))
     {
         <div class="row">
             <div class="col-12">

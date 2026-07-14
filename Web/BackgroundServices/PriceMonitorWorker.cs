@@ -1,8 +1,6 @@
 ﻿using Application.Dtos.Products.ClientSide;
 using Application.Dtos.SendSms.ClientSide;
-using Application.Dtos.Users.ClientSide;
 using Application.Services.Interfaces;
-using Application.Tools;
 
 namespace Web.BackgroundServices
 {
@@ -11,6 +9,8 @@ namespace Web.BackgroundServices
         #region Fields
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly ILogger<PriceMonitorWorker> _logger;
+        private readonly Random _random = new();
+        private int _requestCount = 0;
         #endregion
 
         #region Ctor
@@ -25,162 +25,202 @@ namespace Web.BackgroundServices
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            _logger.LogInformation("Price Monitor Worker Started...");
+            _logger.LogInformation("Price Monitor Worker Started.");
 
-            // Define your fixed execution window interval
-            TimeSpan cycleInterval = TimeSpan.FromMinutes(20);
+            var cycleInterval = TimeSpan.FromMinutes(15);
 
             while (!stoppingToken.IsCancellationRequested)
             {
                 var watch = System.Diagnostics.Stopwatch.StartNew();
+
                 try
                 {
-                    _logger.LogInformation("Starting a new price monitoring cycle at: {Time}", DateTimeOffset.Now);
+                    _logger.LogInformation("New monitoring cycle started at: {Time}", DateTimeOffset.Now);
+
                     await RunMonitoringCycleAsync(stoppingToken);
 
                     watch.Stop();
 
-                    // Calculate how long to sleep so the NEXT cycle starts exactly 20 minutes from now
-                    TimeSpan executionTime = watch.Elapsed;
-                    TimeSpan sleepTime = cycleInterval > executionTime ? cycleInterval - executionTime : TimeSpan.Zero;
+                    var sleepTime = cycleInterval > watch.Elapsed
+                        ? cycleInterval - watch.Elapsed
+                        : TimeSpan.Zero;
 
-                    _logger.LogInformation("Cycle finished in {Duration} mins. Sleeping for {Sleep} mins...",
-                        executionTime.TotalMinutes.ToString("F1"),
+                    _logger.LogInformation(
+                        "Cycle finished in {Duration} min. Sleeping for {Sleep} min.",
+                        watch.Elapsed.TotalMinutes.ToString("F1"),
                         sleepTime.TotalMinutes.ToString("F1"));
 
                     if (sleepTime > TimeSpan.Zero)
-                    {
                         await Task.Delay(sleepTime, stoppingToken);
-                    }
                 }
                 catch (OperationCanceledException)
                 {
-                    _logger.LogWarning("Price Monitor Worker operation was canceled (System shutting down).");
+                    _logger.LogWarning("Price Monitor Worker was canceled.");
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "An error occurred during the price monitoring cycle.");
+                    _logger.LogError(ex, "Unhandled error in monitoring cycle. Retrying in 5 minutes.");
                     await Task.Delay(TimeSpan.FromMinutes(5), stoppingToken);
                 }
             }
         }
 
-
-        private async Task RunMonitoringCycleAsync(CancellationToken stoppingToken)
+        private async Task RunMonitoringCycleAsync(CancellationToken ct)
         {
-            using var scope = _scopeFactory.CreateScope();
-            var productService = scope.ServiceProvider.GetRequiredService<IProductService>();
-            var scraperService = scope.ServiceProvider.GetRequiredService<IDigiKalaService>();
-            var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
+            // ── Step 1: Load monitoring targets in one lightweight scope ──
+            List<ProductMonitoringTargetDto> products;
 
-            var productIdsResult = await userService.ClientSideGetAllEligibleProductIdsAsync(stoppingToken);
-            if (productIdsResult.IsFailure || !productIdsResult.Value.Any())
-                return;
-
-            var allProductIds = productIdsResult.Value;
-            int batchSize = AppInfo.PriceMonitorBatchSize;
-            int page = 0;
-            bool hasMoreProducts = true;
-
-            var mobilesToNotify = new List<ClientSideUserToNotifyDto>();
-            var random = new Random();
-
-            while (hasMoreProducts && !stoppingToken.IsCancellationRequested)
+            using (var scope = _scopeFactory.CreateScope())
             {
-                var batchIds = allProductIds.OrderBy(n => n.Id)
-                    .Select(n => n.Id)
-                    .Skip(page * batchSize)
-                    .Take(batchSize)
-                    .ToList();
+                var productService = scope.ServiceProvider.GetRequiredService<IProductService>();
+                products = await productService.GetAllProductsForMonitoringAsync(ct);
+            }
 
-                if (!batchIds.Any())
-                {
-                    hasMoreProducts = false;
+            if (products.Count == 0)
+            {
+                _logger.LogInformation("No eligible products found for monitoring.");
+                return;
+            }
+
+            _logger.LogInformation("Monitoring {Count} products.", products.Count);
+
+            // Unique users to notify at end of cycle
+            var usersToNotify = new HashSet<int>();
+            _requestCount = 0;
+            bool shouldAbortCycle = false;
+
+            // ── Step 2: Process products one by one ───────────────────────
+            foreach (var product in products)
+            {
+                if (ct.IsCancellationRequested || shouldAbortCycle)
                     break;
-                }
 
-                var productsBatch = await productService.GetProductsBatchForMonitoringAsync(new ClientSideGetProductsBatchForMonitoringDto()
+                try
                 {
-                    ProductIds = batchIds,
-                    CancellationToken = stoppingToken
-                });
+                    await ThrottleAsync(ct);
 
-                if (!productsBatch.Any())
-                {
-                    page++;
-                    continue;
-                }
+                    // Each product gets its own fresh scope
+                    using var productScope = _scopeFactory.CreateScope();
 
-                foreach (var product in productsBatch)
-                {
-                    if (stoppingToken.IsCancellationRequested) break;
+                    var scraperService = productScope.ServiceProvider.GetRequiredService<IDigiKalaService>();
+                    var productService = productScope.ServiceProvider.GetRequiredService<IProductService>();
 
-                    int delay = random.Next(1000, 2800);
-                    await Task.Delay(delay, stoppingToken);
+                    // Scrape latest data from Digikala
+                    var scrapeResult = await scraperService.ScrapeFullProductAsync(product.DigiKalaId, ct);
 
-                    var scrapResult = await scraperService.GetProductDetails(product.DigiKalaId);
-
-                    if (scrapResult.IsFailure)
+                    if (scrapeResult.IsFailure)
                     {
-                        // If the failure is due to a rate limit or firewall, KILL the loop immediately.
-                        if (scrapResult.Message!.Contains("RATE_LIMITED"))
+                        if (!string.IsNullOrWhiteSpace(scrapeResult.Message) &&
+                            scrapeResult.Message.Contains("RATE_LIMITED"))
                         {
-                            _logger.LogCritical("Aborting monitoring loop prematurely to safeguard system IP.");
+                            _logger.LogCritical(
+                                "Rate limit detected while scraping DigiKalaId: {DigiKalaId}. Aborting cycle to protect IP.",
+                                product.DigiKalaId);
+
+                            shouldAbortCycle = true;
                             break;
                         }
+
+                        _logger.LogWarning(
+                            "Scrape failed for DigiKalaId: {DigiKalaId}. Error: {Error}",
+                            product.DigiKalaId,
+                            scrapeResult.Message);
+
                         continue;
                     }
 
-                    decimal newPrice = scrapResult.Value.Price;
-                    decimal oldPrice = 666;
+                    // Sync to DB and get affected users
+                    var affectedUserIds = await productService.SyncProductAndDetectChangesAsync(
+                        product,
+                        scrapeResult.Value,
+                        ct);
 
-                    if (newPrice != oldPrice)
+                    foreach (var userId in affectedUserIds)
+                        usersToNotify.Add(userId);
+                }
+                catch (OperationCanceledException)
+                {
+                    throw;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(
+                        ex,
+                        "Error while processing product ProductId: {ProductId}, DigiKalaId: {DigiKalaId}",
+                        product.ProductId,
+                        product.DigiKalaId);
+
+                    // Continue with next product
+                    continue;
+                }
+            }
+
+            // ── Step 3: Send SMS after cycle ──────────────────────────────
+            if (ct.IsCancellationRequested || usersToNotify.Count == 0)
+            {
+                _logger.LogInformation("No users need notification in this cycle.");
+                return;
+            }
+
+            _logger.LogInformation("Sending SMS to {Count} unique users.", usersToNotify.Count);
+
+            using (var scope = _scopeFactory.CreateScope())
+            {
+                var productService = scope.ServiceProvider.GetRequiredService<IProductService>();
+                var smsService = scope.ServiceProvider.GetRequiredService<ISendSmsService>();
+                var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
+
+                var userContacts = await userService.GetUserContactsAsync(usersToNotify.ToList(), ct);
+
+                foreach (var user in userContacts)
+                {
+                    if (ct.IsCancellationRequested)
+                        break;
+
+                    try
                     {
-                        await productService.ClientSideUpdateProductPrices(new ClientSideUpdateProductPricesDto()
+                        await smsService.ClientSideSendPriceAlert(new ClientSideSendPriceAlertDto
                         {
-                            ProductId = product.Id,
-                            OldPrice = oldPrice,
-                            NewPrice = newPrice,
-                            CancellationToken = stoppingToken
+                            Mobile = user.Mobile,
+                            FirstName = user.FirstName
                         });
 
-                        var userMobiles = allProductIds
-                            .Where(n => n.Id == product.Id)
-                            .SelectMany(n => n.Users)
-                            .Where(u => !string.IsNullOrWhiteSpace(u.FirstName))
-                            .Select(u => new ClientSideUserToNotifyDto()
-                            {
-                                Mobile = u.Mobile,
-                                FirstName = u.FirstName!
-                            }).ToList();
-
-                        if (userMobiles.Any())
-                        {
-                            mobilesToNotify.AddRange(userMobiles);
-                        }
+                        // Small delay between SMS sends, just to be gentle
+                        await Task.Delay(_random.Next(200, 600), ct);
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        throw;
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Failed to send SMS to mobile: {Mobile}", user.Mobile);
                     }
                 }
-
-                page++;
             }
+        }
 
-            var uniqueUsers = mobilesToNotify.DistinctBy(u => u.Mobile).ToList();
+        private async Task ThrottleAsync(CancellationToken ct)
+        {
+            _requestCount++;
 
-            if (uniqueUsers.Any() && !stoppingToken.IsCancellationRequested)
+            // Longer pause every 25 requests
+            if (_requestCount % 25 == 0)
             {
-                var sendSmsService = scope.ServiceProvider.GetRequiredService<ISendSmsService>();
+                var longPause = _random.Next(4000, 7000);
 
-                foreach (var user in uniqueUsers)
-                {
-                    if (stoppingToken.IsCancellationRequested) break;
+                _logger.LogInformation(
+                    "Taking a longer pause of {Pause} ms after {Count} requests.",
+                    longPause,
+                    _requestCount);
 
-                    await sendSmsService.ClientSideSendPriceAlert(new ClientSideSendPriceAlertDto()
-                    {
-                        Mobile = user.Mobile,
-                        FirstName = user.FirstName
-                    });
-                }
+                await Task.Delay(longPause, ct);
+                return;
             }
+
+            // Normal random delay
+            var delay = _random.Next(800, 1800);
+            await Task.Delay(delay, ct);
         }
     }
 }
