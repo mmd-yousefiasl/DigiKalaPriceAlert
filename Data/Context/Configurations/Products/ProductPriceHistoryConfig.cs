@@ -22,7 +22,7 @@ namespace Data.Context.Configurations.Products
 
             builder.Property(ph => ph.ChangePercent)
                 .IsRequired()
-                .HasColumnType("decimal(8,4)");
+                .HasColumnType("decimal(18,4)");
 
             builder.Property(ph => ph.BuyBoxChanged)
                 .HasDefaultValue(false);

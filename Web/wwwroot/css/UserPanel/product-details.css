@@ -1,0 +1,464 @@
+﻿/* ── Base ─────────────────────────────────────────── */
+.pd-card {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+/* ── Product Hero ─────────────────────────────────── */
+.product-hero {
+    background: linear-gradient(135deg, #fafafa 0%, #ffffff 100%);
+}
+
+.product-image-frame {
+    width: 140px;
+    height: 140px;
+    background: #f8f9fa;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+}
+
+    .product-image-frame img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+    }
+
+/* ── Stat Pills ───────────────────────────────────── */
+.stat-pill {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 14px 16px;
+    flex: 1;
+    min-width: 0;
+}
+
+    .stat-pill .stat-label {
+        font-size: 11px;
+        color: #6b7280;
+        margin-bottom: 4px;
+    }
+
+    .stat-pill .stat-value {
+        font-size: 15px;
+        font-weight: 700;
+        color: #111827;
+    }
+
+    .stat-pill .stat-unit {
+        font-size: 10px;
+        color: #9ca3af;
+        font-weight: 400;
+    }
+
+/* ── Color Dot ────────────────────────────────────── */
+.cd {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 2px solid #e5e7eb;
+    flex-shrink: 0;
+}
+
+.cd-lg {
+    width: 22px;
+    height: 22px;
+}
+
+/* ── Color Section ────────────────────────────────── */
+.color-section {
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 12px;
+    background: #fff;
+}
+
+.color-header {
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    cursor: pointer;
+    transition: background 0.15s;
+    border-bottom: 1px solid transparent;
+}
+
+    .color-header:hover {
+        background: #fafafa;
+    }
+
+    .color-header.expanded {
+        border-bottom-color: #e5e7eb;
+        background: #fafafa;
+    }
+
+    .color-header .ch-right {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-shrink: 0;
+    }
+
+    .color-header .ch-left {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-width: 0;
+        flex: 1;
+    }
+
+.winner-badge {
+    background: #fef3c7;
+    color: #92400e;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    white-space: nowrap;
+}
+
+.color-body {
+    display: none;
+    padding: 0;
+}
+
+    .color-body.show {
+        display: block;
+    }
+
+.chevron-icon {
+    transition: transform 0.2s ease;
+    color: #9ca3af;
+    font-size: 18px;
+}
+
+    .chevron-icon.rotated {
+        transform: rotate(180deg);
+    }
+
+/* ── Seller Row ───────────────────────────────────── */
+.seller-row {
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    border-bottom: 1px solid #f3f4f6;
+    transition: background 0.1s;
+}
+
+    .seller-row:last-child {
+        border-bottom: none;
+    }
+
+    .seller-row:hover {
+        background: #f9fafb;
+    }
+
+    .seller-row .sr-info {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        min-width: 0;
+        flex: 1;
+    }
+
+    .seller-row .sr-name {
+        font-size: 13px;
+        font-weight: 500;
+        color: #374151;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .seller-row .sr-meta {
+        font-size: 11px;
+        color: #9ca3af;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .seller-row .sr-price {
+        text-align: left;
+        flex-shrink: 0;
+    }
+
+    .seller-row .sr-price-value {
+        font-size: 14px;
+        font-weight: 700;
+        color: #111827;
+    }
+
+    .seller-row .sr-price-unit {
+        font-size: 10px;
+        color: #9ca3af;
+    }
+
+/* ── Price Change Indicator ───────────────────────── */
+.price-change {
+    font-size: 11px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    direction: ltr;
+}
+
+    .price-change.up {
+        color: #dc2626;
+    }
+
+    .price-change.down {
+        color: #16a34a;
+    }
+
+/* ── Winner Row Special ────────────────────────────── */
+.winner-seller-row {
+    background: #fffbeb;
+}
+
+    .winner-seller-row:hover {
+        background: #fef9c3;
+    }
+
+/* ── Rating ───────────────────────────────────────── */
+.rating-badge {
+    font-size: 11px;
+    color: #6b7280;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+}
+
+    .rating-badge i {
+        color: #f59e0b;
+        font-size: 12px;
+    }
+
+/* ── History ──────────────────────────────────────── */
+.history-item {
+    padding: 12px 16px;
+    border-bottom: 1px solid #f3f4f6;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+    .history-item:last-child {
+        border-bottom: none;
+    }
+
+    .history-item .hi-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        margin-top: 6px;
+        flex-shrink: 0;
+    }
+
+        .history-item .hi-dot.up {
+            background: #dc2626;
+        }
+
+        .history-item .hi-dot.down {
+            background: #16a34a;
+        }
+
+        .history-item .hi-dot.neutral {
+            background: #d1d5db;
+        }
+
+    .history-item .hi-body {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .history-item .hi-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        margin-bottom: 4px;
+    }
+
+    .history-item .hi-seller {
+        font-size: 13px;
+        font-weight: 600;
+        color: #111827;
+    }
+
+    .history-item .hi-time {
+        font-size: 11px;
+        color: #9ca3af;
+        flex-shrink: 0;
+    }
+
+    .history-item .hi-prices {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .history-item .hi-old {
+        font-size: 12px;
+        color: #9ca3af;
+        text-decoration: line-through;
+    }
+
+    .history-item .hi-arrow {
+        font-size: 11px;
+        color: #d1d5db;
+    }
+
+    .history-item .hi-new {
+        font-size: 13px;
+        font-weight: 700;
+        color: #111827;
+    }
+
+.buybox-change-badge {
+    font-size: 10px;
+    background: #dbeafe;
+    color: #1e40af;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-weight: 500;
+}
+
+/* ── Section Header ───────────────────────────────── */
+.section-header {
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.section-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #111827;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.section-count {
+    font-size: 11px;
+    color: #6b7280;
+    background: #f3f4f6;
+    padding: 2px 8px;
+    border-radius: 6px;
+}
+
+/* ── Responsive ───────────────────────────────────── */
+@@media (max-width: 768px) {
+    .product-image-frame {
+        width: 100px;
+        height: 100px;
+    }
+
+    .stat-pill {
+        padding: 10px 12px;
+    }
+
+        .stat-pill .stat-value {
+            font-size: 13px;
+        }
+
+    .color-header {
+        padding: 12px 14px;
+        flex-wrap: wrap;
+    }
+
+    .seller-row {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+        .seller-row .sr-price {
+            width: 100%;
+            text-align: right;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+    .history-item .hi-header {
+        flex-wrap: wrap;
+    }
+
+    .history-item .hi-prices {
+        flex-direction: column;
+        gap: 2px;
+        align-items: flex-start;
+    }
+}
+
+/* ── History Filters ──────────────────────────────── */
+.history-filters {
+    padding: 12px 16px;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.filter-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.filter-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #6b7280;
+    flex-shrink: 0;
+    min-width: 50px;
+}
+
+.filter-chip {
+    background: #f3f4f6;
+    border: 1px solid #e5e7eb;
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 11px;
+    font-weight: 500;
+    color: #374151;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
+}
+
+    .filter-chip:hover {
+        background: #e5e7eb;
+    }
+
+    .filter-chip.active {
+        background: #111827;
+        color: #ffffff;
+        border-color: #111827;
+    }
+
+.history-item.hidden {
+    display: none !important;
+}

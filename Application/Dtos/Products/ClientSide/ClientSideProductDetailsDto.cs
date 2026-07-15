@@ -14,10 +14,6 @@
         public int TotalVariantsCount { get; set; }
         public int TotalSellersCount { get; set; }
 
-        public string? BuyBoxSellerName { get; set; }
-        public decimal? BuyBoxPrice { get; set; }
-        public string? BuyBoxColorName { get; set; }
-
-        public List<ClientSideVariantDetailsDto> Variants { get; set; } = [];
+        public List<ClientSideColorGroupDto> ColorGroups { get; set; } = [];
     }
 }

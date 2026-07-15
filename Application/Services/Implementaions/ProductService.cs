@@ -174,8 +174,10 @@ namespace Application.Services.Implementaions
             if (userId < 1)
                 return Result.Failure<ClientSideProductDetailsDto>(Messages.OperationFailedError);
 
-            // ── Step 1: Fetch raw data from DB ───────────────────────────────
-            var raw = await _context.Products
+            var thirtyDaysAgo = DateTime.UtcNow.AddDays(-30);
+
+            // ── Query 1: Product + sellers (flat, lightweight) ───────────────
+            var product = await _context.Products
                 .AsNoTracking()
                 .Where(p => p.Id == id && p.Users.Any(u => u.UserId == userId))
                 .Select(p => new
@@ -188,128 +190,197 @@ namespace Application.Services.Implementaions
                     p.CreatedDate,
                     p.LastUpdatedDate,
 
-                    Variants = p.Variants
+                    Sellers = p.Variants
                         .Where(v => v.IsActive)
-                        .Select(v => new
-                        {
-                            v.Id,
-                            v.DigiKalaVariantId,
-                            v.ColorName,
-                            v.ColorHex,
-                            v.IsActive,
-
-                            Sellers = v.Sellers
-                                .Where(s => s.IsActive)
-                                .Select(s => new
-                                {
-                                    s.Id,
-                                    s.SellerName,
-                                    s.DigiKalaSellerId,
-                                    s.CurrentPrice,
-                                    s.PreviousPrice,
-                                    s.IsBuyBoxWinner,
-                                    s.SellerRating,
-                                    s.IsActive,
-
-                                    // ✅ Fetch flat list, sort/take in memory
-                                    History = s.PriceHistory
-                                        .Select(h => new
-                                        {
-                                            h.OldPrice,
-                                            h.NewPrice,
-                                            h.ChangePercent,
-                                            h.BuyBoxChanged,
-                                            h.IsBuyBoxWinner,
-                                            h.CreatedDate
-                                        })
-                                        .ToList()
-                                })
-                                .ToList()
-                        })
+                        .SelectMany(v => v.Sellers
+                            .Where(s => s.IsActive)
+                            .Select(s => new ProductSellerRow(
+                                s.Id,
+                                s.SellerName,
+                                s.DigiKalaSellerId,
+                                s.CurrentPrice,
+                                s.PreviousPrice,
+                                s.IsBuyBoxWinner,
+                                s.SellerRating,
+                                s.IsActive,
+                                v.ColorName,
+                                v.ColorHex
+                            )))
                         .ToList()
                 })
                 .FirstOrDefaultAsync();
 
-            if (raw is null)
+            if (product is null)
                 return Result.Failure<ClientSideProductDetailsDto>(Messages.OperationFailedError);
 
-            // ── Step 2: Project in memory (safe to use OrderBy/Take here) ───
-            var allSellers = raw.Variants.SelectMany(v => v.Sellers).ToList();
+            if (!product.Sellers.Any())
+                return Result.Failure<ClientSideProductDetailsDto>(Messages.OperationFailedError);
 
+            // ── Query 2: History (filtered at DB level) ──────────────────────
+            var sellerIds = product.Sellers.Select(s => s.SellerId).ToList();
+
+            var historyRows = await _context.ProductPriceHistory
+                .AsNoTracking()
+                .Where(h => sellerIds.Contains(h.ProductVariantSellerId) &&
+                            h.CreatedDate >= thirtyDaysAgo &&
+                            (h.OldPrice != h.NewPrice || h.BuyBoxChanged))
+                .OrderByDescending(h => h.CreatedDate)
+                .Select(h => new SellerHistoryRow(
+                    h.ProductVariantSellerId,
+                    h.OldPrice,
+                    h.NewPrice,
+                    h.ChangePercent,
+                    h.BuyBoxChanged,
+                    h.IsBuyBoxWinner,
+                    h.CreatedDate
+                ))
+                .ToListAsync();
+
+            var historyBySeller = historyRows
+                .GroupBy(h => h.ProductVariantSellerId)
+                .ToDictionary(g => g.Key, g => g.ToList());
+
+            // ── Build grouped color sections ─────────────────────────────────
+            var colorGroups = product.Sellers
+                .GroupBy(s => new { s.ColorName, s.ColorHex })
+                .Select(group =>
+                {
+                    var sellerRows = group
+                        .OrderByDescending(s => s.IsBuyBoxWinner)
+                        .ThenBy(s => s.CurrentPrice)
+                        .ToList();
+
+                    var winner = sellerRows.FirstOrDefault(s => s.IsBuyBoxWinner)
+                                 ?? sellerRows.FirstOrDefault();
+
+                    var otherSellers = sellerRows
+                        .Where(s => winner == null || s.SellerId != winner.SellerId)
+                        .ToList();
+
+                    return new ClientSideColorGroupDto
+                    {
+                        ColorName = group.Key.ColorName,
+                        ColorHex = group.Key.ColorHex,
+                        SellersCount = sellerRows.Count,
+
+                        Winner = winner is null
+                            ? null
+                            : MapSeller(winner, historyBySeller),
+
+                        OtherSellers = otherSellers
+                            .Select(s => MapSeller(s, historyBySeller))
+                            .OrderBy(s => s.CurrentPrice)
+                            .ToList(),
+
+                        RecentHistory = sellerRows
+                            .SelectMany(s =>
+                            {
+                                historyBySeller.TryGetValue(s.SellerId, out var sellerHistory);
+                                return (sellerHistory ?? new List<SellerHistoryRow>())
+                                    .Select(h => new ClientSideSellerPriceHistoryDto
+                                    {
+                                        SellerName = s.SellerName,
+                                        OldPrice = h.OldPrice,
+                                        NewPrice = h.NewPrice,
+                                        ChangePercent = h.ChangePercent,
+                                        BuyBoxChanged = h.BuyBoxChanged,
+                                        IsBuyBoxWinner = h.IsBuyBoxWinner,
+                                        CreatedDate = h.CreatedDate
+                                    });
+                            })
+                            .OrderByDescending(h => h.CreatedDate)
+                            .ToList()
+                    };
+                })
+                .OrderBy(g => g.ColorName == "بدون رنگ" ? 0 : 1)
+                .ThenBy(g => g.Winner?.CurrentPrice ?? decimal.MaxValue)
+                .ToList();
+
+            // ── Final DTO ────────────────────────────────────────────────────
             var dto = new ClientSideProductDetailsDto
             {
-                Id = raw.Id,
-                Title = raw.Title,
-                DigiKalaId = raw.DigiKalaId,
-                Url = raw.Url,
-                ImageUrl = raw.ImageUrl,
-                CreatedDate = raw.CreatedDate,
-                LastUpdatedDate = raw.LastUpdatedDate,
+                Id = product.Id,
+                Title = product.Title,
+                DigiKalaId = product.DigiKalaId,
+                Url = product.Url,
+                ImageUrl = product.ImageUrl,
+                CreatedDate = product.CreatedDate,
+                LastUpdatedDate = product.LastUpdatedDate,
 
-                TotalVariantsCount = raw.Variants.Count,
-                TotalSellersCount = allSellers.Count,
+                TotalVariantsCount = colorGroups.Count,
+                TotalSellersCount = product.Sellers.Count,
 
-                LowestCurrentPrice = allSellers
+                LowestCurrentPrice = product.Sellers
                     .Where(s => s.CurrentPrice > 0)
                     .Min(s => (decimal?)s.CurrentPrice) ?? 0,
 
-                HighestCurrentPrice = allSellers
+                HighestCurrentPrice = product.Sellers
                     .Where(s => s.CurrentPrice > 0)
                     .Max(s => (decimal?)s.CurrentPrice) ?? 0,
 
-                BuyBoxSellerName = allSellers
-                    .FirstOrDefault(s => s.IsBuyBoxWinner)?.SellerName,
-
-                BuyBoxPrice = allSellers
-                    .FirstOrDefault(s => s.IsBuyBoxWinner)?.CurrentPrice,
-
-                BuyBoxColorName = raw.Variants
-                    .FirstOrDefault(v => v.Sellers.Any(s => s.IsBuyBoxWinner))?.ColorName,
-
-                Variants = raw.Variants
-                    .SelectMany(v => v.Sellers.Select(s => new { Variant = v, Seller = s }))
-                    .OrderByDescending(x => x.Seller.IsBuyBoxWinner)
-                    .ThenBy(x => x.Seller.CurrentPrice)
-                    .Select(x => new ClientSideVariantDetailsDto
-                    {
-                        Id = x.Variant.Id,
-                        DigiKalaVariantId = x.Variant.DigiKalaVariantId,
-                        ColorName = x.Variant.ColorName,
-                        ColorHex = x.Variant.ColorHex,
-                        IsActive = x.Variant.IsActive,
-
-                        Seller = new ClientSideVariantSellerDto
-                        {
-                            Id = x.Seller.Id,
-                            SellerName = x.Seller.SellerName,
-                            DigiKalaSellerId = x.Seller.DigiKalaSellerId,
-                            CurrentPrice = x.Seller.CurrentPrice,
-                            PreviousPrice = x.Seller.PreviousPrice,
-                            IsBuyBoxWinner = x.Seller.IsBuyBoxWinner,
-                            SellerRating = x.Seller.SellerRating,
-                            IsActive = x.Seller.IsActive,
-
-                            // ✅ OrderBy + Take now happen in memory
-                            RecentHistory = x.Seller.History
-    .Where(h => h.OldPrice != h.NewPrice || h.BuyBoxChanged) // ← only real changes
-    .OrderByDescending(h => h.CreatedDate)
-    .Take(20)
-    .Select(h => new ClientSideSellerPriceHistoryDto
-    {
-        OldPrice = h.OldPrice,
-        NewPrice = h.NewPrice,
-        ChangePercent = h.ChangePercent,
-        BuyBoxChanged = h.BuyBoxChanged,
-        IsBuyBoxWinner = h.IsBuyBoxWinner,
-        CreatedDate = h.CreatedDate
-    }).ToList()
-                        }
-                    })
-                    .ToList()
+                ColorGroups = colorGroups
             };
 
             return dto;
         }
+
+        #region Product Details Private Methods
+        private sealed record ProductSellerRow(
+    int SellerId,
+    string SellerName,
+    string DigiKalaSellerId,
+    decimal CurrentPrice,
+    decimal? PreviousPrice,
+    bool IsBuyBoxWinner,
+    decimal? SellerRating,
+    bool IsActive,
+    string ColorName,
+    string? ColorHex
+);
+
+        private sealed record SellerHistoryRow(
+            int ProductVariantSellerId,
+            decimal OldPrice,
+            decimal NewPrice,
+            decimal ChangePercent,
+            bool BuyBoxChanged,
+            bool IsBuyBoxWinner,
+            DateTime CreatedDate
+        );
+
+        private static ClientSideVariantSellerDto MapSeller(
+            ProductSellerRow seller,
+            Dictionary<int, List<SellerHistoryRow>> historyBySeller)
+        {
+            historyBySeller.TryGetValue(seller.SellerId, out var sellerHistory);
+
+            return new ClientSideVariantSellerDto
+            {
+                Id = seller.SellerId,
+                SellerName = seller.SellerName,
+                DigiKalaSellerId = seller.DigiKalaSellerId,
+                CurrentPrice = seller.CurrentPrice,
+                PreviousPrice = seller.PreviousPrice,
+                IsBuyBoxWinner = seller.IsBuyBoxWinner,
+                SellerRating = seller.SellerRating,
+                IsActive = seller.IsActive,
+
+                RecentHistory = (sellerHistory ?? new List<SellerHistoryRow>())
+                    .OrderByDescending(h => h.CreatedDate)
+                    .Select(h => new ClientSideSellerPriceHistoryDto
+                    {
+                        SellerName = seller.SellerName,
+                        OldPrice = h.OldPrice,
+                        NewPrice = h.NewPrice,
+                        ChangePercent = h.ChangePercent,
+                        BuyBoxChanged = h.BuyBoxChanged,
+                        IsBuyBoxWinner = h.IsBuyBoxWinner,
+                        CreatedDate = h.CreatedDate
+                    })
+                    .ToList()
+            };
+        }
+        #endregion
 
         public async Task<Result<ClientSideFilterProductsDto>> ClientSideFilterProducts(ClientSideFilterProductsDto filter)
         {
