@@ -8,61 +8,11 @@
 }
 
 @section HeaderReferences {
-    <style>
-        .compact-product-card {
-            transition: transform 0.2s, box-shadow 0.2s;
-            border-radius: 4px !important;
-        }
-
-            .compact-product-card:hover {
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12) !important;
-            }
-
-        .hover-dark-text:hover {
-            color: #000000 !important;
-            text-decoration: underline !important;
-        }
-
-        .hover-danger-btn:hover {
-            color: #ffffff !important;
-            background-color: #000000 !important;
-            border-color: #000000 !important;
-        }
-
-        .ms-3 {
-            margin-right: 1rem !important;
-            margin-left: 0 !important;
-        }
-
-        .pe-4 {
-            padding-left: 2rem !important;
-            padding-right: 0 !important;
-        }
-
-        .mt-2\.5 {
-            margin-top: 0.65rem !important;
-        }
-
-        .unread-ribbon {
-            position: absolute;
-            top: 15px;
-            right: -35px;
-            background-color: #f46a6a;
-            color: #fff;
-            text-align: center;
-            font-size: 9px;
-            font-weight: bold;
-            padding: 4px 0;
-            width: 120px;
-            transform: rotate(45deg);
-            z-index: 5;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            letter-spacing: 0.5px;
-        }
-    </style>
+    <link rel="stylesheet" href="/css/UserPanel/products-list.css" type="text/css" asp-append-version="true" />
 }
 
 <div class="container-fluid">
+
     <div class="row">
         <div class="col-sm-6">
             <div class="page-title-box">
@@ -77,26 +27,37 @@
         </div>
     </div>
 
-    <div class="card border border-dark mb-4">
-        <div class="card-body">
+    <div class="filter-card mb-3">
+        <div class="p-3">
             <form novalidate asp-area="UserPanel" asp-controller="Product" method="get" asp-action="ProductsList" id="search-form">
                 <input type="hidden" asp-for="Page" id="Page" />
-                <div class="row g-3">
-                    <div class="col-12 col-md-6">
-                        <label class="form-label font-size-12 fw-bold text-dark" asp-for="Search"></label>
-                        <input type="text" class="form-control border-dark-subtle font-size-13" asp-for="Search" autocomplete="off" placeholder="عنوان محصول...">
+                <div class="row g-2 align-items-end">
+                    <div class="col-12 col-md-5">
+                        <label class="form-label font-size-11 fw-bold text-muted mb-1" asp-for="Search"></label>
+                        <input type="text"
+                               class="form-control form-control-sm border-light font-size-12"
+                               asp-for="Search"
+                               autocomplete="off"
+                               placeholder="جستجو در عنوان محصولات..."
+                               style="border-radius: 8px; background: #f9fafb;">
                     </div>
-                    <div class="col-12 col-md-6">
-                        <label class="form-label font-size-12 fw-bold text-dark" asp-for="SortType"></label>
-                        <select class="form-control border-dark-subtle font-size-13" asp-for="SortType" asp-items="@Html.GetEnumSelectList<ProductSortTypeEnum>()">
+                    <div class="col-12 col-md-4">
+                        <label class="form-label font-size-11 fw-bold text-muted mb-1" asp-for="SortType"></label>
+                        <select class="form-control form-control-sm form-select border-light font-size-12"
+                                asp-for="SortType"
+                                asp-items="@Html.GetEnumSelectList<ProductSortTypeEnum>()"
+                                style="border-radius: 8px; background: #f9fafb;">
                         </select>
                     </div>
-                    <div class="col-12 d-flex justify-content-between align-items-center mt-3">
-                        <button class="btn btn-dark btn-sm px-4 font-size-13" type="submit">
-                            <i class="mdi mdi-magnify me-1"></i> جستجو و فیلتر
+                    <div class="col-6 col-md-1">
+                        <button class="btn btn-dark btn-sm w-100 font-size-11" type="submit" style="border-radius: 8px; height: 33px;">
+                            <i class="mdi mdi-magnify"></i>
                         </button>
-                        <a asp-area="UserPanel" asp-controller="Product" asp-action="AddNewProduct" class="btn btn-outline-dark btn-sm px-3 font-size-13">
-                            <i class="mdi mdi-plus me-1"></i> افزودن محصول جدید
+                    </div>
+                    <div class="col-6 col-md-2">
+                        <a asp-area="UserPanel" asp-controller="Product" asp-action="AddNewProduct"
+                           class="btn btn-outline-dark btn-sm w-100 font-size-11" style="border-radius: 8px; height: 33px; line-height: 21px;">
+                            <i class="mdi mdi-plus me-1"></i> افزودن
                         </a>
                     </div>
                 </div>
@@ -106,103 +67,109 @@
 
     @if (Model?.Entities?.Any() ?? false)
     {
-        <div class="row g-2">
-            @foreach (var item in Model.Entities ?? new List<ClientSideProductDto>())
+        <div class="summary-bar">
+            <span>
+                <strong class="text-dark">@Model.Entities.Count</strong> محصول در این صفحه
+            </span>
+            @{
+                var unreadCount = Model.Entities.Count(e => !e.IsRead);
+            }
+            @if (unreadCount > 0)
             {
-                <div class="col-12 col-md-6 col-xl-4 product-item-container">
-                    <div class="card mb-0 border border-dark shadow-sm position-relative overflow-hidden compact-product-card" style="background: #fff;">
+                <span class="meta-tag alert">
+                    <i class="mdi mdi-bell-ring-outline font-size-11"></i>
+                    @unreadCount تغییر جدید
+                </span>
+            }
+        </div>
+
+        <div class="row g-2">
+            @foreach (var item in Model.Entities)
+            {
+                <div class="col-12 col-md-6 col-xl-4">
+                    <div class="product-card @(!item.IsRead ? "unread" : "")">
 
                         @if (!item.IsRead)
                         {
-                            <div class="unread-ribbon">نرخ جدید</div>
+                            <span class="unread-dot" title="تغییر قیمت جدید"></span>
                         }
 
-                        <form class="delete-product-form position-absolute top-0 end-0 p-2"
+                        @* Delete button *@
+                        <form class="delete-product-form"
                               asp-area="UserPanel"
                               asp-controller="Product"
                               asp-action="DeleteProduct"
                               asp-route-id="@item.Id"
-                              style="cursor: pointer; z-index: 10; margin-right: 35px;"
                               onclick="ConfirmDelete(this)"
-                              title="حذف">
-                            <div class="d-flex align-items-center justify-content-center rounded-circle text-muted hover-danger-btn" style="width: 28px; height: 28px; background: rgba(0,0,0,0.03); border: 1px solid #dee2e6;">
+                              title="حذف از لیست">
+                            <div class="delete-btn">
                                 <i class="mdi mdi-close font-size-12"></i>
                             </div>
                         </form>
 
-                        <div class="p-3">
-                            <div class="d-flex align-items-center">
+                        <a asp-area="UserPanel" asp-controller="Product" asp-action="ProductDetails" asp-route-id="@item.Id"
+                           class="text-decoration-none d-block">
 
-                                <a asp-area="UserPanel" asp-controller="Product" asp-action="ProductDetails" asp-route-id="@item.Id"
-                                   class="bg-light border rounded-2 d-flex align-items-center justify-content-center p-1 flex-shrink-0 d-block"
-                                   style="width: 65px; height: 65px; border-color: #dee2e6 !important;">
-                                    <img src="@item.ImageUrl" class="img-fluid rounded-2 object-fit-contain h-100" alt="@item.Title">
-                                </a>
+                            <div class="p-3 product-card-body">
+                                <div class="d-flex gap-3">
 
-                                <div class="flex-grow-1 ms-3 pe-4 overflow-hidden">
-
-                                    <a asp-area="UserPanel" asp-controller="Product" asp-action="ProductDetails" asp-route-id="@item.Id" class="text-decoration-none d-block">
-                                        <h5 class="font-size-13 text-dark fw-bold mb-1 text-truncate hover-dark-text" style="max-width: 85%;" title="@item.Title">
-                                            @item.Title
-                                        </h5>
-                                    </a>
-
-                                    <div class="d-flex align-items-center gap-2 mb-1">
-                                        <span class="badge bg-dark text-white font-size-10 px-2 py-0.5 rounded">در حال مانیتور</span>
-                                        <span class="text-muted font-size-11">
-                                            @item.VariantsCount تنوع · @item.SellersCount فروشنده
-                                        </span>
+                                    <div class="product-thumb">
+                                        <img src="@item.ImageUrl" alt="@item.Title">
                                     </div>
 
-                                    <div class="d-flex align-items-center flex-wrap gap-2">
+                                    <div class="flex-grow-1" style="min-width: 0;">
 
-                                        <div class="d-flex align-items-baseline">
+                                        <h5 class="font-size-13 text-dark fw-bold mb-2 text-truncate" title="@item.Title"
+                                            style="line-height: 1.5;">
+                                            @item.Title
+                                        </h5>
+
+                                        <div class="d-flex align-items-center gap-1 flex-wrap mb-2">
+                                            <span class="meta-tag active">
+                                                <i class="mdi mdi-radar font-size-9"></i>
+                                                مانیتور
+                                            </span>
+                                            <span class="meta-tag info">
+                                                @item.VariantsCount تنوع
+                                            </span>
+                                            <span class="meta-tag info">
+                                                @item.SellersCount فروشنده
+                                            </span>
+                                        </div>
+
+                                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-1">
                                             @if (item.LowestPrice > 0)
                                             {
-                                                @if (item.LowestPrice == item.HighestPrice)
-                                                {
-                                                    <span class="text-dark fw-extrabold font-size-15">
-                                                        @item.LowestPrice.ToTomanFormat()
-                                                    </span>
-                                                    <span class="font-size-10 text-muted ms-1">تومان</span>
-                                                }
-                                                else
-                                                {
-                                                    <span class="text-dark fw-extrabold font-size-14">
-                                                        از @item.LowestPrice.ToTomanFormat()
-                                                    </span>
-                                                    <span class="font-size-10 text-muted ms-1">تومان</span>
-                                                }
+                                                <div>
+                                                    @if (item.LowestPrice == item.HighestPrice)
+                                                    {
+                                                        <span class="price-main">@item.LowestPrice.ToTomanFormat()</span>
+                                                        <span class="price-unit">ت</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="price-main">@item.LowestPrice.ToTomanFormat()</span>
+                                                        <span class="price-unit">ت</span>
+                                                        <span class="price-range me-1">
+                                                            تا @item.HighestPrice.ToTomanFormat() ت
+                                                        </span>
+                                                    }
+                                                </div>
                                             }
                                             else
                                             {
-                                                <span class="text-dark fw-extrabold font-size-15">ناموجود</span>
+                                                <span class="price-main text-muted">ناموجود</span>
                                             }
                                         </div>
-
-                                        @if (item.LowestPrice > 0 && item.LowestPrice != item.HighestPrice)
-                                        {
-                                            <div class="d-flex align-items-baseline opacity-75 ms-auto">
-                                                <span class="text-muted font-size-11">
-                                                    تا @item.HighestPrice.ToTomanFormat() تومان
-                                                </span>
-                                            </div>
-                                        }
-
                                     </div>
-
                                 </div>
                             </div>
+                        </a>
 
-                            <div class="mt-2.5 pt-2 border-top border-light-subtle">
-                                <a href="@item.Url" target="_blank"
-                                   class="btn btn-outline-dark btn-sm w-100 py-1.5 rounded-2 font-size-11 d-flex align-items-center justify-content-center gap-1">
-                                    <i class="mdi mdi-open-in-new font-size-13"></i>
-                                    <span>مشاهده کالا در سایت منبع</span>
-                                </a>
-                            </div>
-                        </div>
-
+                        <a href="@item.Url" target="_blank" class="card-footer-link">
+                            <i class="mdi mdi-open-in-new font-size-13"></i>
+                            <span>مشاهده در دیجی‌کالا</span>
+                        </a>
                     </div>
                 </div>
             }
@@ -210,10 +177,14 @@
     }
     else
     {
-        <div class="card border border-dark">
-            <div class="card-body p-0">
-                <partial name="_NotFoundPartial" />
-            </div>
+        <div class="empty-state">
+            <i class="mdi mdi-package-variant-closed d-block mb-3"></i>
+            <h5 class="text-dark fw-bold font-size-15 mb-2">محصولی یافت نشد</h5>
+            <p class="text-muted font-size-12 mb-3">هنوز محصولی برای رصد اضافه نکرده‌اید یا فیلتر شما نتیجه‌ای ندارد.</p>
+            <a asp-area="UserPanel" asp-controller="Product" asp-action="AddNewProduct"
+               class="btn btn-dark btn-sm px-4 font-size-12" style="border-radius: 8px;">
+                <i class="mdi mdi-plus me-1"></i>
+            </a>
         </div>
     }
 
