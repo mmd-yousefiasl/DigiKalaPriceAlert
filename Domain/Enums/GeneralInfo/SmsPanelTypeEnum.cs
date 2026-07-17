@@ -9,5 +9,11 @@ namespace Domain.Enums.GeneralInfo
 
         [Display(Name = "هشدار قیمت")]
         PriceAlert = 2,
+
+        [Display(Name = "هشدار بای باکس")]
+        BuyBoxAlert = 3,
+
+        [Display(Name = "هشدار قیمت و بای باکس")]
+        PriceAndBuyBoxAlert = 4,
     }
 }

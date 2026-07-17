@@ -1,6 +1,7 @@
 ﻿using Application.Dtos.SendSms.ClientSide;
 using Application.Dtos.SmsConsumer;
 using Application.Services.Interfaces;
+using Application.Tools;
 using Domain.Enums.GeneralInfo;
 using Domain.Shared;
 using Microsoft.Extensions.Logging;
@@ -55,9 +56,11 @@ namespace Application.Services.Implementaions
             if (dto is null)
                 return Result.Failure(Messages.OperationFailedError);
 
-            var infoResult = await _smsPanelService.ClientSideGetSmsPanel(SmsPanelTypeEnum.PriceAlert);
+            var infoResult = await _smsPanelService.ClientSideGetSmsPanel(dto.Type);
             if (infoResult.IsFailure)
                 return Result.Failure(Messages.OperationFailedError);
+
+            var firstName = dto.FirstName.ToSafeSmsName();
 
             var loginSms = new SmsQueueItem(
                 Mobile: dto.Mobile,
@@ -65,7 +68,7 @@ namespace Application.Services.Implementaions
                 PatternId: infoResult.Value.PatternId,
                 Parameters: new List<SmsParameterItem>
                 {
-                        new("NAME", dto.FirstName)
+                    new("NAME", firstName)
                 }
             );
 

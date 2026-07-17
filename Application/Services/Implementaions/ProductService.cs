@@ -81,11 +81,6 @@ namespace Application.Services.Implementaions
             {
                 UserId = userId,
                 ProductId = productId,
-                WatchMode = WatchMode.AllVariants,
-                NotifyOnPriceChange = true,
-                NotifyOnBuyBoxChange = true,
-                NotifyOnNewSeller = false,
-                NotifyOnSellerLeft = false
             };
 
             _context.UserProductMappings.Add(mapping);
@@ -149,11 +144,6 @@ namespace Application.Services.Implementaions
             var userMapping = new UserProductMapping
             {
                 UserId = userId,
-                WatchMode = WatchMode.AllVariants,
-                NotifyOnPriceChange = true,
-                NotifyOnBuyBoxChange = true,
-                NotifyOnNewSeller = false,
-                NotifyOnSellerLeft = false
             };
 
             product.Users = new List<UserProductMapping> { userMapping };
@@ -538,21 +528,17 @@ namespace Application.Services.Implementaions
                         {
                             UserId = upm.UserId,
                             Mobile = upm.User.Mobile,
-                            FirstName = upm.User.FirstName,
-                            WatchMode = upm.WatchMode,
-                            NotifyOnPriceChange = upm.NotifyOnPriceChange,
-                            NotifyOnBuyBoxChange = upm.NotifyOnBuyBoxChange,
-                            MinPriceChangeThreshold = upm.MinPriceChangeThreshold,
-                            WatchedVariantIds = upm.VariantWatches
-                                .Select(vw => vw.ProductVariantId)
-                                .ToList()
+                            FirstName = upm.User.FirstName
                         })
                         .ToList()
                 })
                 .ToListAsync(ct);
         }
 
-        public async Task<List<int>> SyncProductAndDetectChangesAsync(ProductMonitoringTargetDto target, ClientSideScrapedProductDto scraped, CancellationToken ct)
+        public async Task<List<ClientSideUserChangeNotification>> SyncProductAndDetectChangesAsync(
+            ProductMonitoringTargetDto target,
+            ClientSideScrapedProductDto scraped,
+            CancellationToken ct)
         {
             var strategy = _context.Database.CreateExecutionStrategy();
 
@@ -563,27 +549,26 @@ namespace Application.Services.Implementaions
                 try
                 {
                     var now = DateTime.UtcNow;
-                    var affectedUserIds = new HashSet<int>();
+                    var affectedUsers = new Dictionary<int, ClientSideUserChangeNotification>();
                     var anyChangeDetected = false;
 
-                    // ── Load current DB state for this product ───────────────────
+                    // ── Load current DB state ────────────────────────────────────
                     var dbProduct = await _context.Products
-                    .AsSplitQuery()
+                        .AsSplitQuery()
                         .Include(p => p.Variants.Where(v => !v.IsDeleted))
                             .ThenInclude(v => v.Sellers.Where(s => !s.IsDeleted))
                         .FirstOrDefaultAsync(p => p.Id == target.ProductId && !p.IsDeleted, ct);
 
                     if (dbProduct is null)
-                        return new List<int>();
+                        return new List<ClientSideUserChangeNotification>();
 
-                    // ── Build lookup maps ───────────────────────────────────────
+                    // ── Build lookup maps ────────────────────────────────────────
                     var dbVariantMap = dbProduct.Variants
                         .ToDictionary(v => v.DigiKalaVariantId);
 
                     var dbSellerMap = dbProduct.Variants
                         .SelectMany(v => v.Sellers.Select(s => new
                         {
-                            VariantId = v.Id,
                             VariantDigiKalaId = v.DigiKalaVariantId,
                             Seller = s
                         }))
@@ -591,16 +576,14 @@ namespace Application.Services.Implementaions
                             x => (x.VariantDigiKalaId, x.Seller.DigiKalaSellerId),
                             x => x.Seller);
 
-                    // Track existing seller keys from scrape
-                    var scrapedSellerKeys = new HashSet<(long VariantDigiKalaId, string SellerId)>();
+                    var scrapedSellerKeys = new HashSet<(long, string)>();
 
-                    // ── Process scraped variants ────────────────────────────────
+                    // ── Process each scraped variant ─────────────────────────────
                     foreach (var scrapedVariant in scraped.Variants)
                     {
                         var scrapedSellerId = scrapedVariant.SellerId.ToString();
                         scrapedSellerKeys.Add((scrapedVariant.DigiKalaVariantId, scrapedSellerId));
 
-                        // ── Find or create variant ──────────────────────────────
                         ProductVariant dbVariant;
 
                         if (dbVariantMap.TryGetValue(scrapedVariant.DigiKalaVariantId, out var existingVariant))
@@ -613,13 +596,12 @@ namespace Application.Services.Implementaions
                                 dbVariant.LastUpdatedDate = now;
                             }
 
-                            // keep metadata fresh
                             dbVariant.ColorName = scrapedVariant.ColorName;
                             dbVariant.ColorHex = scrapedVariant.ColorHex;
                         }
                         else
                         {
-                            // New variant → create full graph including seller + initial history
+                            // ── New variant ──────────────────────────────────────
                             dbVariant = new ProductVariant
                             {
                                 ProductId = dbProduct.Id,
@@ -662,11 +644,9 @@ namespace Application.Services.Implementaions
 
                             dbProduct.Variants.Add(dbVariant);
                             anyChangeDetected = true;
-
                             continue;
                         }
 
-                        // ── Find or create seller on existing variant ──────────
                         if (dbSellerMap.TryGetValue((scrapedVariant.DigiKalaVariantId, scrapedSellerId), out var dbSeller))
                         {
                             var oldPrice = dbSeller.CurrentPrice;
@@ -675,7 +655,7 @@ namespace Application.Services.Implementaions
                             var priceChanged = oldPrice != scrapedVariant.Price;
                             var buyBoxChanged = oldBuyBox != scrapedVariant.IsBuyBoxWinner;
 
-                            // keep metadata fresh even if no price change
+                            // Always keep metadata fresh
                             dbSeller.SellerName = scrapedVariant.SellerName;
                             dbSeller.SellerRating = scrapedVariant.SellerRating;
                             dbSeller.IsActive = true;
@@ -692,6 +672,8 @@ namespace Application.Services.Implementaions
                                     ? Math.Round((scrapedVariant.Price - oldPrice) / oldPrice * 100, 4)
                                     : 0;
 
+                                changePercent = Math.Max(-99999, Math.Min(99999, changePercent));
+
                                 dbSeller.PriceHistory.Add(new ProductPriceHistory
                                 {
                                     OldPrice = oldPrice,
@@ -705,24 +687,28 @@ namespace Application.Services.Implementaions
 
                                 anyChangeDetected = true;
 
+                                // ── Notify all watchers — no filtering ───────────
                                 foreach (var watcher in target.Watchers)
                                 {
-                                    if (ShouldNotifyUser(
-                                        watcher,
-                                        dbVariant.Id,
-                                        priceChanged,
-                                        buyBoxChanged,
-                                        scrapedVariant.Price,
-                                        oldPrice))
+                                    if (!affectedUsers.ContainsKey(watcher.UserId))
                                     {
-                                        affectedUserIds.Add(watcher.UserId);
+                                        affectedUsers[watcher.UserId] = new ClientSideUserChangeNotification
+                                        {
+                                            UserId = watcher.UserId
+                                        };
                                     }
+
+                                    if (priceChanged)
+                                        affectedUsers[watcher.UserId].HasPriceChange = true;
+
+                                    if (buyBoxChanged)
+                                        affectedUsers[watcher.UserId].HasBuyBoxChange = true;
                                 }
                             }
                         }
                         else
                         {
-                            // New seller on existing variant
+                            // ── New seller on existing variant ───────────────────
                             dbVariant.Sellers.Add(new ProductVariantSeller
                             {
                                 DigiKalaSellerId = scrapedSellerId,
@@ -754,14 +740,12 @@ namespace Application.Services.Implementaions
                         }
                     }
 
-                    // ── Mark disappeared sellers as inactive ────────────────────
+                    // ── Mark disappeared sellers as inactive ─────────────────────
                     foreach (var dbVariant in dbProduct.Variants)
                     {
                         foreach (var dbSeller in dbVariant.Sellers.Where(s => s.IsActive))
                         {
-                            var sellerKey = (dbVariant.DigiKalaVariantId, dbSeller.DigiKalaSellerId);
-
-                            if (!scrapedSellerKeys.Contains(sellerKey))
+                            if (!scrapedSellerKeys.Contains((dbVariant.DigiKalaVariantId, dbSeller.DigiKalaSellerId)))
                             {
                                 dbSeller.IsActive = false;
                                 dbSeller.LastUpdatedDate = now;
@@ -770,7 +754,7 @@ namespace Application.Services.Implementaions
                         }
                     }
 
-                    // ── Update product + IsRead flags if anything changed ───────
+                    // ── Update product timestamp + reset IsRead ──────────────────
                     if (anyChangeDetected)
                     {
                         dbProduct.LastUpdatedDate = now;
@@ -783,7 +767,7 @@ namespace Application.Services.Implementaions
                     await _context.SaveChangesAsync(ct);
                     await transaction.CommitAsync(ct);
 
-                    return affectedUserIds.ToList();
+                    return affectedUsers.Values.ToList();
                 }
                 catch
                 {
@@ -791,39 +775,6 @@ namespace Application.Services.Implementaions
                     throw;
                 }
             });
-        }
-
-        private static bool ShouldNotifyUser(ProductWatcherDto watcher, int variantId, bool priceChanged, bool buyBoxChanged, decimal newPrice, decimal oldPrice)
-        {
-            var variantIsWatched = watcher.WatchMode switch
-            {
-                WatchMode.AllVariants => true,
-                WatchMode.SpecificVariants => watcher.WatchedVariantIds.Contains(variantId),
-                WatchMode.MyShopVariantsOnly => watcher.WatchedVariantIds.Contains(variantId),
-                _ => false
-            };
-
-            if (!variantIsWatched)
-                return false;
-
-            if (priceChanged && watcher.NotifyOnPriceChange)
-            {
-                if (watcher.MinPriceChangeThreshold.HasValue)
-                {
-                    var diff = Math.Abs(newPrice - oldPrice);
-                    if (diff >= watcher.MinPriceChangeThreshold.Value)
-                        return true;
-                }
-                else
-                {
-                    return true;
-                }
-            }
-
-            if (buyBoxChanged && watcher.NotifyOnBuyBoxChange)
-                return true;
-
-            return false;
         }
     }
 }

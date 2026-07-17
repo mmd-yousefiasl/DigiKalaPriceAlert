@@ -173,5 +173,17 @@ namespace Application.Tools
 
             return remaining > 0 ? (int)Math.Ceiling(remaining) : 0;
         }
+
+        public static string ToSafeSmsName(this string? name, int maxLength = 10, string fallback = "کاربر")
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                return fallback;
+
+            var trimmed = name.Trim();
+
+            return trimmed.Length > maxLength
+                ? trimmed[..maxLength]
+                : trimmed;
+        }
     }
 }

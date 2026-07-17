@@ -19,6 +19,6 @@ namespace Application.Services.Interfaces
 
         Task<Result> ClientSideSetProductAsReadForUser(int id);
 
-        Task<List<int>> SyncProductAndDetectChangesAsync(ProductMonitoringTargetDto target, ClientSideScrapedProductDto scraped, CancellationToken ct);
+        Task<List<ClientSideUserChangeNotification>> SyncProductAndDetectChangesAsync(ProductMonitoringTargetDto target, ClientSideScrapedProductDto scraped, CancellationToken ct);
     }
 }

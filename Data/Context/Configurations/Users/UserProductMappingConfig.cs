@@ -18,24 +18,6 @@ namespace Data.Context.Configurations.Users
             builder.Property(up => up.IsRead)
                 .HasDefaultValue(false);
 
-            builder.Property(up => up.WatchMode)
-                .HasSentinel(WatchMode.AllVariants);
-
-            builder.Property(up => up.NotifyOnPriceChange)
-                .HasDefaultValue(true);
-
-            builder.Property(up => up.NotifyOnBuyBoxChange)
-                .HasDefaultValue(true);
-
-            builder.Property(up => up.NotifyOnNewSeller)
-                .HasDefaultValue(false);
-
-            builder.Property(up => up.NotifyOnSellerLeft)
-                .HasDefaultValue(false);
-
-            builder.Property(up => up.MinPriceChangeThreshold)
-                .HasColumnType("decimal(18,0)");
-
             builder.HasIndex(up => new { up.UserId, up.ProductId })
                 .IsUnique();
 

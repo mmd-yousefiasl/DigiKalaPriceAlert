@@ -851,6 +851,7 @@ namespace Application.Services.Implementaions
                 .Where(u => userIds.Contains(u.Id) && !u.IsUserBanned)
                 .Select(u => new ClientSideUserToNotifyDto
                 {
+                    UserId = u.Id,
                     Mobile = u.Mobile,
                     FirstName = u.FirstName ?? "کاربر"
                 })

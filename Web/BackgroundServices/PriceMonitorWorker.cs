@@ -1,6 +1,7 @@
 ﻿using Application.Dtos.Products.ClientSide;
 using Application.Dtos.SendSms.ClientSide;
 using Application.Services.Interfaces;
+using Domain.Enums.GeneralInfo;
 
 namespace Web.BackgroundServices
 {
@@ -67,7 +68,6 @@ namespace Web.BackgroundServices
 
         private async Task RunMonitoringCycleAsync(CancellationToken ct)
         {
-            // ── Step 1: Load monitoring targets in one lightweight scope ──
             List<ProductMonitoringTargetDto> products;
 
             using (var scope = _scopeFactory.CreateScope())
@@ -84,12 +84,12 @@ namespace Web.BackgroundServices
 
             _logger.LogInformation("Monitoring {Count} products.", products.Count);
 
-            // Unique users to notify at end of cycle
-            var usersToNotify = new HashSet<int>();
+            // key: userId
+            var userNotifications = new Dictionary<int, ClientSideUserChangeNotification>();
+
             _requestCount = 0;
             bool shouldAbortCycle = false;
 
-            // ── Step 2: Process products one by one ───────────────────────
             foreach (var product in products)
             {
                 if (ct.IsCancellationRequested || shouldAbortCycle)
@@ -99,13 +99,11 @@ namespace Web.BackgroundServices
                 {
                     await ThrottleAsync(ct);
 
-                    // Each product gets its own fresh scope
                     using var productScope = _scopeFactory.CreateScope();
 
                     var scraperService = productScope.ServiceProvider.GetRequiredService<IDigiKalaService>();
                     var productService = productScope.ServiceProvider.GetRequiredService<IProductService>();
 
-                    // Scrape latest data from Digikala
                     var scrapeResult = await scraperService.ScrapeFullProductAsync(product.DigiKalaId, ct);
 
                     if (scrapeResult.IsFailure)
@@ -129,14 +127,31 @@ namespace Web.BackgroundServices
                         continue;
                     }
 
-                    // Sync to DB and get affected users
-                    var affectedUserIds = await productService.SyncProductAndDetectChangesAsync(
+                    var affectedNotifications = await productService.SyncProductAndDetectChangesAsync(
                         product,
                         scrapeResult.Value,
                         ct);
 
-                    foreach (var userId in affectedUserIds)
-                        usersToNotify.Add(userId);
+                    foreach (var notification in affectedNotifications)
+                    {
+                        if (userNotifications.TryGetValue(notification.UserId, out var existing))
+                        {
+                            if (notification.HasPriceChange)
+                                existing.HasPriceChange = true;
+
+                            if (notification.HasBuyBoxChange)
+                                existing.HasBuyBoxChange = true;
+                        }
+                        else
+                        {
+                            userNotifications[notification.UserId] = new ClientSideUserChangeNotification
+                            {
+                                UserId = notification.UserId,
+                                HasPriceChange = notification.HasPriceChange,
+                                HasBuyBoxChange = notification.HasBuyBoxChange
+                            };
+                        }
+                    }
                 }
                 catch (OperationCanceledException)
                 {
@@ -150,42 +165,53 @@ namespace Web.BackgroundServices
                         product.ProductId,
                         product.DigiKalaId);
 
-                    // Continue with next product
                     continue;
                 }
             }
 
-            // ── Step 3: Send SMS after cycle ──────────────────────────────
-            if (ct.IsCancellationRequested || usersToNotify.Count == 0)
+            if (ct.IsCancellationRequested || userNotifications.Count == 0)
             {
                 _logger.LogInformation("No users need notification in this cycle.");
                 return;
             }
 
-            _logger.LogInformation("Sending SMS to {Count} unique users.", usersToNotify.Count);
+            _logger.LogInformation("Sending SMS to {Count} unique users.", userNotifications.Count);
 
             using (var scope = _scopeFactory.CreateScope())
             {
-                var productService = scope.ServiceProvider.GetRequiredService<IProductService>();
                 var smsService = scope.ServiceProvider.GetRequiredService<ISendSmsService>();
                 var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
 
-                var userContacts = await userService.GetUserContactsAsync(usersToNotify.ToList(), ct);
+                var userContacts = await userService.GetUserContactsAsync(userNotifications.Keys.ToList(), ct);
 
                 foreach (var user in userContacts)
                 {
                     if (ct.IsCancellationRequested)
                         break;
 
+                    if (!userNotifications.TryGetValue(user.UserId, out var notification))
+                        continue;
+
+                    SmsPanelTypeEnum? smsType = (notification.HasPriceChange, notification.HasBuyBoxChange) switch
+                    {
+                        (true, true) => SmsPanelTypeEnum.PriceAndBuyBoxAlert,
+                        (true, false) => SmsPanelTypeEnum.PriceAlert,
+                        (false, true) => SmsPanelTypeEnum.BuyBoxAlert,
+                        _ => null
+                    };
+
+                    if (smsType is null)
+                        continue;
+
                     try
                     {
                         await smsService.ClientSideSendPriceAlert(new ClientSideSendPriceAlertDto
                         {
                             Mobile = user.Mobile,
-                            FirstName = user.FirstName
+                            FirstName = user.FirstName,
+                            Type = smsType.Value
                         });
 
-                        // Small delay between SMS sends, just to be gentle
                         await Task.Delay(_random.Next(200, 600), ct);
                     }
                     catch (OperationCanceledException)
@@ -204,7 +230,6 @@ namespace Web.BackgroundServices
         {
             _requestCount++;
 
-            // Longer pause every 25 requests
             if (_requestCount % 25 == 0)
             {
                 var longPause = _random.Next(4000, 7000);
@@ -218,7 +243,6 @@ namespace Web.BackgroundServices
                 return;
             }
 
-            // Normal random delay
             var delay = _random.Next(800, 1800);
             await Task.Delay(delay, ct);
         }
