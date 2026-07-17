@@ -1,6 +1,5 @@
 ﻿using Application.Dtos.BalanceTransaction.AdminSide;
 using Application.Dtos.BalanceTransaction.ClientSide;
-using Application.Dtos.Products.ClientSide;
 using Application.Dtos.Users.AdminSide;
 using Application.Dtos.Users.ClientSide;
 using Application.Dtos.UserValidation;
@@ -38,15 +37,9 @@ namespace Application.Services.Interfaces
 
         Task<Result> ClientSideAddToUserSubscription(int durationInDays);
 
-        Task<Result> ClientSideAddRefundTransaction(decimal amount);
-
         Task<Result> ClientSideCanUserAddProduct();
 
         Task<Result> ClientSideIsUserHaveSubscription(int userId);
-
-        Task<Result<List<ClientSideEligibleProductIdWithUsersDto>>> ClientSideGetAllEligibleProductIdsAsync(CancellationToken cancellationToken);
-
-        Task<List<string>> ClientSideGetUsersTrackingProduct(ClientSideGetUsersTrackingProductDto dto);
 
         Task<Result<OtpGenerationResultDto>> GenerateUserValidationCode(string mobile);
 

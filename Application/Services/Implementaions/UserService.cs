@@ -1,6 +1,5 @@
 ﻿using Application.Dtos.BalanceTransaction.AdminSide;
 using Application.Dtos.BalanceTransaction.ClientSide;
-using Application.Dtos.Products.ClientSide;
 using Application.Dtos.Role.AdminSide;
 using Application.Dtos.SendSms.ClientSide;
 using Application.Dtos.Users.AdminSide;
@@ -451,32 +450,6 @@ namespace Application.Services.Implementaions
             return Result.Success();
         }
 
-        public async Task<Result> ClientSideAddRefundTransaction(decimal amount)
-        {
-            if (amount < 0) return Result.Failure(Messages.OperationFailedError);
-
-            var userId = _httpContextAccessor.HttpContext.User.GetUserId();
-            if (userId < 1) return Result.Failure(Messages.OperationFailedError);
-
-            var user = await _context.Users.Where(n => n.Id == userId).Include(n => n.Transactions).FirstOrDefaultAsync();
-            if (user is null) return Result.Failure(Messages.OperationFailedError);
-
-            user.Balance += amount;
-            user.Transactions.Add(new BalanceTransaction()
-            {
-                IsSuccess = true,
-                Amount = amount,
-                TransId = null,
-                Type = BalanceTransactionTypeEnum.Credit,
-                Description = Messages.RefundUserBalanceMessage
-            });
-
-            _context.Users.Update(user);
-            await _context.SaveChangesAsync();
-
-            return Result.Success();
-        }
-
         public async Task<Result> ClientSideCanUserAddProduct()
         {
             var userId = _httpContextAccessor.HttpContext.User.GetUserId();
@@ -500,44 +473,6 @@ namespace Application.Services.Implementaions
                 return Result.Success();
 
             return Result.Failure(Messages.OperationFailedError);
-        }
-
-        public async Task<Result<List<ClientSideEligibleProductIdWithUsersDto>>> ClientSideGetAllEligibleProductIdsAsync(CancellationToken cancellationToken)
-        {
-            var now = DateTime.UtcNow;
-
-            var result = await _context.UserProductMappings
-                .AsNoTracking()
-                .Where(upm => upm.User.SubscriptionEndDate > now)
-                .GroupBy(upm => upm.ProductId)
-                .Select(group => new ClientSideEligibleProductIdWithUsersDto
-                {
-                    Id = group.Key,
-                    Users = group.Select(upm => new ClientSideUserDto
-                    {
-                        Id = upm.User.Id,
-                        FirstName = upm.User.FirstName,
-                        Mobile = upm.User.Mobile,
-                        IsBanned = upm.User.IsUserBanned
-                    }).ToList()
-                })
-                .ToListAsync(cancellationToken);
-
-            if (result.Count == 0)
-                return Result.Failure<List<ClientSideEligibleProductIdWithUsersDto>>(Messages.OperationFailedError);
-
-            return Result.Success(result);
-        }
-
-        public async Task<List<string>> ClientSideGetUsersTrackingProduct(ClientSideGetUsersTrackingProductDto dto)
-        {
-            var now = DateTime.UtcNow;
-
-            return await _context.UserProductMappings
-                .AsNoTracking()
-                .Where(up => up.ProductId == dto.ProductId && up.User.SubscriptionEndDate > now)
-                .Select(up => up.User.Mobile)
-                .ToListAsync(dto.CancellationToken);
         }
 
         public async Task<Result<OtpGenerationResultDto>> GenerateUserValidationCode(string mobile)

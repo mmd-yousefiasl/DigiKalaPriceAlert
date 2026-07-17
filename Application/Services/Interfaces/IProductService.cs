@@ -15,8 +15,6 @@ namespace Application.Services.Interfaces
 
         Task<List<ProductMonitoringTargetDto>> GetAllProductsForMonitoringAsync(CancellationToken ct);
 
-        Task<Result> ClientSideUpdateProductPrices(ClientSideUpdateProductPricesDto dto);
-
         Task<Result> ClientSideSetProductAsReadForUser(int id);
 
         Task<List<ClientSideUserChangeNotification>> SyncProductAndDetectChangesAsync(ProductMonitoringTargetDto target, ClientSideScrapedProductDto scraped, CancellationToken ct);

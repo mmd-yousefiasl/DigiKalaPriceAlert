@@ -479,11 +479,6 @@ namespace Application.Services.Implementaions
             return Result.Success();
         }
 
-        public Task<Result> ClientSideUpdateProductPrices(ClientSideUpdateProductPricesDto dto)
-        {
-            throw new NotImplementedException();
-        }
-
         public async Task<Result> ClientSideSetProductAsReadForUser(int id)
         {
             if (id < 1)
