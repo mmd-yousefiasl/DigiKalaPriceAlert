@@ -5,6 +5,7 @@
         public string ColorName { get; set; }
         public string? ColorHex { get; set; }
         public int SellersCount { get; set; }
+        public DateTime LastUpdatedDate { get; set; }
 
         public ClientSideVariantSellerDto? Winner { get; set; }
         public List<ClientSideVariantSellerDto> OtherSellers { get; set; } = [];

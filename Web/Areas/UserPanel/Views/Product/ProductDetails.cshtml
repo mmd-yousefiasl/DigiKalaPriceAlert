@@ -171,7 +171,16 @@
                                 <span class="cd cd-lg" style="background-color: @group.ColorHex;"></span>
                             }
                             <div>
-                                <div class="fw-bold font-size-13">@group.ColorName</div>
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="fw-bold font-size-13">@group.ColorName</span>
+                                    @if (group.LastUpdatedDate > DateTime.MinValue)
+                                    {
+                                        <span class="font-size-10 text-muted">
+                                            <i class="mdi mdi-clock-outline font-size-10"></i>
+                                            @group.LastUpdatedDate.ToPersianRelativeTime()
+                                        </span>
+                                    }
+                                </div>
                                 <div class="d-flex align-items-center gap-2 mt-1">
                                     <span class="winner-badge">
                                         <i class="mdi mdi-trophy font-size-11"></i>
@@ -364,7 +373,7 @@
                                     <span class="hi-seller">@item.History.SellerName</span>
                                     <span class="font-size-11 text-muted">@item.ColorName</span>
                                 </div>
-                                <span class="hi-time">@item.History.CreatedDate.GetDateTime()</span>
+                                <span class="hi-time">@item.History.CreatedDate.ToPersianRelativeTime()</span>
                             </div>
 
                             <div class="hi-prices">
@@ -387,7 +396,20 @@
 
                                 @if (item.History.BuyBoxChanged)
                                 {
-                                    <span class="buybox-change-badge">تغییر بای‌باکس</span>
+                                    @if (item.History.IsBuyBoxWinner)
+                                    {
+                                        <span class="buybox-badge win" title="این فروشنده بای‌باکس را فتح کرد">
+                                            <i class="mdi mdi-trophy font-size-11"></i>
+                                            برنده جدید بای‌باکس
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="buybox-badge loss" title="این فروشنده بای‌باکس را از دست داد">
+                                            <i class="mdi mdi-close-circle-outline font-size-11"></i>
+                                            خروج از بای‌باکس
+                                        </span>
+                                    }
                                 }
                             </div>
                         </div>

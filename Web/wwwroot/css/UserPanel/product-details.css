@@ -462,3 +462,194 @@
 .history-item.hidden {
     display: none !important;
 }
+
+/* ── BuyBox Badges ───────────────────────────────────── */
+.buybox-badge {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    white-space: nowrap;
+}
+
+    /* Won BuyBox */
+    .buybox-badge.win {
+        background-color: #fef3c7;
+        color: #92400e;
+        border: 1px solid #fde68a;
+    }
+
+    /* Lost BuyBox */
+    .buybox-badge.loss {
+        background-color: #fee2e2;
+        color: #991b1b;
+        border: 1px solid #fecaca;
+    }
+
+/* ── Better mobile overflow handling ───────────────────────── */
+@media (max-width: 768px) {
+
+    /* Product hero should stack on mobile */
+    .product-hero .p-3.p-md-4 > .d-flex {
+        flex-direction: column;
+        align-items: center !important;
+    }
+
+    .product-hero .flex-grow-1 {
+        width: 100%;
+        min-width: 0;
+    }
+
+    /* Header section should wrap */
+    .section-header {
+        flex-wrap: wrap;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .section-count {
+        max-width: 100%;
+        white-space: normal;
+        word-break: break-word;
+    }
+
+    /* Color header layout */
+    .color-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+
+        .color-header .ch-left,
+        .color-header .ch-right {
+            width: 100%;
+            min-width: 0;
+        }
+
+        .color-header .ch-left {
+            align-items: flex-start;
+        }
+
+            .color-header .ch-left > div {
+                min-width: 0;
+                flex: 1;
+            }
+
+        .color-header .ch-right {
+            justify-content: space-between;
+            text-align: right;
+        }
+
+    /* Winner badge and meta should wrap */
+    .winner-badge {
+        white-space: normal;
+        word-break: break-word;
+        line-height: 1.5;
+        max-width: 100%;
+    }
+
+    .rating-badge {
+        flex-wrap: wrap;
+        max-width: 100%;
+    }
+
+    /* Seller rows */
+    .seller-row .sr-info,
+    .seller-row .sr-price {
+        min-width: 0;
+    }
+
+    .seller-row .sr-name {
+        white-space: normal;
+        overflow: visible;
+        text-overflow: unset;
+        line-height: 1.6;
+        word-break: break-word;
+    }
+
+    .seller-row .sr-meta {
+        flex-wrap: wrap;
+        row-gap: 4px;
+    }
+
+    .seller-row .sr-price {
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    /* History block */
+    .history-item {
+        align-items: flex-start;
+    }
+
+        .history-item .hi-body {
+            min-width: 0;
+            width: 100%;
+        }
+
+        .history-item .hi-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 4px;
+        }
+
+            .history-item .hi-header > div {
+                min-width: 0;
+                width: 100%;
+                flex-wrap: wrap;
+            }
+
+        .history-item .hi-seller {
+            white-space: normal;
+            word-break: break-word;
+            line-height: 1.6;
+        }
+
+        .history-item .hi-time {
+            white-space: normal;
+            word-break: break-word;
+        }
+
+        .history-item .hi-prices {
+            width: 100%;
+            align-items: flex-start;
+            flex-wrap: wrap;
+        }
+
+        .history-item .hi-new,
+        .history-item .hi-old,
+        .price-change,
+        .buybox-badge {
+            max-width: 100%;
+            word-break: break-word;
+        }
+
+    /* Filter area */
+    .history-filters {
+        padding: 10px 12px;
+    }
+
+    .filter-group {
+        align-items: flex-start;
+    }
+
+    .filter-label {
+        min-width: auto;
+        width: 100%;
+        margin-bottom: 4px;
+    }
+
+    .filter-chip {
+        white-space: normal;
+        text-align: center;
+        line-height: 1.4;
+    }
+
+    /* Stat pills */
+    .stat-pill {
+        min-width: calc(50% - 4px);
+    }
+}
