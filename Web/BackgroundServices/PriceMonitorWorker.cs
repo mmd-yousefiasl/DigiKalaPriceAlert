@@ -11,7 +11,11 @@ namespace Web.BackgroundServices
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly ILogger<PriceMonitorWorker> _logger;
         private readonly Random _random = new();
-        private int _requestCount = 0;
+
+        private const int BatchSize = 50;
+        private const int CycleIntervalMinutes = 15;
+
+        private int _requestCount;
         #endregion
 
         #region Ctor
@@ -28,7 +32,7 @@ namespace Web.BackgroundServices
         {
             _logger.LogInformation("Price Monitor Worker Started.");
 
-            var cycleInterval = TimeSpan.FromMinutes(15);
+            var cycleInterval = TimeSpan.FromMinutes(CycleIntervalMinutes);
 
             while (!stoppingToken.IsCancellationRequested)
             {
@@ -68,107 +72,140 @@ namespace Web.BackgroundServices
 
         private async Task RunMonitoringCycleAsync(CancellationToken ct)
         {
-            List<ProductMonitoringTargetDto> products;
-
-            using (var scope = _scopeFactory.CreateScope())
-            {
-                var productService = scope.ServiceProvider.GetRequiredService<IProductService>();
-                products = await productService.GetAllProductsForMonitoringAsync(ct);
-            }
-
-            if (products.Count == 0)
-            {
-                _logger.LogInformation("No eligible products found for monitoring.");
-                return;
-            }
-
-            _logger.LogInformation("Monitoring {Count} products.", products.Count);
-
-            // key: userId
             var userNotifications = new Dictionary<int, ClientSideUserChangeNotification>();
 
             _requestCount = 0;
+            int page = 0;
+            int totalProcessed = 0;
             bool shouldAbortCycle = false;
 
-            foreach (var product in products)
+            while (!ct.IsCancellationRequested && !shouldAbortCycle)
             {
-                if (ct.IsCancellationRequested || shouldAbortCycle)
-                    break;
+                // ── Load one batch ───────────────────────────────────────
+                List<ProductMonitoringTargetDto> batch;
 
-                try
+                using (var scope = _scopeFactory.CreateScope())
                 {
-                    await ThrottleAsync(ct);
+                    var productService = scope.ServiceProvider.GetRequiredService<IProductService>();
+                    var result = await productService.GetProductBatchForMonitoringAsync(page, BatchSize, ct);
 
-                    using var productScope = _scopeFactory.CreateScope();
+                    if (result.IsFailure || !result.Value.Any())
+                        break;
 
-                    var scraperService = productScope.ServiceProvider.GetRequiredService<IDigiKalaService>();
-                    var productService = productScope.ServiceProvider.GetRequiredService<IProductService>();
+                    batch = result.Value;
+                }
 
-                    var scrapeResult = await scraperService.ScrapeFullProductAsync(product.DigiKalaId, ct);
+                _logger.LogInformation(
+                    "Processing batch {Page} ({Count} products, total so far: {Total})",
+                    page + 1,
+                    batch.Count,
+                    totalProcessed);
 
-                    if (scrapeResult.IsFailure)
+                // ── Process each product in the batch ────────────────────
+                foreach (var product in batch)
+                {
+                    if (ct.IsCancellationRequested || shouldAbortCycle)
+                        break;
+
+                    try
                     {
-                        if (!string.IsNullOrWhiteSpace(scrapeResult.Message) &&
-                            scrapeResult.Message.Contains("RATE_LIMITED"))
-                        {
-                            _logger.LogCritical(
-                                "Rate limit detected while scraping DigiKalaId: {DigiKalaId}. Aborting cycle to protect IP.",
-                                product.DigiKalaId);
+                        await ThrottleAsync(ct);
 
-                            shouldAbortCycle = true;
-                            break;
+                        using var productScope = _scopeFactory.CreateScope();
+
+                        var scraperService = productScope.ServiceProvider.GetRequiredService<IDigiKalaService>();
+                        var productService = productScope.ServiceProvider.GetRequiredService<IProductService>();
+
+                        // Scrape
+                        var scrapeResult = await scraperService.ScrapeFullProductAsync(product.DigiKalaId, ct);
+
+                        if (scrapeResult.IsFailure)
+                        {
+                            if (!string.IsNullOrWhiteSpace(scrapeResult.Message) &&
+                                scrapeResult.Message.Contains("RATE_LIMITED"))
+                            {
+                                _logger.LogCritical(
+                                    "Rate limit detected for DigiKalaId: {DigiKalaId}. Aborting cycle.",
+                                    product.DigiKalaId);
+
+                                shouldAbortCycle = true;
+                                break;
+                            }
+
+                            _logger.LogWarning(
+                                "Scrape failed for DigiKalaId: {DigiKalaId}. Error: {Error}",
+                                product.DigiKalaId,
+                                scrapeResult.Message);
+
+                            continue;
                         }
 
-                        _logger.LogWarning(
-                            "Scrape failed for DigiKalaId: {DigiKalaId}. Error: {Error}",
-                            product.DigiKalaId,
-                            scrapeResult.Message);
+                        // Sync + detect changes
+                        var syncResult = await productService.SyncProductAndDetectChangesAsync(
+                            product,
+                            scrapeResult.Value,
+                            ct);
+
+                        if (syncResult.IsFailure)
+                        {
+                            _logger.LogWarning(
+                                "Sync failed for DigiKalaId: {DigiKalaId}. Error: {Error}",
+                                product.DigiKalaId,
+                                syncResult.Message);
+
+                            continue;
+                        }
+
+                        // Merge notifications
+                        foreach (var notification in syncResult.Value)
+                        {
+                            if (userNotifications.TryGetValue(notification.UserId, out var existing))
+                            {
+                                if (notification.HasPriceChange)
+                                    existing.HasPriceChange = true;
+
+                                if (notification.HasBuyBoxChange)
+                                    existing.HasBuyBoxChange = true;
+                            }
+                            else
+                            {
+                                userNotifications[notification.UserId] = new ClientSideUserChangeNotification
+                                {
+                                    UserId = notification.UserId,
+                                    HasPriceChange = notification.HasPriceChange,
+                                    HasBuyBoxChange = notification.HasBuyBoxChange
+                                };
+                            }
+                        }
+
+                        totalProcessed++;
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        throw;
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(
+                            ex,
+                            "Error processing ProductId: {ProductId}, DigiKalaId: {DigiKalaId}",
+                            product.ProductId,
+                            product.DigiKalaId);
 
                         continue;
                     }
-
-                    var affectedNotifications = await productService.SyncProductAndDetectChangesAsync(
-                        product,
-                        scrapeResult.Value,
-                        ct);
-
-                    foreach (var notification in affectedNotifications)
-                    {
-                        if (userNotifications.TryGetValue(notification.UserId, out var existing))
-                        {
-                            if (notification.HasPriceChange)
-                                existing.HasPriceChange = true;
-
-                            if (notification.HasBuyBoxChange)
-                                existing.HasBuyBoxChange = true;
-                        }
-                        else
-                        {
-                            userNotifications[notification.UserId] = new ClientSideUserChangeNotification
-                            {
-                                UserId = notification.UserId,
-                                HasPriceChange = notification.HasPriceChange,
-                                HasBuyBoxChange = notification.HasBuyBoxChange
-                            };
-                        }
-                    }
                 }
-                catch (OperationCanceledException)
-                {
-                    throw;
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(
-                        ex,
-                        "Error while processing product ProductId: {ProductId}, DigiKalaId: {DigiKalaId}",
-                        product.ProductId,
-                        product.DigiKalaId);
 
-                    continue;
-                }
+                // If batch was smaller than BatchSize, we've reached the end
+                if (batch.Count < BatchSize)
+                    break;
+
+                page++;
             }
 
+            _logger.LogInformation("Processed {Total} products total in this cycle.", totalProcessed);
+
+            // ── Send SMS notifications ────────────────────────────────────
             if (ct.IsCancellationRequested || userNotifications.Count == 0)
             {
                 _logger.LogInformation("No users need notification in this cycle.");
@@ -177,51 +214,58 @@ namespace Web.BackgroundServices
 
             _logger.LogInformation("Sending SMS to {Count} unique users.", userNotifications.Count);
 
-            using (var scope = _scopeFactory.CreateScope())
+            await SendNotificationsAsync(userNotifications, ct);
+        }
+
+        private async Task SendNotificationsAsync(
+            Dictionary<int, ClientSideUserChangeNotification> userNotifications,
+            CancellationToken ct)
+        {
+            using var scope = _scopeFactory.CreateScope();
+
+            var smsService = scope.ServiceProvider.GetRequiredService<ISendSmsService>();
+            var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
+
+            var userContacts = await userService.GetUserContactsAsync(
+                userNotifications.Keys.ToList(), ct);
+
+            foreach (var user in userContacts)
             {
-                var smsService = scope.ServiceProvider.GetRequiredService<ISendSmsService>();
-                var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
+                if (ct.IsCancellationRequested)
+                    break;
 
-                var userContacts = await userService.GetUserContactsAsync(userNotifications.Keys.ToList(), ct);
+                if (!userNotifications.TryGetValue(user.UserId, out var notification))
+                    continue;
 
-                foreach (var user in userContacts)
+                SmsPanelTypeEnum? smsType = (notification.HasPriceChange, notification.HasBuyBoxChange) switch
                 {
-                    if (ct.IsCancellationRequested)
-                        break;
+                    (true, true) => SmsPanelTypeEnum.PriceAndBuyBoxAlert,
+                    (true, false) => SmsPanelTypeEnum.PriceAlert,
+                    (false, true) => SmsPanelTypeEnum.BuyBoxAlert,
+                    _ => null
+                };
 
-                    if (!userNotifications.TryGetValue(user.UserId, out var notification))
-                        continue;
+                if (smsType is null)
+                    continue;
 
-                    SmsPanelTypeEnum? smsType = (notification.HasPriceChange, notification.HasBuyBoxChange) switch
+                try
+                {
+                    await smsService.ClientSideSendPriceAlert(new ClientSideSendPriceAlertDto
                     {
-                        (true, true) => SmsPanelTypeEnum.PriceAndBuyBoxAlert,
-                        (true, false) => SmsPanelTypeEnum.PriceAlert,
-                        (false, true) => SmsPanelTypeEnum.BuyBoxAlert,
-                        _ => null
-                    };
+                        Mobile = user.Mobile,
+                        FirstName = user.FirstName,
+                        Type = smsType.Value
+                    });
 
-                    if (smsType is null)
-                        continue;
-
-                    try
-                    {
-                        await smsService.ClientSideSendPriceAlert(new ClientSideSendPriceAlertDto
-                        {
-                            Mobile = user.Mobile,
-                            FirstName = user.FirstName,
-                            Type = smsType.Value
-                        });
-
-                        await Task.Delay(_random.Next(200, 600), ct);
-                    }
-                    catch (OperationCanceledException)
-                    {
-                        throw;
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError(ex, "Failed to send SMS to mobile: {Mobile}", user.Mobile);
-                    }
+                    await Task.Delay(_random.Next(200, 600), ct);
+                }
+                catch (OperationCanceledException)
+                {
+                    throw;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Failed to send SMS to mobile: {Mobile}", user.Mobile);
                 }
             }
         }

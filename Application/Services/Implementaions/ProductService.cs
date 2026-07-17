@@ -558,7 +558,46 @@ namespace Application.Services.Implementaions
                 .ToListAsync(ct);
         }
 
-        public async Task<List<ClientSideUserChangeNotification>> SyncProductAndDetectChangesAsync(
+        public async Task<Result<List<ProductMonitoringTargetDto>>> GetProductBatchForMonitoringAsync(int page, int batchSize, CancellationToken ct)
+        {
+            var now = DateTime.UtcNow;
+
+            var batch = await _context.Products
+                .AsNoTracking()
+                .AsSplitQuery()
+                .Where(p => !p.IsDeleted &&
+                            p.Users.Any(upm =>
+                                !upm.IsDeleted &&
+                                !upm.User.IsUserBanned &&
+                                upm.User.SubscriptionEndDate > now))
+                .OrderBy(p => p.Id)
+                .Skip(page * batchSize)
+                .Take(batchSize)
+                .Select(p => new ProductMonitoringTargetDto
+                {
+                    ProductId = p.Id,
+                    DigiKalaId = p.DigiKalaId,
+                    Watchers = p.Users
+                        .Where(upm =>
+                            !upm.IsDeleted &&
+                            !upm.User.IsUserBanned &&
+                            upm.User.SubscriptionEndDate > now)
+                        .Select(upm => new ProductWatcherDto
+                        {
+                            UserId = upm.UserId,
+                            Mobile = upm.User.Mobile,
+                            FirstName = upm.User.FirstName
+                        })
+                        .ToList()
+                }).ToListAsync(ct);
+
+            if (!batch.Any())
+                return Result.Failure<List<ProductMonitoringTargetDto>>(Messages.OperationFailedError);
+
+            return Result.Success(batch);
+        }
+
+        public async Task<Result<List<ClientSideUserChangeNotification>>> SyncProductAndDetectChangesAsync(
             ProductMonitoringTargetDto target,
             ClientSideScrapedProductDto scraped,
             CancellationToken ct)
@@ -583,7 +622,7 @@ namespace Application.Services.Implementaions
                         .FirstOrDefaultAsync(p => p.Id == target.ProductId && !p.IsDeleted, ct);
 
                     if (dbProduct is null)
-                        return new List<ClientSideUserChangeNotification>();
+                        return Result.Failure<List<ClientSideUserChangeNotification>>(Messages.OperationFailedError);
 
                     // ── Build lookup maps ────────────────────────────────────────
                     var dbVariantMap = dbProduct.Variants

@@ -13,10 +13,10 @@ namespace Application.Services.Interfaces
 
         Task<Result> ClientSideDeleteUserProduct(int id);
 
-        Task<List<ProductMonitoringTargetDto>> GetAllProductsForMonitoringAsync(CancellationToken ct);
+        Task<Result<List<ProductMonitoringTargetDto>>> GetProductBatchForMonitoringAsync(int page, int batchSize, CancellationToken ct);
 
         Task<Result> ClientSideSetProductAsReadForUser(int id);
 
-        Task<List<ClientSideUserChangeNotification>> SyncProductAndDetectChangesAsync(ProductMonitoringTargetDto target, ClientSideScrapedProductDto scraped, CancellationToken ct);
+        Task<Result<List<ClientSideUserChangeNotification>>> SyncProductAndDetectChangesAsync(ProductMonitoringTargetDto target, ClientSideScrapedProductDto scraped, CancellationToken ct);
     }
 }
