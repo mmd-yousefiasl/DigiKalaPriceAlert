@@ -130,7 +130,7 @@ namespace Web.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        [HttpGet("/alert")]
+        [HttpGet("/a")]
         public IActionResult Alert()
         {
             ViewData["NoIndex"] = true;
