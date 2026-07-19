@@ -355,6 +355,7 @@
                 {
                     hIdx++;
                     var isUp = item.History.NewPrice > item.History.OldPrice;
+                    // Determine dot color based on actual price change, neutral if no price change
                     var dotClass = item.History.ChangePercent != 0 ? (isUp ? "up" : "down") : "neutral";
 
                     <div class="history-item"
@@ -377,22 +378,36 @@
                             </div>
 
                             <div class="hi-prices">
-                                @if (item.History.OldPrice > 0)
+                                @* LOGIC FIX START: Check if price actually changed *@
+                                @if (item.History.OldPrice == item.History.NewPrice)
                                 {
-                                    <span class="hi-old">@item.History.OldPrice.ToTomanFormat()</span>
-                                    <span class="hi-arrow">←</span>
-                                }
-                                <span class="hi-new">
-                                    @item.History.NewPrice.ToTomanFormat()
-                                    <span class="font-size-10 text-muted fw-normal">ت</span>
-                                </span>
-
-                                @if (item.History.ChangePercent != 0)
-                                {
-                                    <span class="price-change @(isUp ? "up" : "down")">
-                                        @(isUp ? "▲" : "▼") @Math.Abs(item.History.ChangePercent).ToString("N1")%
+                                    @* Scenario: Price is stable, only BuyBox changed *@
+                                    <span class="hi-price-stable">
+                                        @item.History.NewPrice.ToTomanFormat()
+                                        <span class="font-size-10 text-muted fw-normal">ت</span>
                                     </span>
                                 }
+                                else
+                                {
+                                    @* Scenario: Actual price change occurred *@
+                                    @if (item.History.OldPrice > 0)
+                                    {
+                                        <span class="hi-old">@item.History.OldPrice.ToTomanFormat()</span>
+                                        <span class="hi-arrow">←</span>
+                                    }
+                                    <span class="hi-new">
+                                        @item.History.NewPrice.ToTomanFormat()
+                                        <span class="font-size-10 text-muted fw-normal">ت</span>
+                                    </span>
+
+                                    @if (item.History.ChangePercent != 0)
+                                    {
+                                        <span class="price-change @(isUp ? "up" : "down")">
+                                            @(isUp ? "▲" : "▼") @Math.Abs(item.History.ChangePercent).ToString("N1")%
+                                        </span>
+                                    }
+                                }
+                                @* LOGIC FIX END *@
 
                                 @if (item.History.BuyBoxChanged)
                                 {
