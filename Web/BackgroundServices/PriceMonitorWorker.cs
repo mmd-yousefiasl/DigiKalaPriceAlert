@@ -13,7 +13,7 @@ namespace Web.BackgroundServices
         private readonly Random _random = new();
 
         private const int BatchSize = 50;
-        private const int CycleIntervalMinutes = 15;
+        private const int CycleIntervalMinutes = 2;
 
         private int _requestCount;
         #endregion

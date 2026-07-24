@@ -1,4 +1,5 @@
-﻿using Application.Mediator;
+﻿using Application.Dtos.DigiKala;
+using Application.Mediator;
 using Application.Services.Implementaions;
 using Application.Services.Implementations;
 using Application.Services.Interfaces;
@@ -37,16 +38,28 @@ namespace Web
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddSingleton<ISmsQueue, SmsQueue>();
             services.AddSingleton<ICacheManager, CacheManager>();
+            services.AddSingleton<DigiKalaSessionState>();
             #endregion
 
             #region HttpClient Services
-            services.AddHttpClient<IDigiKalaService, DigiKalaService>()
-                .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+            services.AddHttpClient<IDigiKalaService, DigiKalaService>(client =>
+            {
+                client.Timeout = TimeSpan.FromSeconds(30);
+            })
+            .ConfigurePrimaryHttpMessageHandler(() => new SocketsHttpHandler
+            {
+                UseCookies = true,
+                CookieContainer = new CookieContainer(),
+                AutomaticDecompression = DecompressionMethods.GZip
+                                       | DecompressionMethods.Deflate
+                                       | DecompressionMethods.Brotli,
+                EnableMultipleHttp2Connections = true,
+                SslOptions = new System.Net.Security.SslClientAuthenticationOptions
                 {
-                    UseCookies = true,
-                    CookieContainer = new CookieContainer(),
-                    AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate | DecompressionMethods.Brotli
-                });
+                    EnabledSslProtocols = System.Security.Authentication.SslProtocols.Tls13
+                                        | System.Security.Authentication.SslProtocols.Tls12,
+                }
+            });
             #endregion
 
             #region Scoped Services

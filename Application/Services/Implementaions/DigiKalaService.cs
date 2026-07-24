@@ -15,16 +15,21 @@ namespace Application.Services.Implementations
         #region Fields
         private readonly HttpClient _httpClient;
         private readonly ILogger<DigiKalaService> _logger;
+        private readonly DigiKalaSessionState _session;
 
         private const string _userAgent =
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36";
         #endregion
 
         #region Ctor
-        public DigiKalaService(HttpClient httpClient, ILogger<DigiKalaService> logger)
+        public DigiKalaService(
+            HttpClient httpClient,
+            ILogger<DigiKalaService> logger,
+            DigiKalaSessionState session)
         {
             _httpClient = httpClient;
             _logger = logger;
+            _session = session;
         }
         #endregion
 
@@ -33,6 +38,8 @@ namespace Application.Services.Implementations
 
         public async Task<Result<ClientSideScrapedProductDto>> ScrapeFullProductAsync(string digiKalaId, CancellationToken ct = default)
             => await ScrapeFullProductInternalAsync(digiKalaId, ct);
+
+        public void ResetSession() => _session.Reset();
 
         public Result<string> ExtractProductIdFromUrl(string url)
         {
@@ -47,11 +54,53 @@ namespace Application.Services.Implementations
         #region Private Methods
 
         // ════════════════════════════════════════════════════════════════
+        // SESSION WARM-UP (singleton state — runs once per cycle globally)
+        // ════════════════════════════════════════════════════════════════
+
+        private async Task EnsureSessionAsync(CancellationToken ct)
+        {
+            if (_session.IsWarmedUp) return; // fast-path — no lock needed
+
+            await _session.Lock.WaitAsync(ct);
+            try
+            {
+                if (_session.IsWarmedUp) return; // double-check after acquiring lock
+
+                _logger.LogInformation("Warming up DigiKala session...");
+
+                var homeRequest = new HttpRequestMessage(HttpMethod.Get, "https://www.digikala.com/");
+                homeRequest.Headers.TryAddWithoutValidation("User-Agent", _userAgent);
+                homeRequest.Headers.TryAddWithoutValidation("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
+                homeRequest.Headers.TryAddWithoutValidation("Accept-Language", "fa-IR,fa;q=0.9,en-US;q=0.8,en;q=0.7");
+                homeRequest.Headers.TryAddWithoutValidation("Sec-Fetch-Dest", "document");
+                homeRequest.Headers.TryAddWithoutValidation("Sec-Fetch-Mode", "navigate");
+                homeRequest.Headers.TryAddWithoutValidation("Sec-Fetch-Site", "none");
+                homeRequest.Headers.TryAddWithoutValidation("Sec-Fetch-User", "?1");
+
+                await _httpClient.SendAsync(homeRequest, ct);
+
+                _session.MarkWarmedUp();
+                _logger.LogInformation("DigiKala session warmed up successfully.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "DigiKala session warm-up failed, continuing anyway.");
+                _session.MarkWarmedUp(); // don't retry on every call
+            }
+            finally
+            {
+                _session.Lock.Release();
+            }
+        }
+
+        // ════════════════════════════════════════════════════════════════
         // HTTP LAYER
         // ════════════════════════════════════════════════════════════════
 
         private async Task<Result<JsonElement>> FetchRawJsonAsync(string digiKalaId, CancellationToken ct = default)
         {
+            await EnsureSessionAsync(ct);
+
             try
             {
                 var request = BuildRequest(digiKalaId);
@@ -91,6 +140,12 @@ namespace Application.Services.Implementations
             request.Headers.TryAddWithoutValidation("X-Web-Client", "DesktopWeb");
             request.Headers.TryAddWithoutValidation("Referer", "https://www.digikala.com/");
             request.Headers.TryAddWithoutValidation("Origin", "https://www.digikala.com");
+            request.Headers.TryAddWithoutValidation("sec-ch-ua", "\"Not/A)Brand\";v=\"8\", \"Chromium\";v=\"126\", \"Google Chrome\";v=\"126\"");
+            request.Headers.TryAddWithoutValidation("sec-ch-ua-mobile", "?0");
+            request.Headers.TryAddWithoutValidation("sec-ch-ua-platform", "\"Windows\"");
+            request.Headers.TryAddWithoutValidation("Sec-Fetch-Dest", "empty");
+            request.Headers.TryAddWithoutValidation("Sec-Fetch-Mode", "cors");
+            request.Headers.TryAddWithoutValidation("Sec-Fetch-Site", "same-site");
 
             return request;
         }
@@ -158,7 +213,6 @@ namespace Application.Services.Implementations
                     .GetProperty("data")
                     .GetProperty("product");
 
-                // ── Step 1: Parse all variants (IsBuyBoxWinner = false at this stage)
                 var variants = ParseVariants(product);
 
                 if (variants.Count == 0)
@@ -167,7 +221,6 @@ namespace Application.Services.Implementations
                     return Result.Failure<ClientSideScrapedProductDto>("NO_VARIANTS");
                 }
 
-                // ── Step 2: Determine BuyBox winner per color group using rank
                 SetBuyBoxWinnersPerColor(variants);
 
                 var scraped = new ClientSideScrapedProductDto
@@ -219,7 +272,6 @@ namespace Application.Services.Implementations
                 ? id.GetInt64()
                 : 0;
 
-        // ── Parses all variants WITHOUT setting IsBuyBoxWinner ───────────
         private List<ClientSideScrapedVariantDto> ParseVariants(JsonElement product)
         {
             var result = new List<ClientSideScrapedVariantDto>();
@@ -237,7 +289,6 @@ namespace Application.Services.Implementations
             return result;
         }
 
-        // ── Sets BuyBox winner as the highest ranked variant per color ───
         private static void SetBuyBoxWinnersPerColor(List<ClientSideScrapedVariantDto> variants)
         {
             var colorGroups = variants
@@ -246,7 +297,6 @@ namespace Application.Services.Implementations
 
             foreach (var group in colorGroups)
             {
-                // Highest rank within this color = BuyBox winner for this color
                 var winner = group
                     .OrderByDescending(v => v.Rank)
                     .First();
@@ -259,7 +309,6 @@ namespace Application.Services.Implementations
         {
             try
             {
-                // ── Required fields ──────────────────────────────────────
                 if (!variant.TryGetProperty("id", out var idProp))
                     return null;
 
@@ -269,29 +318,24 @@ namespace Application.Services.Implementations
                 if (!seller.TryGetProperty("id", out var sellerId))
                     return null;
 
-                // ── Status ───────────────────────────────────────────────
                 var status = variant.TryGetProperty("status", out var statusProp)
                     ? statusProp.GetString() ?? "unknown"
                     : "unknown";
 
-                // ── Rank (used to determine per-color BuyBox winner) ─────
                 decimal rank = 0;
                 if (variant.TryGetProperty("rank", out var rankProp))
                     rank = rankProp.GetDecimal();
 
-                // ── Price ────────────────────────────────────────────────
                 decimal price = 0;
                 if (variant.TryGetProperty("price", out var priceObj) &&
                     priceObj.TryGetProperty("selling_price", out var sp))
                 {
-                    price = sp.GetDecimal() / 10; // Rial → Toman
+                    price = sp.GetDecimal() / 10;
                 }
 
-                // Skip ghost variants (unmarketable AND no price)
                 if (price == 0 && status != "marketable")
                     return null;
 
-                // ── Color (optional — some products have no color) ───────
                 int? colorId = null;
                 string colorName = "بدون رنگ";
                 string? colorHex = null;
@@ -303,7 +347,6 @@ namespace Application.Services.Implementations
                     colorHex = color.TryGetProperty("hex_code", out var cHex) ? cHex.GetString() : null;
                 }
 
-                // ── Seller rating (optional) ─────────────────────────────
                 decimal? sellerRating = null;
                 if (seller.TryGetProperty("rating", out var rating) &&
                     rating.TryGetProperty("total_rate", out var rateVal))
@@ -316,7 +359,7 @@ namespace Application.Services.Implementations
                     DigiKalaVariantId = idProp.GetInt64(),
                     Status = status,
                     Rank = rank,
-                    IsBuyBoxWinner = false,    // Set correctly after grouping by color
+                    IsBuyBoxWinner = false,
 
                     ColorId = colorId,
                     ColorName = colorName,
