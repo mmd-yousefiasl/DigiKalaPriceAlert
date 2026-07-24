@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authentication.Cookies;
+﻿using Domain.Statics;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace Web.Configuration
 {
@@ -6,6 +7,13 @@ namespace Web.Configuration
     {
         public static void ConfigAuthentication(this WebApplicationBuilder builder)
         {
+            builder.Services.AddAntiforgery(options =>
+            {
+                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                options.Cookie.HttpOnly = true;
+                options.Cookie.SameSite = SameSiteMode.Strict;
+            });
+
             builder.Services.AddAuthentication(option =>
             {
                 option.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
@@ -17,12 +25,12 @@ namespace Web.Configuration
             {
                 option.LoginPath = "/login";
                 option.LogoutPath = "/logout";
-                option.ExpireTimeSpan = TimeSpan.FromDays(2);
-                option.Cookie.SameSite = SameSiteMode.Lax;
-                option.Cookie.MaxAge = TimeSpan.FromDays(1);
-                option.SlidingExpiration = false;
+                option.ExpireTimeSpan = TimeSpan.FromDays(SiteTools.LoginExpirationInDays);
+                option.Cookie.MaxAge = TimeSpan.FromDays(SiteTools.LoginExpirationInDays);
+                option.SlidingExpiration = true;
                 option.Cookie.IsEssential = true;
                 option.Cookie.HttpOnly = true;
+                option.Cookie.SameSite = SameSiteMode.Lax;
                 option.Cookie.SecurePolicy = CookieSecurePolicy.Always;
             });
         }

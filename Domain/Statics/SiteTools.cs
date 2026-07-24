@@ -16,6 +16,8 @@
         public static string DefaultImage { get; set; }
 
         public static string PaymentLogo { get; set; }
+
+        public static int LoginExpirationInDays { get; set; }
         #endregion
 
         #region Blog
