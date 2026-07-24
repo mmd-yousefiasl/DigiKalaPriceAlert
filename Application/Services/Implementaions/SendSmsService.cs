@@ -46,7 +46,6 @@ namespace Application.Services.Implementaions
                 }
             );
 
-            Console.WriteLine(dto.Code);
             await _smsQueue.QueueSmsAsync(loginSms);
 
             return Result.Success();
