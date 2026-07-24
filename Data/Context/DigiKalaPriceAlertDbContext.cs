@@ -7,6 +7,7 @@ using Domain.Models.Media;
 using Domain.Models.NewsLetters;
 using Domain.Models.Orders;
 using Domain.Models.Products;
+using Domain.Models.SiteNotifications;
 using Domain.Models.SubscriptionPlans;
 using Domain.Models.Tickets;
 using Domain.Models.Users;
@@ -70,5 +71,7 @@ namespace Data.Context
         public DbSet<Ticket> Tickets => Set<Ticket>();
         public DbSet<TicketMessage> TicketMessages => Set<TicketMessage>();
         public DbSet<TicketHistory> TicketHistories => Set<TicketHistory>();
+
+        public DbSet<SiteNotification> SiteNotifications => Set<SiteNotification>();
     }
 }

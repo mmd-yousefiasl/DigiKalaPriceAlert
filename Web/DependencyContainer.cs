@@ -87,6 +87,7 @@ namespace Web
             services.AddScoped<IMediatorHandler, MediatorHandler>();
             services.AddScoped<IMediumService, MediumService>();
             services.AddScoped<IVisitorService, VisitorService>();
+            services.AddScoped<ISiteNotificationService, SiteNotificationService>();
             #endregion
 
             #region Background Services
