@@ -1,0 +1,18 @@
+﻿@model int
+
+<div class="dropdown d-inline-block ms-1">
+    <button class="btn header-item noti-icon waves-effect" onclick="location.href='/admin/notifications-list'">
+        <i class="mdi mdi-bell-outline"></i>
+        @if (Model > 0)
+        {
+            if (Model > 99)
+            {
+                <span class="badge bg-danger rounded-pill">99+</span>
+            }
+            else
+            {
+                <span class="badge bg-danger rounded-pill">@Model</span>
+            }
+        }
+    </button>
+</div>

@@ -48,7 +48,8 @@ namespace Application.Services.Implementaions
             {
                 Id = n.Id,
                 Content = n.Content,
-                CreatedDate = n.CreatedDate
+                CreatedDate = n.CreatedDate,
+                IsRead = n.IsRead
             }));
 
             return filter;
@@ -137,6 +138,28 @@ namespace Application.Services.Implementaions
             return await _context.SiteNotifications
                 .AsNoTracking()
                 .CountAsync(n => n.ForUserId == userId && n.IsRead == false);
+        }
+
+        public Task AdminSideSetNotificationsRead()
+        {
+            return _context.SiteNotifications
+                .Where(n => n.ForUserId == null && n.IsRead == false)
+                .ExecuteUpdateAsync(s => s
+                .SetProperty(n => n.IsRead, true)
+                .SetProperty(n => n.LastUpdatedDate, DateTime.UtcNow));
+        }
+
+        public Task ClientSideSetNotificationsRead()
+        {
+            var userId = _httpContextAccessor.HttpContext.User.GetUserId();
+            if (userId < 1)
+                return Task.CompletedTask;
+
+            return _context.SiteNotifications
+                .Where(n => n.ForUserId == userId && n.IsRead == false)
+                .ExecuteUpdateAsync(s => s
+                .SetProperty(n => n.IsRead, true)
+                .SetProperty(n => n.LastUpdatedDate, DateTime.UtcNow));
         }
     }
 }

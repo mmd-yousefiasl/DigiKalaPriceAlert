@@ -93,3 +93,7 @@ html, body {
     .tr-card.failed {
         border-right-color: #dee2e6;
     }
+
+    .fs-30 {
+        font-size: 30px;
+    }

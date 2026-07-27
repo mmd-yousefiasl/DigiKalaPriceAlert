@@ -17,5 +17,9 @@ namespace Application.Services.Interfaces
         Task<int> AdminSideGetUnreadNotificationsCount();
 
         Task<int> ClientSideGetUnreadNotificationsCount();
+
+        Task AdminSideSetNotificationsRead();
+
+        Task ClientSideSetNotificationsRead();
     }
 }

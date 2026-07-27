@@ -25,7 +25,7 @@ try
         .PersistKeysToFileSystem(new DirectoryInfo(
             Path.Combine(builder.Environment.ContentRootPath, "KeyDirectory")))
         .SetApplicationName(SiteTools.SiteName)
-        .SetDefaultKeyLifetime(TimeSpan.FromMinutes(
+        .SetDefaultKeyLifetime(TimeSpan.FromDays(
             int.Parse(builder.Configuration.GetSection("MachineKeyLifetime").Value)));
     #endregion
 

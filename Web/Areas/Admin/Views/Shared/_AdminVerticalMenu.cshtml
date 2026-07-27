@@ -36,9 +36,11 @@
                 </li>
 
                 <li permission="ManageNotifications">
-                    <a asp-area="Admin" asp-controller="Notification" asp-action="Notifications" class="waves-effect">
+                    <a asp-area="Admin" asp-controller="SiteNotification" asp-action="NotificationsList" class="waves-effect">
                         <i class="mdi mdi-bell-ring-outline"></i>
                         <span>پیام ها</span>
+
+                        @await Component.InvokeAsync("AdminNotificationsCountVerticalMenu")
                     </a>
                 </li>
 
