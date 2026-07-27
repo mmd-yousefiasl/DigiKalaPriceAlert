@@ -1,5 +1,6 @@
 ﻿@using Application.Dtos.SiteNotifications.AdminSide
 @using Application.Tools
+@using Domain.Enums.SiteNotifications
 @model AdminSideFilterNotificationsDto
 
 @{
@@ -22,18 +23,20 @@
         </div>
     </div>
 
-    @*     <div class="row">
+    <div class="row">
         <div class="col-xl-12">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title">جست و جوی کاربران</h4>
-                    <form novalidate asp-area="Admin" asp-controller="User" method="get" asp-action="UsersList" id="search-form">
+                    <h4 class="card-title">جست و جوی اعلان ها</h4>
+                    <form novalidate asp-area="Admin" asp-controller="SiteNotification" method="get" asp-action="NotificationsList" id="search-form">
                         <input type="hidden" asp-for="Page" id="Page" />
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label class="form-label" asp-for="Search"></label>
-                                    <input type="text" class="form-control" asp-for="Search" autocomplete="off">
+                                    <label class="form-label" asp-for="Type"></label>
+                                    <select type="text" class="form-control" asp-for="Type" asp-items="Html.GetEnumSelectList<SiteNotificationTypeEnum>()">
+                                        <option value="">همه</option>
+                                    </select>
                                 </div>
                             </div>
                         </div>
@@ -42,14 +45,14 @@
                 </div>
             </div>
         </div>
-    </div> *@
+    </div>
 
     @if (Model?.Entities?.Any() ?? false)
     {
         @foreach (var item in Model.Entities)
         {
             <div class="mb-2 p-3 shadow-sm"
-                 style="border: 1px solid #e9ecef; border-right: 4px solid @(item.IsRead ? "#dee2e6" : "#000000"); border-radius: 4px; background: @(item.IsRead ? "#ffffff" : "#fafafa");">
+                 style="border: 1px solid #e9ecef; border-right: 4px solid #dee2e6; border-radius: 4px; background: @(item.IsRead ? "#ffffff" : "#fafafa");">
 
                 <div class="d-flex justify-content-between align-items-center mb-2">
 

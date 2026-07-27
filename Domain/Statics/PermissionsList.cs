@@ -520,9 +520,26 @@ namespace Domain.Statics
                 UniqueName = "DeleteMedium"
             },
             #endregion
+
+            #region SiteNotifications
+            new Permission
+            {
+                Id = 68,
+                ParentId = 1,
+                Title = "مدیریت اعلان های سایت",
+                UniqueName = "ManageSiteNotifications"
+            },
+            new Permission
+            {
+                Id = 69,
+                ParentId = 68,
+                Title = "لیست اعلان های سایت",
+                UniqueName = "NotificationsList"
+            },
+            #endregion
         };
 
-        //Last used id ==> 67
+        //Last used id ==> 69
         public static List<Permission> Permissions = _permissions;
     }
 }

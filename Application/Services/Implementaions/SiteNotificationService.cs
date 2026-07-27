@@ -33,6 +33,11 @@ namespace Application.Services.Implementaions
 
             var conditions = Filter.GenerateConditions<SiteNotification>();
 
+            if (filter.Type is not null)
+            {
+                conditions.Add(n => n.Type == filter.Type);
+            }
+
             conditions.Add(n => n.ForUserId == null);
 
             IQueryable<SiteNotification> query = _context.SiteNotifications;
@@ -95,7 +100,8 @@ namespace Application.Services.Implementaions
             {
                 Content = model.Content,
                 ForUserId = null,
-                IsRead = false
+                IsRead = false,
+                Type = model.Type,
             };
 
             _context.SiteNotifications.Add(notification);

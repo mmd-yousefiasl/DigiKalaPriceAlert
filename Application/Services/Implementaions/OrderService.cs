@@ -3,12 +3,14 @@ using Application.Dtos.Orders.AdminSide;
 using Application.Dtos.Orders.ClientSide;
 using Application.Dtos.Payment;
 using Application.Dtos.Users.ClientSide;
+using Application.Mediator;
 using Application.Services.Interfaces;
 using Application.Tools;
 using Data.Context;
 using Domain.Enums.Orders;
 using Domain.Enums.Payment;
 using Domain.Enums.Users;
+using Domain.Events.Orders;
 using Domain.Models.Orders;
 using Domain.Shared;
 using Domain.Statics;
@@ -26,6 +28,7 @@ namespace Application.Services.Implementaions
         private readonly ISubscriptionPlanService _subscriptionPlanService;
         private readonly IUserService _userService;
         private readonly IPaymentService _paymentService;
+        private readonly IMediatorHandler _mediator;
         #endregion
 
         #region Ctor
@@ -34,7 +37,8 @@ namespace Application.Services.Implementaions
             IUsedFreePlanService usedFreePlanService,
             ISubscriptionPlanService subscriptionPlanService,
             IUserService userService,
-            IPaymentService paymentService)
+            IPaymentService paymentService,
+            IMediatorHandler mediator)
         {
             _context = context;
             _httpContextAccessor = httpContextAccessor;
@@ -42,6 +46,7 @@ namespace Application.Services.Implementaions
             _subscriptionPlanService = subscriptionPlanService;
             _userService = userService;
             _paymentService = paymentService;
+            _mediator = mediator;
         }
         #endregion
 
@@ -321,6 +326,20 @@ namespace Application.Services.Implementaions
 
                     await _context.SaveChangesAsync();
                     await dbTx.CommitAsync();
+
+                    OrderUpdatedEvent OrderUpdatedEvent = new OrderUpdatedEvent(
+                    order.Id,
+                    order.CreatedDate,
+                    order.LastUpdatedDate,
+                    order.Status,
+                    order.PlanPrice,
+                    order.PlanTitle,
+                    order.PaidDate,
+                    order.InvoiceId,
+                    order.SubscriptionPlanId,
+                    order.UserId);
+
+                    await _mediator.PublishEvent(OrderUpdatedEvent);
 
                     return order.InvoiceId;
                 }

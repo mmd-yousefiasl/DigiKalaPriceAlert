@@ -1,10 +1,12 @@
 ﻿using Application.Dtos.Tickets;
 using Application.Dtos.Tickets.AdminSide;
 using Application.Dtos.Tickets.ClientSide;
+using Application.Mediator;
 using Application.Services.Interfaces;
 using Application.Tools;
 using Data.Context;
 using Domain.Enums.Tickets;
+using Domain.Events.Tickets;
 using Domain.Models.Tickets;
 using Domain.Shared;
 using Domain.Statics;
@@ -18,14 +20,17 @@ namespace Application.Services.Implementaions
         #region Fields
         private protected DigiKalaPriceAlertDbContext _context;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IMediatorHandler _mediator;
         #endregion
 
         #region Ctor
         public TicketService(DigiKalaPriceAlertDbContext context,
-            IHttpContextAccessor httpContextAccessor)
+            IHttpContextAccessor httpContextAccessor,
+            IMediatorHandler mediator)
         {
             _context = context;
             _httpContextAccessor = httpContextAccessor;
+            _mediator = mediator;
         }
         #endregion
 
@@ -117,6 +122,15 @@ namespace Application.Services.Implementaions
                 TicketId = createdTicketId,
                 Description = Messages.NewTicketCreatedByUser
             });
+
+            TicketCreatedEvent TicketCreatedEvent = new TicketCreatedEvent(
+                ticket.CreatedDate,
+                ticket.Title,
+                ticket.Category,
+                ticket.Priority,
+                ticket.Status);
+
+            await _mediator.PublishEvent(TicketCreatedEvent);
 
             return createdTicketId;
         }

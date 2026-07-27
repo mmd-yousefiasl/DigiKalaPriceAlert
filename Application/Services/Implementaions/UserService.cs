@@ -109,6 +109,10 @@ namespace Application.Services.Implementaions
 
                 _context.Users.Add(loginUser);
                 await _context.SaveChangesAsync();
+
+                UserCreatedEvent UserCreatedEvent = new UserCreatedEvent(loginUser.Mobile);
+
+                await _mediator.PublishEvent(UserCreatedEvent);
             }
             else
             {

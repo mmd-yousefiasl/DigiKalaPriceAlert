@@ -1,8 +1,10 @@
 ﻿using Application.Dtos.ContactUs.AdminSide;
 using Application.Dtos.ContactUs.ClientSide;
+using Application.Mediator;
 using Application.Services.Interfaces;
 using Application.Tools;
 using Data.Context;
+using Domain.Events.ContactUs;
 using Domain.Models.ContactUs;
 using Domain.Shared;
 using Microsoft.AspNetCore.Http;
@@ -14,14 +16,17 @@ namespace Application.Services.Implementaions
         #region Fields
         private protected DigiKalaPriceAlertDbContext _context;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IMediatorHandler _mediator;
         #endregion
 
         #region Ctor
         public ContactUsFormService(DigiKalaPriceAlertDbContext context,
-            IHttpContextAccessor httpContextAccessor)
+            IHttpContextAccessor httpContextAccessor,
+            IMediatorHandler mediator)
         {
             _context = context;
             _httpContextAccessor = httpContextAccessor;
+            _mediator = mediator;
         }
         #endregion
 
@@ -45,6 +50,19 @@ namespace Application.Services.Implementaions
 
             _context.ContactUsForms.Add(contactUs);
             await _context.SaveChangesAsync();
+
+            ContactUsFormCreatedEvent ContactUsFormCreatedEvent = new ContactUsFormCreatedEvent(
+            contactUs.CreatedDate,
+            contactUs.FullName,
+            contactUs.Mobile,
+            contactUs.Subject,
+            contactUs.Message,
+            contactUs.IsRead,
+            contactUs.ReadByUserId,
+            contactUs.UserId,
+            contactUs.UserIP);
+
+            await _mediator.PublishEvent(ContactUsFormCreatedEvent);
 
             return Result.Success(Messages.ContactUsFormSentSuccessfully);
         }
