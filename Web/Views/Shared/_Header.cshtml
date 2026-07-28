@@ -8,7 +8,7 @@
                     <a asp-area="" asp-controller="Home" asp-action="Index">
                         <img src="/assets/image/logo.png" class="max-w-24 md:max-w-32 h-fit" alt="صفحه اصلی">
                     </a>
-                </div>
+                </div>f
                 <ul class="p-5 space-y-1 text-sm text-zinc-800 h-screen overflow-y-auto pb-48">
                     <li>
                         <a asp-area="" asp-controller="Home" asp-action="Index" class="py-3 px-4 hover:bg-gray-100 rounded-lg flex gap-x-2">
@@ -67,8 +67,8 @@
                             سوالات متداول
                         </a>
                     </li>
-                    <li>
-                        <a permission="AdminPanel" asp-area="Admin" asp-controller="Home" asp-action="Index" class="py-3 px-4 hover:bg-gray-100 rounded-lg block">
+                    <li permission="AdminPanel">
+                        <a asp-area="Admin" asp-controller="Home" asp-action="Index" class="py-3 px-4 hover:bg-gray-100 rounded-lg block">
                             پنل ادمین
                         </a>
                     </li>
@@ -195,8 +195,8 @@
                     </div>
                 </a>
             </li>
-            <li>
-                <a permission="AdminPanel" asp-area="Admin" asp-controller="Home" asp-action="Index" class="pt-1 flex gap-x-2 items-center group relative">
+            <li permission="AdminPanel">
+                <a asp-area="Admin" asp-controller="Home" asp-action="Index" class="pt-1 flex gap-x-2 items-center group relative">
                     <div class="relative text-zinc-600 text-sm group-hover:text-primary-500 transition pb-2
                         after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-[2px]
                         after:bg-primary-500 after:scale-x-0 after:origin-right after:transition-transform after:duration-300
