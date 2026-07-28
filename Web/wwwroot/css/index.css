@@ -1,0 +1,293 @@
+﻿:root {
+    --dk-red: #ef4056;
+    --dk-red-hover: #c82a3c;
+    --bg-white: #ffffff;
+    --bg-light: #f0f0f2;
+    --text-dark: #23254e;
+    --text-muted: #62666d;
+    --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 8px 24px rgba(239, 64, 86, 0.08);
+}
+
+.seller-main-container {
+    font-family: Vazir;
+    background-color: var(--bg-white);
+    color: var(--text-dark);
+    line-height: 1.7;
+}
+
+.section-wrapper {
+    padding: 80px 0;
+}
+
+.container {
+    width: 100%;
+    max-width: 1140px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.row-layout {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+}
+
+.col-6 {
+    display: table-cell;
+    width: 50%;
+    vertical-align: middle;
+}
+
+/* بخش Hero */
+.hero-section {
+    background: linear-gradient(180deg, rgba(239, 64, 86, 0.03) 0%, rgba(255, 255, 255, 0) 100%);
+    padding: 60px 0;
+}
+
+.hero-content {
+    padding-left: 40px;
+}
+
+    /* بهینه‌سازی شده: هم h2 قبلی و هم h1 جدید سئو را استایل‌دهی می‌کند */
+    .hero-content h2,
+    .hero-content h1 {
+        font-size: 28pt;
+        font-weight: 800;
+        line-height: 1.4;
+        margin-bottom: 20px;
+    }
+
+        .hero-content h2 span,
+        .hero-content h1 span {
+            color: var(--dk-red);
+        }
+
+    .hero-content p {
+        font-size: 12pt;
+        color: var(--text-muted);
+        margin-bottom: 35px;
+        text-align: justify;
+    }
+
+.btn {
+    display: inline-block;
+    padding: 14px 32px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 11pt;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.btn-red {
+    background-color: var(--dk-red);
+    color: var(--bg-white);
+    border: 2px solid var(--dk-red);
+    box-shadow: var(--shadow-md);
+    margin-left: 15px;
+}
+
+    .btn-red:hover {
+        background-color: var(--dk-red-hover);
+        border-color: var(--dk-red-hover);
+    }
+
+.btn-outline {
+    background-color: transparent;
+    color: var(--text-dark);
+    border: 2px solid var(--bg-light);
+}
+
+    .btn-outline:hover {
+        background-color: var(--bg-light);
+    }
+
+/* موکاپ پیش‌نمایش اعلان */
+.mockup-display {
+    background-color: var(--bg-white);
+    border: 3px solid var(--bg-light);
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: var(--shadow-sm);
+    max-width: 380px;
+    margin: 0 auto;
+}
+
+.mockup-top {
+    border-bottom: 1px solid var(--bg-light);
+    padding-bottom: 12px;
+    margin-bottom: 15px;
+    font-weight: 700;
+    color: var(--dk-red);
+    font-size: 10.5pt;
+}
+
+.mockup-msg {
+    background-color: var(--bg-light);
+    padding: 12px;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    font-size: 10pt;
+}
+
+.mockup-alert {
+    border-right: 4px solid var(--dk-red);
+    background-color: rgba(239, 64, 86, 0.03);
+}
+
+/* عناوین بخش‌ها */
+.center-title {
+    text-align: center;
+    margin-bottom: 60px;
+}
+
+    /* بهینه‌سازی شده: هم h3 قبلی و هم h2 جدید بخش‌ها را استایل‌دهی می‌کند */
+    .center-title h3,
+    .center-title h2 {
+        font-size: 22pt;
+        font-weight: 800;
+        margin-bottom: 12px;
+    }
+
+    .center-title p {
+        color: var(--text-muted);
+        font-size: 11pt;
+    }
+
+/* گرید ۳ ستونه */
+.grid-3-columns {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+    border-spacing: 20px 0;
+}
+
+.grid-cell {
+    display: table-cell;
+    background-color: var(--bg-white);
+    border: 1px solid var(--bg-light);
+    border-radius: 12px;
+    padding: 35px 25px;
+    text-align: center;
+    box-shadow: var(--shadow-sm);
+}
+
+.icon-container {
+    width: 60px;
+    height: 60px;
+    background-color: rgba(239, 64, 86, 0.06);
+    border-radius: 50%;
+    display: block;
+    margin: 0 auto 20px auto;
+    padding: 15px;
+}
+
+    .icon-container svg {
+        width: 100%;
+        height: 100%;
+        fill: var(--dk-red);
+    }
+
+/* بهینه‌سازی شده: هم h4 قبلی و هم h3 جدید کارت‌ها را استایل‌دهی می‌کند */
+.grid-cell h4,
+.grid-cell h3 {
+    font-size: 14pt;
+    font-weight: 700;
+    margin-bottom: 15px;
+}
+
+.grid-cell p {
+    font-size: 10.5pt;
+    color: var(--text-muted);
+    text-align: center;
+    padding: 25px;
+}
+
+/* بخش لایه خاکستری */
+.bg-alt-section {
+    background-color: rgba(239, 64, 86, 0.01);
+    border-top: 1px solid var(--bg-light);
+    border-bottom: 1px solid var(--bg-light);
+}
+
+/* بخش آمار عددی */
+.stats-bar {
+    background-color: var(--dk-red);
+    color: var(--bg-white);
+    padding: 50px 0;
+    text-align: center;
+}
+
+.stats-table {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+}
+
+.stat-node {
+    display: table-cell;
+}
+
+    .stat-node .number {
+        font-size: 26pt;
+        font-weight: 900;
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    .stat-node .desc {
+        font-size: 11pt;
+        opacity: 0.9;
+    }
+
+/* سوالات متداول */
+.faq-block {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.faq-row {
+    border-bottom: 1px solid var(--bg-light);
+    padding: 24px 10px;
+}
+
+    /* بهینه‌سازی شده: هم h4 قبلی و هم h3 جدید سوالات متداول را استایل‌دهی می‌کند */
+    .faq-row h4,
+    .faq-row h3 {
+        font-size: 13pt;
+        font-weight: 700;
+        margin-bottom: 10px;
+        margin-top: 0;
+    }
+
+    .faq-row p {
+        font-size: 11pt;
+        color: var(--text-muted);
+        text-align: justify;
+    }
+
+@media (max-width: 768px) {
+    .col-6, .grid-cell, .stat-node {
+        display: block !important;
+        width: 100% !important;
+        text-align: center !important;
+        margin-bottom: 30px;
+    }
+
+    .grid-3-columns {
+        display: block;
+        border-spacing: 0;
+    }
+
+    .hero-content {
+        padding-left: 0;
+    }
+
+    .btn {
+        width: 100%;
+        margin-left: 0;
+        margin-bottom: 12px;
+    }
+}

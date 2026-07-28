@@ -3,7 +3,7 @@
 <head>
     <partial name="_Meta" />
 
-    <title>@ViewData["Title"] | دیجیتو | پایش قیمت رقبا و مدیریت بای‌باکس دیجی‌کالا</title>
+    <title>دیجیتو | پایش قیمت رقبا و مدیریت بای‌باکس دیجی‌کالا | @ViewData["Title"]</title>
     <script type="importmap"></script>
 
     <partial name="_HeaderReferences" />
@@ -18,6 +18,8 @@
     {
         <link rel="canonical" href="@($"{SiteTools.SiteUrl.TrimEnd('/')}{Context.Request.Path}")" />
     }
+
+    <partial name="_OrganizationSchema" />
 </head>
 <body class="max-w-[1700px] mx-auto">
     <partial name="_Loader" />

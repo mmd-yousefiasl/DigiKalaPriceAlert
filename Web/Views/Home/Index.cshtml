@@ -3,325 +3,27 @@
 }
 
 @section HeaderReferences {
-    <style>
-        :root {
-            --dk-red: #ef4056;
-            --dk-red-hover: #c82a3c;
-            --bg-white: #ffffff;
-            --bg-light: #f0f0f2;
-            --text-dark: #23254e;
-            --text-muted: #62666d;
-            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 8px 24px rgba(239, 64, 86, 0.08);
-        }
-
-        .seller-main-container {
-            font-family: Vazir;
-            background-color: var(--bg-white);
-            color: var(--text-dark);
-            line-height: 1.7;
-        }
-
-        .section-wrapper {
-            padding: 80px 0;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 1140px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        .row-layout {
-            display: table;
-            width: 100%;
-            table-layout: fixed;
-        }
-
-        .col-6 {
-            display: table-cell;
-            width: 50%;
-            vertical-align: middle;
-        }
-
-        /* بخش Hero */
-        .hero-section {
-            background: linear-gradient(180deg, rgba(239, 64, 86, 0.03) 0%, rgba(255, 255, 255, 0) 100%);
-            padding: 60px 0;
-        }
-
-        .hero-content {
-            padding-left: 40px;
-        }
-
-            /* بهینه‌سازی شده: هم h2 قبلی و هم h1 جدید سئو را استایل‌دهی می‌کند */
-            .hero-content h2,
-            .hero-content h1 {
-                font-size: 28pt;
-                font-weight: 800;
-                line-height: 1.4;
-                margin-bottom: 20px;
-            }
-
-                .hero-content h2 span,
-                .hero-content h1 span {
-                    color: var(--dk-red);
-                }
-
-            .hero-content p {
-                font-size: 12pt;
-                color: var(--text-muted);
-                margin-bottom: 35px;
-                text-align: justify;
-            }
-
-        .btn {
-            display: inline-block;
-            padding: 14px 32px;
-            border-radius: 8px;
-            font-weight: 700;
-            font-size: 11pt;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            text-align: center;
-        }
-
-        .btn-red {
-            background-color: var(--dk-red);
-            color: var(--bg-white);
-            border: 2px solid var(--dk-red);
-            box-shadow: var(--shadow-md);
-            margin-left: 15px;
-        }
-
-            .btn-red:hover {
-                background-color: var(--dk-red-hover);
-                border-color: var(--dk-red-hover);
-            }
-
-        .btn-outline {
-            background-color: transparent;
-            color: var(--text-dark);
-            border: 2px solid var(--bg-light);
-        }
-
-            .btn-outline:hover {
-                background-color: var(--bg-light);
-            }
-
-        /* موکاپ پیش‌نمایش اعلان */
-        .mockup-display {
-            background-color: var(--bg-white);
-            border: 3px solid var(--bg-light);
-            border-radius: 20px;
-            padding: 20px;
-            box-shadow: var(--shadow-sm);
-            max-width: 380px;
-            margin: 0 auto;
-        }
-
-        .mockup-top {
-            border-bottom: 1px solid var(--bg-light);
-            padding-bottom: 12px;
-            margin-bottom: 15px;
-            font-weight: 700;
-            color: var(--dk-red);
-            font-size: 10.5pt;
-        }
-
-        .mockup-msg {
-            background-color: var(--bg-light);
-            padding: 12px;
-            border-radius: 12px;
-            margin-bottom: 12px;
-            font-size: 10pt;
-        }
-
-        .mockup-alert {
-            border-right: 4px solid var(--dk-red);
-            background-color: rgba(239, 64, 86, 0.03);
-        }
-
-        /* عناوین بخش‌ها */
-        .center-title {
-            text-align: center;
-            margin-bottom: 60px;
-        }
-
-            /* بهینه‌سازی شده: هم h3 قبلی و هم h2 جدید بخش‌ها را استایل‌دهی می‌کند */
-            .center-title h3,
-            .center-title h2 {
-                font-size: 22pt;
-                font-weight: 800;
-                margin-bottom: 12px;
-            }
-
-            .center-title p {
-                color: var(--text-muted);
-                font-size: 11pt;
-            }
-
-        /* گرید ۳ ستونه */
-        .grid-3-columns {
-            display: table;
-            width: 100%;
-            table-layout: fixed;
-            border-spacing: 20px 0;
-        }
-
-        .grid-cell {
-            display: table-cell;
-            background-color: var(--bg-white);
-            border: 1px solid var(--bg-light);
-            border-radius: 12px;
-            padding: 35px 25px;
-            text-align: center;
-            box-shadow: var(--shadow-sm);
-        }
-
-        .icon-container {
-            width: 60px;
-            height: 60px;
-            background-color: rgba(239, 64, 86, 0.06);
-            border-radius: 50%;
-            display: block;
-            margin: 0 auto 20px auto;
-            padding: 15px;
-        }
-
-            .icon-container svg {
-                width: 100%;
-                height: 100%;
-                fill: var(--dk-red);
-            }
-
-        /* بهینه‌سازی شده: هم h4 قبلی و هم h3 جدید کارت‌ها را استایل‌دهی می‌کند */
-        .grid-cell h4,
-        .grid-cell h3 {
-            font-size: 14pt;
-            font-weight: 700;
-            margin-bottom: 15px;
-        }
-
-        .grid-cell p {
-            font-size: 10.5pt;
-            color: var(--text-muted);
-            text-align: center;
-            padding: 25px;
-        }
-
-        /* بخش لایه خاکستری */
-        .bg-alt-section {
-            background-color: rgba(239, 64, 86, 0.01);
-            border-top: 1px solid var(--bg-light);
-            border-bottom: 1px solid var(--bg-light);
-        }
-
-        /* بخش آمار عددی */
-        .stats-bar {
-            background-color: var(--dk-red);
-            color: var(--bg-white);
-            padding: 50px 0;
-            text-align: center;
-        }
-
-        .stats-table {
-            display: table;
-            width: 100%;
-            table-layout: fixed;
-        }
-
-        .stat-node {
-            display: table-cell;
-        }
-
-            .stat-node .number {
-                font-size: 26pt;
-                font-weight: 900;
-                display: block;
-                margin-bottom: 5px;
-            }
-
-            .stat-node .desc {
-                font-size: 11pt;
-                opacity: 0.9;
-            }
-
-        /* سوالات متداول */
-        .faq-block {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .faq-row {
-            border-bottom: 1px solid var(--bg-light);
-            padding: 24px 10px;
-        }
-
-            /* بهینه‌سازی شده: هم h4 قبلی و هم h3 جدید سوالات متداول را استایل‌دهی می‌کند */
-            .faq-row h4,
-            .faq-row h3 {
-                font-size: 13pt;
-                font-weight: 700;
-                margin-bottom: 10px;
-                margin-top: 0;
-            }
-
-            .faq-row p {
-                font-size: 11pt;
-                color: var(--text-muted);
-                text-align: justify;
-            }
-
-        @@media (max-width: 768px) {
-            .col-6, .grid-cell, .stat-node {
-                display: block !important;
-                width: 100% !important;
-                text-align: center !important;
-                margin-bottom: 30px;
-            }
-
-            .grid-3-columns {
-                display: block;
-                border-spacing: 0;
-            }
-
-            .hero-content {
-                padding-left: 0;
-            }
-
-            .btn {
-                width: 100%;
-                margin-left: 0;
-                margin-bottom: 12px;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="/css/index.css" type="text/css" asp-append-version="true" />
 }
 
-<main class="seller-main-container" dir="rtl">
+<div class="seller-main-container" dir="rtl">
     <section class="section-wrapper hero-section">
         <div class="container">
             <div class="row-layout">
                 <div class="col-6 hero-content">
-                    <!-- Optimized H1 with target high-volume search keywords -->
                     <h1>ربات هوشمند پایش قیمت رقبا در <span>دیجی‌کالا</span>؛ ابزار برنده شدن در بای‌باکس!</h1>
 
-                    <!-- Expanded paragraph boosting semantic keyword density naturally -->
                     <p>
                         به عنوان فروشنده مارکت‌پلیس، نوسان مانیتورینگ قیمت دیجی‌کالا مستقیماً روی نرخ برنده شدن در بای‌باکس (Buy Box) و حجم فروش فروشگاه شما تأثیر می‌گذارد. با سرویس دیجیتو (دیجی‌پرایس‌الرت)، کافیست لینک کالا را در پنل خود ثبت کنید تا سیستم خودکار به عنوان یک ربات اعلام تغییر قیمت دیجی‌کالا، رقبا را رصد کند. به محض کوچک‌ترین کاهش یا افزایش قیمت، فوراً هشدار پیامکی (SMS) همراه با لینک مستقیم کالا برای شما ارسال می‌شود تا سهم بازار و سود فروشندگی خود را حفظ کنید.
                     </p>
 
                     <div>
-                        <!-- SEO anchor texts optimized with relevant target keywords -->
                         <a asp-area="" asp-controller="Subscription" asp-action="Pricing" class="btn btn-red" title="تعرفه‌های اشتراک ربات پایش قیمت دیجی کالا">💰 مشاهده قیمت و تعرفه‌ها</a>
                         <a asp-area="" asp-controller="Subscription" asp-action="Purchase" asp-route-planId="1" class="btn btn-outline" title="ثبت نام و تست رایگان سیستم مانیتورینگ قیمت">🚀 شروع تست رایگان ۷ روزه</a>
                     </div>
                 </div>
 
                 <div class="col-6">
-                    <!-- Added semantic schema attributes to the mockup context for engine parsers -->
                     <div class="mockup-display" role="img" aria-label="شبیه‌ساز پیامک هشدار تغییر قیمت بای باکس دیجی کالا">
                         <div class="mockup-top">📱 سیستم مانیتورینگ هوشمند دیجیتو</div>
                         <div class="mockup-msg">محصول جدید با موفقیت ثبت شد. پایش منظم و بررسی خودکار وضعیت بای‌باکس آغاز گردید...</div>
@@ -378,7 +80,6 @@
             <div class="grid-3-columns">
                 <article class="grid-cell">
                     <span class="icon-container">
-                        <!-- SVG آیکون رعد و برق / سرعت -->
                         <svg viewBox="0 0 24 24"><path d="M7 2v11h3v9l7-12h-4l4-8z" /></svg>
                     </span>
                     <h3>بررسی سریع ۱۵ دقیقه‌ای</h3>
@@ -386,7 +87,6 @@
                 </article>
                 <article class="grid-cell">
                     <span class="icon-container">
-                        <!-- SVG آیکون گوشی / پیامک -->
                         <svg viewBox="0 0 24 24"><path d="M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z" /></svg>
                     </span>
                     <h3>اعلام آنی با پیامک (SMS)</h3>
@@ -394,7 +94,6 @@
                 </article>
                 <article class="grid-cell">
                     <span class="icon-container">
-                        <!-- SVG آیکون سایت / لپ‌تاپ -->
                         <svg viewBox="0 0 24 24"><path d="M20 18c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2H0v2h24v-2h-4zM4 4h16v12H4V4z" /></svg>
                     </span>
                     <h3>لینک مستقیم اصلاح قیمت</h3>
@@ -462,6 +161,65 @@
             </div>
         </div>
     </section>
-</main>
+</div>
 
 @await Component.InvokeAsync("LatestBlogs")
+
+@section FooterReferences {
+    <script type="application/ld+json">
+        {
+          "@@context": "https://schema.org",
+          "@@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@@type": "Question",
+              "name": "آیا پایش قیمت‌ها نیاز به نصب نرم‌افزار یا اتصال مداوم اینترنت دارد؟",
+              "acceptedAnswer": {
+                "@@type": "Answer",
+                "text": "خیر، تمام فرآیند پایش روی سرورهای ابری ما انجام می‌شود. پس از ثبت لینک محصول در پنل کاربری، می‌توانید مرورگر خود را ببندید یا اینترنت را قطع کنید؛ سیستم بدون توقف به کار خود ادامه می‌دهد و تغییرات را مستقیماً به صورت پیامک به موبایل شما می‌فرستد."
+              }
+            },
+            {
+              "@@type": "Question",
+              "name": "سیستم با چه سرعتی تغییرات قیمت کالاها را شناسایی می‌کند؟",
+              "acceptedAnswer": {
+                "@@type": "Answer",
+                "text": "سیستم مانیتورینگ ما به صورت خودکار و منظم، هر ۱۵ دقیقه یک‌بار قیمت محصولات شما و رقبایتان را بررسی می‌کند. به محض اینکه کوچک‌ترین تغییر قیمتی نسبت به آخرین پایش ثبت شود، سیستم فوراً پیامک هشدار را برای شما ارسال خواهد کرد."
+              }
+            },
+            {
+              "@@type": "Question",
+              "name": "لینک مستقیم ارسال‌شده در پیامک چه کاربردی دارد؟",
+              "acceptedAnswer": {
+                "@@type": "Answer",
+                "text": "درون هر پیامک هشدار، یک لینک مستقیم و اختصاصی قرار دارد. با کلیک روی آن، مستقیماً به صفحه همان محصول در پنل کاربری هدایت می‌شوید تا بتوانید بدون اتلاف وقت برای جستجوی محصول، قیمت خود را تغییر داده و بای‌باکس را تصاحب کنید."
+              }
+            },
+            {
+              "@@type": "Question",
+              "name": "چگونه این سیستم به برنده شدن ما در بای‌باکس (Buy Box) کمک می‌کند؟",
+              "acceptedAnswer": {
+                "@@type": "Answer",
+                "text": "بزرگ‌ترین عامل برنده شدن در بای‌باکس، داشتن قیمت رقابتی است. این ابزار به شما کمک می‌کند تا به محض اینکه رقیبتان قیمت خود را کاهش داد (حتی در نیمه‌شب)، باخبر شوید و با اصلاح سریع قیمت، جایگاه بای‌باکس و سهم فروش کالا را حفظ کنید."
+              }
+            },
+            {
+              "@@type": "Question",
+              "name": "آیا برای شروع استفاده از سیستم باید هزینه‌ای پرداخت کنیم؟",
+              "acceptedAnswer": {
+                "@@type": "Answer",
+                "text": "خیر، شما می‌توانید از پلن تست ۷ روزه استفاده کنید. در این دوره، سیستم پایش قیمت فعال است تا بتوانید سرعت، دقت و نحوه ارسال پیامک‌ها را کاملاً بسنجید و پس از اطمینان از کارایی ابزار، اشتراک خود را تمدید یا ارتقا دهید."
+              }
+            },
+            {
+              "@@type": "Question",
+              "name": "محدودیت تعداد لینک‌های ثبت‌شده در هر پلن به چه صورت است؟",
+              "acceptedAnswer": {
+                "@@type": "Answer",
+                "text": "در تمامی پلن‌های سیستم پایش (شامل پلن تست و پلن‌های تجاری ۳۰ روزه و ۹۰ روزه)، شما امکان پایش همزمان حداکثر ۲۰ کالا را دارید تا بتوانید به راحتی و بدون محدودیت، تمام کالاهای استراتژیک و پررقابت فروشگاه خود را رصد کنید."
+              }
+            }
+          ]
+        }
+    </script>
+}
