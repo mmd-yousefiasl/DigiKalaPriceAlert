@@ -227,7 +227,8 @@ namespace Application.Services.Implementaions
                     h.ChangePercent,
                     h.BuyBoxChanged,
                     h.IsBuyBoxWinner,
-                    h.CreatedDate
+                    h.CreatedDate,
+                    h.ChangeDescription
                 ))
                 .ToListAsync();
 
@@ -303,7 +304,8 @@ namespace Application.Services.Implementaions
                                     ChangePercent = h.ChangePercent,
                                     BuyBoxChanged = h.BuyBoxChanged,
                                     IsBuyBoxWinner = h.IsBuyBoxWinner,
-                                    CreatedDate = h.CreatedDate
+                                    CreatedDate = h.CreatedDate,
+                                    ChangeDescription = h.ChangeDescription
                                 });
                         })
                         .OrderByDescending(h => h.CreatedDate)
@@ -395,7 +397,8 @@ namespace Application.Services.Implementaions
             decimal ChangePercent,
             bool BuyBoxChanged,
             bool IsBuyBoxWinner,
-            DateTime CreatedDate
+            DateTime CreatedDate,
+            string ChangeDescription
         );
 
         #endregion
@@ -736,6 +739,17 @@ namespace Application.Services.Implementaions
 
                                 changePercent = Math.Max(-99999, Math.Min(99999, changePercent));
 
+                                // Build the description
+                                var changeDescription = BuildChangeDescription(
+                                    colorName: scrapedVariant.ColorName,
+                                    sellerName: scrapedVariant.SellerName,
+                                    oldPrice: oldPrice,
+                                    newPrice: scrapedVariant.Price,
+                                    changePercent: changePercent,
+                                    buyBoxChanged: buyBoxChanged,
+                                    isBuyBoxWinner: scrapedVariant.IsBuyBoxWinner
+                                );
+
                                 dbSeller.PriceHistory.Add(new ProductPriceHistory
                                 {
                                     OldPrice = oldPrice,
@@ -838,5 +852,63 @@ namespace Application.Services.Implementaions
                 }
             });
         }
+
+        #region SyncProduct Helper Methods
+        private string BuildChangeDescription(
+            string? colorName,
+            string? sellerName,
+            decimal oldPrice,
+            decimal newPrice,
+            decimal changePercent,
+            bool buyBoxChanged,
+            bool isBuyBoxWinner)
+        {
+            var parts = new List<string>();
+
+            // Color info
+            var colorInfo = !string.IsNullOrEmpty(colorName) ? $"({colorName})" : "";
+
+            // Price change
+            if (oldPrice != newPrice)
+            {
+                var direction = newPrice > oldPrice ? "افزایش" : "کاهش";
+                var arrow = newPrice > oldPrice ? "↑" : "↓";
+
+                parts.Add($"قیمت {colorInfo}: {FormatPrice(oldPrice)} ← {FormatPrice(newPrice)} ({arrow}{Math.Abs(changePercent):F1}% {direction})");
+            }
+
+            // BuyBox change
+            if (buyBoxChanged)
+            {
+                var buyBoxStatus = isBuyBoxWinner
+                    ? "🏆 بای‌باکس را به دست آورد"
+                    : "❌ بای‌باکس را از دست داد";
+
+                parts.Add(buyBoxStatus);
+            }
+
+            // Seller info
+            if (!string.IsNullOrEmpty(sellerName))
+            {
+                parts.Add($"فروشنده: {sellerName}");
+            }
+
+            return string.Join(" | ", parts);
+        }
+
+        private string FormatPrice(decimal price)
+        {
+            if (price >= 1_000_000_000m)
+                return $"{(price / 1_000_000_000m):F1} میلیارد";
+
+            if (price >= 1_000_000m)
+                return $"{(price / 1_000_000m):F1} میلیون";
+
+            if (price >= 1_000m)
+                return $"{price:N0}";
+
+            return price.ToString("N0");
+        }
+        #endregion
     }
 }

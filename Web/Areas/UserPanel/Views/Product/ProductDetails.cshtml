@@ -427,6 +427,15 @@
                                     }
                                 }
                             </div>
+
+                            @* ── Change Description ── *@
+                            @if (!string.IsNullOrWhiteSpace(item.History.ChangeDescription))
+                            {
+                                <div class="hi-description">
+                                    <i class="mdi mdi-information-outline"></i>
+                                    <span>@item.History.ChangeDescription</span>
+                                </div>
+                            }
                         </div>
                     </div>
                 }

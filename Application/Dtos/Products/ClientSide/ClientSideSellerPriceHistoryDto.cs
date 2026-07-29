@@ -9,5 +9,6 @@
         public bool BuyBoxChanged { get; set; }
         public bool IsBuyBoxWinner { get; set; }
         public DateTime CreatedDate { get; set; }
+        public string? ChangeDescription { get; set; }
     }
 }

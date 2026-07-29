@@ -24,6 +24,9 @@ namespace Data.Context.Configurations.Products
                 .IsRequired()
                 .HasColumnType("decimal(18,4)");
 
+            builder.Property(ph => ph.ChangeDescription)
+                .HasMaxLength(500);
+
             builder.Property(ph => ph.BuyBoxChanged)
                 .HasDefaultValue(false);
 
