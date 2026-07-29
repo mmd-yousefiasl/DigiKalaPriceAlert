@@ -13,7 +13,7 @@
     string formattedPlaceholder = $"ارسال مجدد کد تا ({displayMinutes:D2}:{displaySeconds:D2})";
 }
 
-<main class="w-full h-screen text-center flex items-center justify-center">
+<div class="w-full h-screen text-center flex items-center justify-center">
     <form onsubmit="submitAnimation()" asp-area="" asp-controller="Account" asp-action="VerifyLoginCode" method="post" class="bg-white p-6 rounded-3xl shadow-lg w-10/12 md:w-6/12 lg:w-5/12 xl:w-3/12 scale-90">
         <input type="hidden" asp-for="ReturnUrl" />
         <input type="hidden" asp-for="Mobile" />
@@ -72,7 +72,7 @@
             </button>
         </div>
     </form>
-</main>
+</div>
 
 @section FooterReferences {
     <script asp-append-version="true" src="/js/disableEnter.js"></script>

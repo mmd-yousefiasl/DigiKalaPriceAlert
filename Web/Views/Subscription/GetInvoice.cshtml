@@ -2,117 +2,7 @@
     ViewData["Title"] = "سبد خرید خالی است";
 }
 
-@section HeaderReferences {
-    <style>
-        /* تنظیمات پایه سازگار با پوسته دیجیتو */
-        .digito-checkout-wrapper {
-            color: #27272a;
-            direction: rtl;
-            font-family: 'Vazir';
-            padding: 80px 16px;
-            box-sizing: border-box;
-            line-height: 1.6;
-            background-color: #fafafa;
-            min-height: 80vh;
-            margin: 0px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-            .digito-checkout-wrapper *,
-            .digito-checkout-wrapper *::before,
-            .digito-checkout-wrapper *::after {
-                box-sizing: inherit;
-                margin: 0;
-                padding: 0;
-            }
-
-        /* باکس متمرکز سبد خرید خالی */
-        .empty-cart-card {
-            background-color: #ffffff;
-            border: 1px solid #e4e4e7;
-            border-radius: 20px;
-            padding: 50px 30px;
-            max-width: 550px;
-            width: 100%;
-            text-align: center;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.04), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
-        }
-
-        /* آیکون سبد خرید خالی */
-        .empty-cart-icon {
-            width: 90px;
-            height: 90px;
-            background-color: #fff1f2;
-            color: #f43f5e;
-            font-size: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            margin: 0 auto 24px auto;
-            border: 2px dashed #fca5a5;
-            animation: pulse 2s infinite;
-        }
-
-        .empty-cart-card h2 {
-            color: #18181b;
-            font-size: 20px;
-            font-weight: 800;
-            margin-bottom: 12px;
-        }
-
-        .empty-cart-card p {
-            color: #71717a;
-            font-size: 14px;
-            margin-bottom: 32px;
-            padding: 0 20px;
-        }
-
-        /* دکمه اکشن هدایت به پلن‌ها */
-        .btn-view-plans {
-            display: inline-block;
-            background-color: #ed1945;
-            color: #ffffff;
-            padding: 14px 32px;
-            border-radius: 12px;
-            font-size: 15px;
-            font-weight: bold;
-            text-decoration: none;
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 12px rgba(237, 25, 69, 0.2);
-        }
-
-            .btn-view-plans:hover {
-                background-color: #d1123a;
-                transform: translateY(-1px);
-                box-shadow: 0 6px 16px rgba(237, 25, 69, 0.3);
-            }
-
-            .btn-view-plans:active {
-                transform: translateY(0);
-            }
-
-        /* انیمیشن مینی‌مال آیکون */
-        @@keyframes pulse {
-            0% {
-                transform: scale(1);
-            }
-
-            50% {
-                transform: scale(1.05);
-                background-color: #ffe4e6;
-            }
-
-            100% {
-                transform: scale(1);
-            }
-        }
-    </style>
-}
-
-<main class="digito-checkout-wrapper">
+<div class="digito-checkout-wrapper">
     <div class="empty-cart-card">
         <div class="empty-cart-icon">
             🛒
@@ -127,4 +17,4 @@
             🚀 مشاهده و انتخاب پلن‌های اشتراک
         </a>
     </div>
-</main>
+</div>

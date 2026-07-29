@@ -10,7 +10,7 @@
     }
 }
 
-<main class="mt-0 md:mt-8">
+<div class="mt-0 md:mt-8">
     <form asp-area="" asp-controller="Blog" asp-action="BlogsList" method="get" id="search-form">
         <input type="hidden" asp-for="Page" id="Page" />
         <input type="hidden" asp-for="CategorySlug" />
@@ -46,4 +46,4 @@
         <!-- pagination -->
         <partial name="_Paging" model="@Model.GetCurrentPaging()" />
     }
-</main>
+</div>
