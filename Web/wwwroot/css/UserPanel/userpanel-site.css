@@ -66,11 +66,6 @@ input, select, textarea, button {
     white-space: nowrap;
 }
 
-.admin-vertical-menu {
-    height: 100%;
-    overflow-x: scroll;
-}
-
 .cursor-pointer {
     cursor: pointer;
 }
@@ -133,4 +128,34 @@ input, select, textarea, button {
 .bg-soft-danger {
     background-color: rgba(244, 106, 106, 0.18) !important;
     color: #f46a6a !important;
+}
+
+.admin-vertical-menu {
+    height: 100%;
+    /* Use 'auto' so it only shows when content is longer than height */
+    overflow-y: auto;
+    /* Explicitly hide horizontal scroll */
+    overflow-x: hidden;
+    /* Optional: Smooth scrolling */
+    scroll-behavior: smooth;
+    /* Hide scrollbar for Chrome, Safari and Opera */
+    &::-webkit-scrollbar {
+        width: 5px; /* Very thin */
+    }
+
+    &::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: #d4d4d8; /* zinc-300 - matches your theme */
+        border-radius: 10px;
+    }
+    /* Hide scrollbar for IE, Edge and Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: thin; /* Firefox (can also use 'none') */
+}
+
+.fs-30 {
+    font-size: 30px;
 }
