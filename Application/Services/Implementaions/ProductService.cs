@@ -758,7 +758,8 @@ namespace Application.Services.Implementaions
                                     BuyBoxChanged = buyBoxChanged,
                                     IsBuyBoxWinner = scrapedVariant.IsBuyBoxWinner,
                                     CreatedDate = now,
-                                    LastUpdatedDate = now
+                                    LastUpdatedDate = now,
+                                    ChangeDescription = changeDescription
                                 });
 
                                 anyChangeDetected = true;

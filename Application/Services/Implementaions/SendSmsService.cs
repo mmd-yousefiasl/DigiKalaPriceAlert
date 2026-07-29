@@ -62,7 +62,7 @@ namespace Application.Services.Implementaions
 
             var firstName = dto.FirstName.ToSafeSmsName();
 
-            var loginSms = new SmsQueueItem(
+            var alertSms = new SmsQueueItem(
                 Mobile: dto.Mobile,
                 ApiKey: infoResult.Value.ApiKey,
                 PatternId: infoResult.Value.PatternId,
@@ -72,7 +72,7 @@ namespace Application.Services.Implementaions
                 }
             );
 
-            await _smsQueue.QueueSmsAsync(loginSms);
+            await _smsQueue.QueueSmsAsync(alertSms);
 
             return Result.Success();
         }
