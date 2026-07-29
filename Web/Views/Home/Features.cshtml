@@ -1,266 +1,12 @@
 ﻿@{
-    ViewData["Title"] = "امکانات دیجیتو";
+    ViewData["Title"] = "امکانات سامانه پایش قیمت و بای‌باکس دیجی‌کالا | دیجیتو";
 }
 
 @section HeaderReferences {
-    <style>
-        /* استایل‌های بخش اصلی امکانات دیجیتو */
-        .digito-main {
-            color: #27272a;
-            direction: rtl;
-            font-family: Vazir;
-            padding: 40px 16px;
-        }
-
-        /* بخش هیرو / معرفی ابتدایی */
-        .digito-hero {
-            background-color: #ffffff;
-            border: 1px solid #e4e4e7;
-            border-radius: 16px;
-            max-width: 1100px;
-            margin: 0 auto 40px auto;
-            padding: 48px 24px;
-            text-align: center;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .digito-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background-color: #fef2f2;
-            color: #ed1945;
-            padding: 6px 12px;
-            border-radius: 50px;
-            font-size: 12px;
-            font-weight: bold;
-            margin-bottom: 24px;
-        }
-
-        .digito-badge-dot {
-            width: 8px;
-            height: 8px;
-            background-color: #ed1945;
-            border-radius: 50%;
-            display: inline-block;
-        }
-
-        .digito-hero-title {
-            color: #09090b;
-            font-size: 28px;
-            font-weight: 800;
-            margin-bottom: 16px;
-            line-height: 1.4;
-        }
-
-            .digito-hero-title .highlight {
-                color: #ed1945;
-            }
-
-        .digito-hero-desc {
-            color: #71717a;
-            font-size: 14px;
-            max-width: 600px;
-            margin: 0 auto 32px auto;
-            line-height: 1.6;
-        }
-
-        .digito-btn-container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 16px;
-        }
-
-        .digito-btn-primary {
-            background-color: #ed1945;
-            color: #ffffff;
-            font-weight: bold;
-            text-decoration: none;
-            padding: 12px 28px;
-            border-radius: 12px;
-            font-size: 14px;
-            box-shadow: 0 4px 12px rgba(237, 25, 69, 0.2);
-            transition: background-color 0.2s;
-        }
-
-            .digito-btn-primary:hover {
-                background-color: #d1123a;
-            }
-
-        .digito-btn-secondary {
-            background-color: #f4f4f5;
-            color: #44444f;
-            font-weight: bold;
-            text-decoration: none;
-            padding: 12px 28px;
-            border-radius: 12px;
-            font-size: 14px;
-            transition: background-color 0.2s;
-        }
-
-            .digito-btn-secondary:hover {
-                background-color: #e4e4e7;
-            }
-
-        /* بخش امکانات کلیدی (کارت‌ها) */
-        .digito-features {
-            max-width: 1100px;
-            margin: 0 auto 60px auto;
-        }
-
-        .digito-section-header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
-        .digito-section-title {
-            color: #09090b;
-            font-size: 22px;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        .digito-section-subtitle {
-            color: #71717a;
-            font-size: 13px;
-        }
-
-        .digito-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 24px;
-        }
-
-        .digito-card {
-            background-color: #ffffff;
-            border: 1px solid #e4e4e7;
-            border-radius: 16px;
-            padding: 24px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-            .digito-card:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            }
-
-        .digito-icon-box {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            background-color: #fef2f2;
-            color: #ed1945;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 20px;
-            font-size: 20px;
-        }
-
-        .digito-card-title {
-            color: #09090b;
-            font-size: 16px;
-            font-weight: 700;
-            margin-bottom: 12px;
-        }
-
-        .digito-card-desc {
-            color: #71717a;
-            font-size: 13px;
-            line-height: 1.6;
-            margin: 0;
-        }
-
-        /* بخش مراحل کارکرد */
-        .digito-how-it-works {
-            background-color: #ffffff;
-            border: 1px solid #e4e4e7;
-            border-radius: 16px;
-            max-width: 1100px;
-            margin: 0 auto 40px auto;
-            padding: 48px 24px;
-        }
-
-        .digito-step-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 24px;
-        }
-
-        .digito-step-item {
-            text-align: center;
-        }
-
-        .digito-step-number {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background-color: #fef2f2;
-            color: #ed1945;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 12px auto;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-        }
-
-            .digito-step-number.active {
-                background-color: #ed1945;
-                color: #ffffff;
-                box-shadow: 0 2px 4px rgba(237,25,69,0.2);
-            }
-
-        .digito-step-title {
-            color: #09090b;
-            font-size: 15px;
-            font-weight: bold;
-            margin-bottom: 8px;
-        }
-
-        .digito-step-desc {
-            color: #71717a;
-            font-size: 12px;
-            line-height: 1.5;
-            margin: 0;
-        }
-
-        /* بخش آمار و ارقام */
-        .digito-stats {
-            background-color: #18181b;
-            border-radius: 16px;
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 32px 16px;
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            text-align: center;
-        }
-
-        .digito-stat-number {
-            color: #ed1945;
-            font-size: 24px;
-            font-weight: 800;
-            margin-bottom: 4px;
-        }
-
-        .digito-stat-label {
-            color: #a1a1aa;
-            font-size: 11px;
-        }
-
-        .digito-border-x {
-            border-left: 1px solid #27272a;
-            border-right: 1px solid #27272a;
-        }
-    </style>
+    <link rel="stylesheet" href="/css/features.css" type="text/css" asp-append-version="true" />
 }
 
-<main class="digito-main">
+<div class="digito-main">
     <section class="digito-hero">
         <div class="digito-badge">
             <span class="digito-badge-dot"></span>
@@ -274,7 +20,15 @@
         </p>
         <div class="digito-btn-container">
             <a asp-area="" asp-controller="Subscription" asp-action="Purchase" asp-route-planId="1" class="digito-btn-primary">
-                🚀 شروع تست ۷ روزه (همین حالا)
+                <span class="btn-icon-wrapper">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2C15 4 17 8 16.5 13C16.3 14.8 15.6 16.5 14.5 18L12 20.5L9.5 18C8.4 16.5 7.7 14.8 7.5 13C7 8 9 4 12 2Z" stroke="white" stroke-width="1.8" stroke-linejoin="round" />
+                        <circle cx="12" cy="10" r="2" stroke="white" stroke-width="1.8" />
+                        <path d="M8 16L5.5 17.5C5 17.8 4.7 18.3 4.7 18.9V20.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                        <path d="M16 16L18.5 17.5C19 17.8 19.3 18.3 19.3 18.9V20.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                    شروع تست ۷ روزه (همین حالا)
+                </span>
             </a>
             <a href="#how-it-works" class="digito-btn-secondary">
                 چرا به سیستم دیجیتو نیاز داریم؟
@@ -290,31 +44,61 @@
 
         <div class="digito-grid">
             <div class="digito-card">
-                <div class="digito-icon-box">👁️</div>
+                <div class="digito-icon-box">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M2 12C2 12 5.5 5 12 5C18.5 5 22 12 22 12C22 12 18.5 19 12 19C5.5 19 2 12 2 12Z" stroke="#a1a1aa" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                        <circle cx="12" cy="12" r="3.2" stroke="#ed1945" stroke-width="1.8" />
+                    </svg>
+                </div>
                 <h3 class="digito-card-title">پایش ۲4 ساعته و فتح بای‌باکس</h3>
                 <p class="digito-card-desc">الگوریتم‌های هوشمند ما به صورت شبانه‌روزی وضعیت جعبه خرید (Buy-Box) کالاها را رصد می‌کنند. نتیجه؟ به محض تغییر جایگاه، سریعاً مطلع شده و با اصلاح قیمت، دوباره فروش را به دست می‌آورید.</p>
             </div>
 
             <div class="digito-card">
-                <div class="digito-icon-box">🔔</div>
+                <div class="digito-icon-box">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M18 9V11.764C18 12.9092 18.3385 14.0286 18.9727 14.9812L19.7071 16.0828C20.4207 17.1543 19.6541 18.5833 18.3675 18.5833H5.63252C4.34588 18.5833 3.57932 17.1543 4.29289 16.0828L5.02733 14.9812C5.66148 14.0286 6 12.9092 6 11.764V9C6 5.68629 8.68629 3 12 3C15.3137 3 18 5.68629 18 9Z" stroke="#a1a1aa" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                        <path d="M9.5 20.5C10 21.5 10.9 22 12 22C13.1 22 14 21.5 14.5 20.5" stroke="#ed1945" stroke-width="1.8" stroke-linecap="round" />
+                    </svg>
+                </div>
                 <h3 class="digito-card-title">ارسال فوری پیامک (SMS) هشدار</h3>
                 <p class="digito-card-desc">دیگر نیازی به چک کردن دستی پنل فروشندگان (سلر سنتر) نیست. هرگونه کاهش یا افزایش قیمت توسط رقیب، در کوتاه‌ترین زمان به صورت پیامک همراه با لینک مستقیم کالا برای شما ارسال می‌شود.</p>
             </div>
 
             <div class="digito-card">
-                <div class="digito-icon-box">📊</div>
+                <div class="digito-icon-box">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M3 20.5H21" stroke="#a1a1aa" stroke-width="1.8" stroke-linecap="round" />
+                        <path d="M6 20.5V14" stroke="#a1a1aa" stroke-width="1.8" stroke-linecap="round" />
+                        <path d="M12 20.5V9" stroke="#ed1945" stroke-width="1.8" stroke-linecap="round" />
+                        <path d="M18 20.5V5" stroke="#ed1945" stroke-width="1.8" stroke-linecap="round" />
+                        <path d="M5 11L10 6L14 9L20 3" stroke="#ed1945" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </div>
                 <h3 class="digito-card-title">تحلیل روند و گزارش روزانه نوسانات</h3>
                 <p class="digito-card-desc">با دسترسی به گزارش متنی روزانه از وضعیت نوسانات بازار، رفتار رقبای خود را آنالیز کنید. این ویژگی به شما کمک می‌کند تا هوشمندانه‌ترین استراتژی را برای رقابت و داشتن حاشیه سود بالاتر پیاده کنید.</p>
             </div>
 
             <div class="digito-card">
-                <div class="digito-icon-box">📋</div>
+                <div class="digito-icon-box">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="5" y="4" width="14" height="17" rx="2" stroke="#a1a1aa" stroke-width="1.8" />
+                        <path d="M9 4C9 2.89543 9.89543 2 11 2H13C14.1046 2 15 2.89543 15 4V4.5C15 5.05228 14.5523 5.5 14 5.5H10C9.44772 5.5 9 5.05228 9 4.5V4Z" stroke="#a1a1aa" stroke-width="1.8" />
+                        <path d="M9 12H15" stroke="#ed1945" stroke-width="1.8" stroke-linecap="round" />
+                        <path d="M9 16H13" stroke="#ed1945" stroke-width="1.8" stroke-linecap="round" />
+                    </svg>
+                </div>
                 <h3 class="digito-card-title">مدیریت متمرکز در پنل تحت وب</h3>
                 <p class="digito-card-desc">در داشبورد اختصاصی سایت، لیست تمام کالاهای تحت نظر را به صورت یکپارچه مدیریت کنید. افزودن، حذف یا توقف پایش محصولات تنها با چند کلیک ساده و بدون پیچیدگی امکان‌پذیر است.</p>
             </div>
 
             <div class="digito-card">
-                <div class="digito-icon-box">🛡️</div>
+                <div class="digito-icon-box">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2L20 5.5V11C20 16.25 16.5 20.5 12 22C7.5 20.5 4 16.25 4 11V5.5L12 2Z" stroke="#a1a1aa" stroke-width="1.8" stroke-linejoin="round" />
+                        <path d="M9 12L11 14L15.5 9.5" stroke="#ed1945" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </div>
                 <h3 class="digito-card-title">۱۰۰٪ امن (بدون نیاز به پسورد پنل)</h3>
                 <p class="digito-card-desc">امنیت اطلاعات شما خط قرمز ماست! دیجیتو دیتای خود را مستقیماً از صفحات عمومی وب‌سایت دیجی‌کالا استخراج می‌کند، در نتیجه نیازی به رمز عبور پنل مرچنت (Seller) یا دسترسی‌های حساس شما نداریم.</p>
             </div>
@@ -354,15 +138,15 @@
     <section class="digito-stats">
         <div>
             <div class="digito-stat-number">۱۵ دقیقه</div>
-            <div class="digito-stat-label">فواصل زمانی بازرسی و پایش دقیق قیمت‌ها</div>
+            <div class="digito-stat-label">فاصله زمانی هر بررسی قیمت</div>
         </div>
         <div class="digito-border-x">
-            <div class="digito-stat-number">+9</div>
-            <div class="digito-stat-label">فروشنده موفق و فعال دیجی‌کالا</div>
+            <div class="digito-stat-number">۲۴/۷</div>
+            <div class="digito-stat-label">پایش بدون وقفه، حتی نیمه‌شب</div>
         </div>
         <div>
-            <div class="digito-stat-number">پیامک آنی</div>
-            <div class="digito-stat-label">همراه با لینک مستقیم ورود به پنل کالا</div>
+            <div class="digito-stat-number">۷ روز</div>
+            <div class="digito-stat-label">تست کاملاً رایگان، بدون نیاز به کارت بانکی</div>
         </div>
     </section>
-</main>
+</div>

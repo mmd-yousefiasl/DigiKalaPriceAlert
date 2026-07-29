@@ -66,9 +66,6 @@ namespace Web.Controllers
             }
             await _blogService.ClientSideAddBlogView(result.Value.Id);
 
-            ViewData["MetaAuthor"] = result.Value.Writer;
-            ViewData["MetaDescription"] = result.Value.MetaDescription;
-
             return View(result.Value);
         }
 
@@ -80,18 +77,14 @@ namespace Web.Controllers
                 TempData[TemporaryErrorMessage] = Messages.OperationFailedError;
                 return RedirectToAction(nameof(BlogsList));
             }
-            var result = await _blogService.ClientSideGetBlogDetails(id);
+            var result = await _blogService.ClientSideGetBlogSlugById(id);
             if (result.IsFailure)
             {
                 TempData[TemporaryErrorMessage] = result.Message;
                 return RedirectToAction(nameof(BlogsList));
             }
-            await _blogService.ClientSideAddBlogView(result.Value.Id);
 
-            ViewData["MetaAuthor"] = result.Value.Writer;
-            ViewData["MetaDescription"] = result.Value.MetaDescription;
-
-            return View(result.Value);
+            return RedirectToActionPermanent(nameof(BlogDetails), new { id = id, slug = result.Value });
         }
     }
 }

@@ -1,5 +1,5 @@
 ﻿@{
-    ViewData["Title"] = "صفحه اصلی";
+    ViewData["Title"] = "پایش قیمت رقبا و مدیریت بای‌باکس دیجی‌کالا | دیجیتو";
 }
 
 @section HeaderReferences {
@@ -18,19 +18,56 @@
                     </p>
 
                     <div>
-                        <a asp-area="" asp-controller="Subscription" asp-action="Pricing" class="btn btn-red" title="تعرفه‌های اشتراک ربات پایش قیمت دیجی کالا">💰 مشاهده قیمت و تعرفه‌ها</a>
-                        <a asp-area="" asp-controller="Subscription" asp-action="Purchase" asp-route-planId="1" class="btn btn-outline" title="ثبت نام و تست رایگان سیستم مانیتورینگ قیمت">🚀 شروع تست رایگان ۷ روزه</a>
+                        <a class="btn btn-red" title="تعرفه‌های اشتراک ربات پایش قیمت دیجی کالا" href="/subscription/pricing">
+                            <span style="display:inline-flex; align-items:center; gap:6px;">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 3C9 3 8 5 8 6.5C8 7.5 8.5 8 9 8.3" stroke="white" stroke-width="1.8" stroke-linecap="round" />
+                                    <path d="M6 8.5C4 10 3 12.5 3 15C3 18.5 6.5 21 12 21C17.5 21 21 18.5 21 15C21 12.5 20 10 18 8.5C16.5 7.5 14.5 7 12 7C9.5 7 7.5 7.5 6 8.5Z" stroke="white" stroke-width="1.8" stroke-linejoin="round" />
+                                    <path d="M12 12V17M10 13.5H13C13.5 13.5 14 13.9 14 14.5C14 15.1 13.5 15.5 13 15.5H11C10.5 15.5 10 15.9 10 16.5C10 17.1 10.5 17.5 11 17.5H14" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                                مشاهده قیمت و تعرفه‌ها
+                            </span>
+                        </a>
+                        <a class="btn btn-outline" title="ثبت نام و تست رایگان سیستم مانیتورینگ قیمت" href="/subscription/purchase/1">
+                            <span style="display:inline-flex; align-items:center; gap:6px;">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 2C15 4 17 8 16.5 13C16.3 14.8 15.6 16.5 14.5 18L12 20.5L9.5 18C8.4 16.5 7.7 14.8 7.5 13C7 8 9 4 12 2Z" stroke="#ed1945" stroke-width="1.8" stroke-linejoin="round" />
+                                    <circle cx="12" cy="10" r="2" stroke="#ed1945" stroke-width="1.8" />
+                                    <path d="M8 16L5.5 17.5C5 17.8 4.7 18.3 4.7 18.9V20.5" stroke="#ed1945" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                                    <path d="M16 16L18.5 17.5C19 17.8 19.3 18.3 19.3 18.9V20.5" stroke="#ed1945" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                                شروع تست رایگان ۷ روزه
+                            </span>
+                        </a>
                     </div>
                 </div>
 
                 <div class="col-6">
                     <div class="mockup-display" role="img" aria-label="شبیه‌ساز پیامک هشدار تغییر قیمت بای باکس دیجی کالا">
-                        <div class="mockup-top">📱 سیستم مانیتورینگ هوشمند دیجیتو</div>
+                        <div class="mockup-top">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="7" y="2" width="10" height="20" rx="2" stroke="#ed1945" stroke-width="1.8" />
+                                <path d="M11 19H13" stroke="#ed1945" stroke-width="1.8" stroke-linecap="round" />
+                            </svg>
+                            سیستم مانیتورینگ هوشمند دیجیتو
+                        </div>
                         <div class="mockup-msg">محصول جدید با موفقیت ثبت شد. پایش منظم و بررسی خودکار وضعیت بای‌باکس آغاز گردید...</div>
                         <div class="mockup-msg mockup-alert">
-                            <span>💬 [پیامک پایش سیستم دیجیتو]</span><br>
+                            <span>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M4 6C4 4.9 4.9 4 6 4H18C19.1 4 20 4.9 20 6V14C20 15.1 19.1 16 18 16H9L5 19.5V16H6C4.9 16 4 15.1 4 14V6Z" stroke="#a1a1aa" stroke-width="1.8" stroke-linejoin="round" />
+                                </svg>
+                                [پیامک پایش سیستم دیجیتو]
+                            </span><br>
                             <strong>هشدار تغییر قیمت رقبا در دیجی‌کالا</strong><br><br>
-                            <span>🔗 ورود به پنل و اصلاح سریع قیمت کالا:</span><br>
+                            <span>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M9 15L15 9" stroke="#ed1945" stroke-width="1.8" stroke-linecap="round" />
+                                    <path d="M11 6L12.5 4.5C13.8 3.2 15.9 3.2 17.2 4.5C18.5 5.8 18.5 7.9 17.2 9.2L15.7 10.7" stroke="#a1a1aa" stroke-width="1.8" stroke-linecap="round" />
+                                    <path d="M13 18L11.5 19.5C10.2 20.8 8.1 20.8 6.8 19.5C5.5 18.2 5.5 16.1 6.8 14.8L8.3 13.3" stroke="#a1a1aa" stroke-width="1.8" stroke-linecap="round" />
+                                </svg>
+                                ورود به پنل و اصلاح سریع قیمت کالا:
+                            </span><br>
                             <code>digipricealert.ir/user/products/list</code>
                         </div>
                     </div>

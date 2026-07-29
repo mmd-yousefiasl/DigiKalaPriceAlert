@@ -3,7 +3,7 @@
 @model ClientSideFilterBlogsDto
 
 @{
-    ViewData["Title"] = (!string.IsNullOrWhiteSpace(Model.CategoryTitle) ? Model.CategoryTitle : "وبلاگ");
+    ViewData["Title"] = (!string.IsNullOrWhiteSpace(Model.CategoryTitle) ? (Model.CategoryTitle + " | دیجیتو") : "وبلاگ آموزشی فروش و قیمت‌گذاری در دیجی‌کالا | دیجیتو");
     if (!string.IsNullOrWhiteSpace(Model.CategorySlug))
     {
         ViewData["CanonicalOverride"] = (SiteTools.SiteUrl + "blogs/" + Model.CategorySlug);

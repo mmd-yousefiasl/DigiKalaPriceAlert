@@ -45,5 +45,7 @@ namespace Application.Services.Interfaces
         Task<Result<List<AdminSideBlogCategoryAsOptionDto>>> AdminSideGetCategoriesAsOptions();
 
         Task<Result> ClientSideAddBlogView(int blogId);
+
+        Task<Result<string>> ClientSideGetBlogSlugById(int id);
     }
 }

@@ -602,5 +602,21 @@ namespace Application.Services.Implementaions
 
             return Result.Success();
         }
+
+        public async Task<Result<string>> ClientSideGetBlogSlugById(int id)
+        {
+            if (id < 1)
+                return Result.Failure<string>(Messages.OperationFailedError);
+
+            var slug = await _context.Blogs
+                .AsNoTracking()
+                .Where(n => n.Id == id)
+                .Select(n => n.Slug)
+                .FirstOrDefaultAsync();
+            if (string.IsNullOrWhiteSpace(slug))
+                return Result.Failure<string>(Messages.OperationFailedError);
+
+            return slug;
+        }
     }
 }

@@ -4,12 +4,15 @@
 @model ClientSideBlogDetailsDto
 
 @{
-    ViewData["Title"] = Model.Title;
+    ViewData["OgType"] = "article";
+    ViewData["Title"] = (Model.Title + " | دیجیتو");
     ViewData["CanonicalOverride"] = (SiteTools.SiteUrl + "b/" + Model.Id + "/" + Model.Slug);
+    ViewData["MetaAuthor"] = Model.Writer;
+    ViewData["MetaDescription"] = Model.MetaDescription;
     string pageUrl = (SiteTools.SiteUrl + "b/" + Model.Id);
 }
 
-<main class="mt-5">
+<div class="mt-5">
     <div class="flex flex-col lg:flex-row px-4 md:px-10 gap-5 pb-20">
         @await Component.InvokeAsync("RelatedBlogs", new { blogId = Model.Id, categoryId = Model.CategoryId })
         <!-- main blog -->
@@ -85,4 +88,29 @@
             </div>
         }
     </div>
-</main>
+</div>
+
+@section FooterReferences {
+    <script type="application/ld+json">
+        {
+          "@@context": "https://schema.org",
+          "@@type": "BlogPosting",
+          "headline": "@Model?.Title",
+          "image": "@SiteTools.BlogFile@Model?.FileName",
+          "datePublished": "@Model?.CreatedDate.ToString("yyyy-MM-dd")",
+          "author": {
+            "@@type": "Person",
+            "name": "@Model?.Writer"
+          },
+          "publisher": {
+            "@@type": "Organization",
+            "name": "دیجیتو",
+            "logo": {
+              "@@type": "ImageObject",
+              "url": "https://digipricealert.ir/assets/image/logo.png"
+            }
+          },
+          "mainEntityOfPage": "@ViewData["CanonicalOverride"]"
+        }
+    </script>
+}
