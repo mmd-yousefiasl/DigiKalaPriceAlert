@@ -368,3 +368,5 @@ FodyWeavers.xsd
 /Web/wwwroot/files/
 /Web/SensitiveFiles
 /Web/KeyDirectory
+/Web/appsettings.Production.json
+/Web/appsettings.Development.json

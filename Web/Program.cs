@@ -34,7 +34,7 @@ try
     #endregion
 
     #region Dependencies
-    var connectionString = builder.Configuration.GetConnectionString("LocalConnectionString");
+    var connectionString = builder.Configuration.GetConnectionString("ConnectionString");
     DependencyContainer.RegisterDependencies(builder.Services, connectionString);
     #endregion
 

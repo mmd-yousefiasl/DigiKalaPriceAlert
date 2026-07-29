@@ -9,6 +9,7 @@
     ViewData["CanonicalOverride"] = (SiteTools.SiteUrl + "b/" + Model.Id + "/" + Model.Slug);
     ViewData["MetaAuthor"] = Model.Writer;
     ViewData["MetaDescription"] = Model.MetaDescription;
+    ViewData["OgImage"] = (SiteTools.SiteUrl.TrimEnd("/").ToString() + SiteTools.BlogFile + Model.FileName);
     string pageUrl = (SiteTools.SiteUrl + "b/" + Model.Id);
 }
 
@@ -96,7 +97,7 @@
           "@@context": "https://schema.org",
           "@@type": "BlogPosting",
           "headline": "@Model?.Title",
-          "image": "@SiteTools.BlogFile@Model?.FileName",
+          "image": "@ViewData["OgImage"]",
           "datePublished": "@Model?.CreatedDate.ToString("yyyy-MM-dd")",
           "author": {
             "@@type": "Person",

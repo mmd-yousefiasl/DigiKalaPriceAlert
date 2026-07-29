@@ -17,7 +17,7 @@
 <!-- Generic/Default values -->
 <meta property="og:type" content="@(ViewData["OgType"] as string ?? "website")">
 <meta property="og:url" content="@Context.Request.Scheme://@Context.Request.Host@Context.Request.Path">
-<meta property="og:image" content="https://digipricealert.ir/assets/image/logo.png">
+<meta property="og:image" content="@(ViewData["OgImage"] as string ?? "https://digipricealert.ir/assets/image/logo.png")">
 
 <!-- Dynamic values with Fallbacks -->
 <meta property="og:title" content="@(ViewData["Title"] ?? "پایش قیمت رقبا و مدیریت بای‌باکس دیجی‌کالا | دیجیتو")">
