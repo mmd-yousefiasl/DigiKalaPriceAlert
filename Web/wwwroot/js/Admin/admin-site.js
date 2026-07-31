@@ -62,34 +62,6 @@ if (imageInput3) {
     });
 }
 
-function submitAnimation() {
-    var element = document.activeElement; // Get the button that triggered the form submission
-
-    // Prevent double-clicks if animation is already running
-    if (element.classList.contains('is-loading')) {
-        return false;
-    }
-
-    var spinner = document.createElement('div');
-    const innerText = element.innerText;
-
-    element.innerText = "";
-    spinner.classList.add('spinner');
-    element.appendChild(spinner);
-
-    // 🎯 THE FIX: Use a class instead of 'disabled = true'
-    element.classList.add('is-loading');
-    element.style.pointerEvents = 'none'; // Prevents further taps/clicks
-    spinner.style.display = 'inline-block';
-
-    setTimeout(function () {
-        element.classList.remove('is-loading');
-        element.style.pointerEvents = 'auto';
-        spinner.style.display = 'none';
-        element.innerText = innerText;
-    }, 3000);
-}
-
 function FillPageId(id) {
     $("#Page").val(id);
 
@@ -297,3 +269,58 @@ function submitFormOnChange(form) {
         form.submit();
     }
 }
+
+document.addEventListener('DOMContentLoaded', function () {
+
+    // Listen for 'submit' on ALL forms on the page
+    document.querySelectorAll('form').forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+
+            // Find the submit button inside this specific form
+            // This handles both <button> and <input type="submit">
+            const button = form.querySelector('button[type="submit"], input[type="submit"], button:not([type])');
+
+            if (!button) return;
+
+            // If already loading, cancel the submission!
+            if (button.classList.contains('is-loading')) {
+                event.preventDefault();
+                return false;
+            }
+
+            // Save original text (works for both <button> and <input>)
+            const isInputTag = button.tagName === 'INPUT';
+            const innerText = isInputTag ? button.value : button.innerText;
+
+            // Apply loading state
+            button.classList.add('is-loading');
+            button.style.pointerEvents = 'none'; // Stops iOS double-taps
+
+            if (isInputTag) {
+                // <input type="submit"> can't have child elements like a spinner
+                button.value = "⏳ Loading...";
+            } else {
+                // <button> can have a spinner
+                button.innerText = "";
+                const spinner = document.createElement('span');
+                spinner.classList.add('spinner');
+                spinner.style.display = 'inline-block';
+                button.appendChild(spinner);
+            }
+
+            setTimeout(function () {
+                button.classList.remove('is-loading');
+                button.style.pointerEvents = 'auto';
+
+                if (isInputTag) {
+                    button.value = innerText;
+                } else {
+                    const existingSpinner = button.querySelector('.spinner');
+                    if (existingSpinner) existingSpinner.remove();
+                    button.innerText = innerText;
+                }
+            }, 3000);
+        });
+    });
+
+});
