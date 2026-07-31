@@ -26,7 +26,6 @@ namespace Web.Configuration
                 option.LoginPath = "/login";
                 option.LogoutPath = "/logout";
                 option.ExpireTimeSpan = TimeSpan.FromDays(SiteTools.LoginExpirationInDays);
-                option.Cookie.MaxAge = TimeSpan.FromDays(SiteTools.LoginExpirationInDays);
                 option.SlidingExpiration = true;
                 option.Cookie.IsEssential = true;
                 option.Cookie.HttpOnly = true;

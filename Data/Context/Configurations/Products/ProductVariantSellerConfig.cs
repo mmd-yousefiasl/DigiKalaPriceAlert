@@ -30,7 +30,7 @@ namespace Data.Context.Configurations.Products
                 .HasColumnType("decimal(18,0)");
 
             builder.Property(s => s.SellerRating)
-                .HasColumnType("decimal(4,2)");
+                .HasColumnType("decimal(5,2)");
 
             builder.Property(s => s.IsBuyBoxWinner)
                 .HasDefaultValue(false);
