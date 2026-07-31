@@ -63,23 +63,28 @@ if (imageInput3) {
 }
 
 function submitAnimation() {
-    var element = document.querySelector(".btn-submit");
+    var element = document.activeElement; // Get the button that triggered the form submission
+
+    // Prevent double-clicks if animation is already running
+    if (element.classList.contains('is-loading')) {
+        return false;
+    }
+
     var spinner = document.createElement('div');
     const innerText = element.innerText;
 
     element.innerText = "";
-    // Add a spinner element to the button
     spinner.classList.add('spinner');
-
     element.appendChild(spinner);
 
-    // Disable the button and start the animation
-    element.disabled = true;
+    // 🎯 THE FIX: Use a class instead of 'disabled = true'
+    element.classList.add('is-loading');
+    element.style.pointerEvents = 'none'; // Prevents further taps/clicks
     spinner.style.display = 'inline-block';
 
     setTimeout(function () {
-        // Enable the button and stop the animation after 3 seconds
-        element.disabled = false;
+        element.classList.remove('is-loading');
+        element.style.pointerEvents = 'auto';
         spinner.style.display = 'none';
         element.innerText = innerText;
     }, 3000);
