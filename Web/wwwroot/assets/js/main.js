@@ -173,17 +173,6 @@ window.addEventListener("scroll", function () {
   let scrollPercentage = (scrollTop / scrollHeight) * 100; // محاسبه درصد اسکرول
   document.getElementById("progressBar").style.width = scrollPercentage + "%"; // تغییر عرض نوار
 });
-//////////////////////////////// loading
-window.addEventListener("load", function () {
-  const loadingScreen = document.getElementById("loading");
-  setTimeout(() => {
-    loadingScreen.classList.add("opacity-0");
-  }, 500);
-  setTimeout(() => {
-    loadingScreen.classList.add("hidden");
-  }, 1000);
-});
-//////////////////////////////// btn go to top
 document.getElementById("btn-back-to-top").addEventListener("click", function() {
   window.scrollTo({
       top: 0,
