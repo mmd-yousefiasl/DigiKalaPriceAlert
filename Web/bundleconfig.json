@@ -1,11 +1,5 @@
 [
   {
-    "outputFileName": "wwwroot/assets/css/main.min.css",
-    "inputFiles": [
-      "wwwroot/assets/css/main.css"
-    ]
-  },
-  {
     "outputFileName": "wwwroot/css/site.min.css",
     "inputFiles": [
       "wwwroot/css/site.css"
