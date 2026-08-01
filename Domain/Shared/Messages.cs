@@ -35,6 +35,8 @@
         public const string FailedToSendSmsError = "ارسال پیامک با خطا مواجه شد. لطفا مجددا تلاش کنید";
         public const string LoginCodeExpiredError = "کد تایید شما منقضی شده است. لطفا مجددا درخواست کد کنید";
         public const string FailedToCreatePurchaseError = "خطا در صدور فاکتور. لطفا مجدد تلاش کنید";
+        public const string ThisProductAlreadyInYourWatchListError = "این محصول قبلاً به لیست پایش شما اضافه شده است";
+        public const string SellerNotFoundError = "فروشنده محصول پیدا نشد. لطفا مجدد تلاش کنید";
 
         #endregion
 

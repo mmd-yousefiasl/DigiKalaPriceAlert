@@ -50,10 +50,9 @@
                     <form asp-area="UserPanel"
                           asp-controller="Product"
                           asp-action="AddNewProduct"
-                          method="post"
-                          >
+                          method="post">
 
-                        @* ── Input ── *@
+                        @* ── Product URL Input ── *@
                         <div class="mb-4">
                             <label class="form-label font-size-12 fw-bold text-dark mb-2">
                                 لینک محصول یا شناسه کالا
@@ -71,7 +70,7 @@
                             <span asp-validation-for="Url" class="error-text"></span>
                         </div>
 
-                        @* ── Hint ── *@
+                        @* ── Hint for URL ── *@
                         <div class="hint-card mb-4">
                             <div class="d-flex align-items-start gap-3">
                                 <div class="hint-icon">
@@ -86,6 +85,28 @@
                                     </p>
                                 </div>
                             </div>
+                        </div>
+
+                        @* ── Seller Code Input ── *@
+                        <div class="mb-4">
+                            <label class="form-label font-size-12 fw-bold text-dark mb-2">
+                                کد فروشندگی <span class="text-danger">*</span>
+                            </label>
+
+                            <div class="input-icon-wrapper">
+                                <i class="mdi mdi-store-outline input-icon"></i>
+                                <input type="text"
+                                       asp-for="SellerCode"
+                                       class="add-input"
+                                       placeholder="مثلاً H3NUK"
+                                       autocomplete="off"
+                                       required />
+                            </div>
+
+                            <span asp-validation-for="SellerCode" class="error-text"></span>
+                            <small class="font-size-11 text-muted mt-1 d-block">
+                                کد فروشنده در صفحه محصول دیجی‌کالا، زیر دکمه خرید و در بخش مشخصات فروشنده نمایش داده می‌شود.
+                            </small>
                         </div>
 
                         @* ── Buttons ── *@

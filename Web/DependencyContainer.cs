@@ -39,26 +39,28 @@ namespace Web
             services.AddSingleton<ISmsQueue, SmsQueue>();
             services.AddSingleton<ICacheManager, CacheManager>();
             services.AddSingleton<DigiKalaSessionState>();
+            services.AddSingleton<IBuyBoxStrategy, HighestRankBuyBoxStrategy>();
+            services.AddSingleton<IDigiKalaProductParser, DigiKalaProductParser>();
             #endregion
 
             #region HttpClient Services
-            services.AddHttpClient<IDigiKalaService, DigiKalaService>(client =>
+            // 4. HTTP Client with decompression handler
+            services.AddHttpClient<IDigiKalaProductApiClient, DigiKalaProductApiClient>((sp, client) =>
             {
-                client.Timeout = TimeSpan.FromSeconds(30);
+                client.BaseAddress = new Uri("https://api.digikala.com/");
+                client.Timeout = TimeSpan.FromSeconds(15);
+
+                // Configure default headers once per client
+                client.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36");
+                client.DefaultRequestHeaders.AcceptLanguage.ParseAdd("fa-IR,fa;q=0.9,en-US;q=0.8,en;q=0.7");
+                client.DefaultRequestHeaders.Accept.ParseAdd("application/json, text/plain, */*");
+                client.DefaultRequestHeaders.Referrer = new Uri("https://www.digikala.com/");
+                client.DefaultRequestHeaders.Add("X-Web-Client", "DesktopWeb");
             })
-            .ConfigurePrimaryHttpMessageHandler(() => new SocketsHttpHandler
+            .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
             {
-                UseCookies = true,
-                CookieContainer = new CookieContainer(),
-                AutomaticDecompression = DecompressionMethods.GZip
-                                       | DecompressionMethods.Deflate
-                                       | DecompressionMethods.Brotli,
-                EnableMultipleHttp2Connections = true,
-                SslOptions = new System.Net.Security.SslClientAuthenticationOptions
-                {
-                    EnabledSslProtocols = System.Security.Authentication.SslProtocols.Tls13
-                                        | System.Security.Authentication.SslProtocols.Tls12,
-                }
+                // Automatically handle gzip/deflate/brotli so we don't have to manually decode
+                AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate | DecompressionMethods.Brotli
             });
             #endregion
 
@@ -88,6 +90,7 @@ namespace Web
             services.AddScoped<IMediumService, MediumService>();
             services.AddScoped<IVisitorService, VisitorService>();
             services.AddScoped<ISiteNotificationService, SiteNotificationService>();
+            services.AddScoped<IDigiKalaService, DigiKalaService>();
             #endregion
 
             #region Background Services

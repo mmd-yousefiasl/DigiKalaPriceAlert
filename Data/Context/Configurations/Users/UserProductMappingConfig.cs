@@ -1,5 +1,4 @@
-﻿using Domain.Enums.Products;
-using Domain.Models.Users;
+﻿using Domain.Models.Users;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -18,11 +17,14 @@ namespace Data.Context.Configurations.Users
             builder.Property(up => up.IsRead)
                 .HasDefaultValue(false);
 
+            builder.Property(up => up.DigiKalaSellerCode)
+                .HasMaxLength(50)
+                .IsRequired();
+
             builder.HasIndex(up => new { up.UserId, up.ProductId })
                 .IsUnique();
 
             builder.HasIndex(up => up.UserId);
-
             builder.HasIndex(up => up.ProductId);
 
             builder.HasOne(up => up.User)

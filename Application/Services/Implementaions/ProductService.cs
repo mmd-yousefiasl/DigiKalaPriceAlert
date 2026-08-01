@@ -63,24 +63,35 @@ namespace Application.Services.Implementaions
                 .FirstOrDefaultAsync();
 
             if (existingProduct is not null)
-                return await MapUserToExistingProductAsync(userId, existingProduct.Id);
+                return await MapUserToExistingProductAsync(userId, existingProduct.Id, dto.SellerCode);
 
-            return await CreateProductFromScrapeAsync(userId, digiKalaId);
+            return await CreateProductFromScrapeAsync(userId, digiKalaId, dto.SellerCode);
         }
 
         #region Create New Product Private Methods
-        private async Task<Result<int>> MapUserToExistingProductAsync(int userId, int productId)
+        private async Task<Result<int>> MapUserToExistingProductAsync(int userId, int productId, string sellerCode)
         {
+            var normalizedSellerCode = sellerCode.Trim().ToUpperInvariant();
+
             var alreadyMapped = await _context.UserProductMappings
                 .AnyAsync(m => m.UserId == userId && m.ProductId == productId);
 
             if (alreadyMapped)
-                return productId;
+                return Result.Failure<int>(Messages.ThisProductAlreadyInYourWatchListError);
+
+            var sellerExists = await _context.ProductVariantSellers
+                .AsNoTracking()
+                .AnyAsync(s => s.Variant.ProductId == productId &&
+                               s.DigiKalaSellerId == normalizedSellerCode);
+
+            if (!sellerExists)
+                return Result.Failure<int>(Messages.SellerNotFoundError);
 
             var mapping = new UserProductMapping
             {
                 UserId = userId,
                 ProductId = productId,
+                DigiKalaSellerCode = normalizedSellerCode
             };
 
             _context.UserProductMappings.Add(mapping);
@@ -89,13 +100,24 @@ namespace Application.Services.Implementaions
             return productId;
         }
 
-        private async Task<Result<int>> CreateProductFromScrapeAsync(int userId, string digiKalaId)
+        private async Task<Result<int>> CreateProductFromScrapeAsync(int userId, string digiKalaId, string sellerCode)
         {
             var scrapeResult = await _digiKalaService.ScrapeFullProductAsync(digiKalaId);
             if (scrapeResult.IsFailure)
                 return Result.Failure<int>(Messages.InvalidDigiKalaProductUrlError);
 
             var scraped = scrapeResult.Value;
+            var normalizedSellerCode = sellerCode.Trim().ToUpperInvariant();
+
+            var sellerVariants = scraped.Variants
+                .Where(v => v.SellerCode != null &&
+                            v.SellerCode.Equals(normalizedSellerCode, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+            if (sellerVariants.Count == 0)
+            {
+                return Result.Failure<int>(Messages.SellerNotFoundError);
+            }
 
             var product = new Product
             {
@@ -117,7 +139,7 @@ namespace Application.Services.Implementaions
 
                 var seller = new ProductVariantSeller
                 {
-                    DigiKalaSellerId = scrapedVariant.SellerId.ToString(),
+                    DigiKalaSellerId = scrapedVariant.SellerCode ?? scrapedVariant.SellerId.ToString(),
                     SellerName = scrapedVariant.SellerName,
                     CurrentPrice = scrapedVariant.Price,
                     PreviousPrice = null,
@@ -144,6 +166,7 @@ namespace Application.Services.Implementaions
             var userMapping = new UserProductMapping
             {
                 UserId = userId,
+                DigiKalaSellerCode = normalizedSellerCode
             };
 
             product.Users = new List<UserProductMapping> { userMapping };

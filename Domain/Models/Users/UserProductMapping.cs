@@ -6,6 +6,8 @@ namespace Domain.Models.Users
     {
         public bool IsRead { get; set; } = false;
 
+        public string DigiKalaSellerCode { get; set; } = string.Empty;
+
         #region Relations
         public int UserId { get; set; }
         public User? User { get; set; }
