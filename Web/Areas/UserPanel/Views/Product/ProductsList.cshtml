@@ -12,7 +12,6 @@
 }
 
 <div class="container-fluid">
-
     <div class="row">
         <div class="col-sm-6">
             <div class="page-title-box">
@@ -86,6 +85,8 @@
         <div class="row g-2">
             @foreach (var item in Model.Entities)
             {
+                var isUndercut = item.CompetitorLowestPrice > 0 && item.CompetitorLowestPrice < item.YourPrice;
+
                 <div class="col-12 col-md-6 col-xl-4">
                     <div class="product-card @(!item.IsRead ? "unread" : "")">
 
@@ -94,71 +95,73 @@
                             <span class="unread-dot" title="تغییر قیمت جدید"></span>
                         }
 
-                        @* Delete button *@
-                        <form class="delete-product-form"
-                              asp-area="UserPanel"
-                              asp-controller="Product"
-                              asp-action="DeleteProduct"
-                              asp-route-id="@item.Id"
-                              onclick="ConfirmDelete(this)"
-                              title="حذف از لیست">
-                            <div class="delete-btn">
-                                <i class="mdi mdi-close font-size-12"></i>
-                            </div>
+                        <form class="delete-product-form" asp-area="UserPanel" asp-controller="Product" asp-action="DeleteProduct" asp-route-id="@item.Id" onclick="ConfirmDelete(this)" title="حذف از لیست">
+                            <div class="delete-btn"><i class="mdi mdi-close font-size-12"></i></div>
                         </form>
 
-                        <a asp-area="UserPanel" asp-controller="Product" asp-action="ProductDetails" asp-route-id="@item.Id"
-                           class="text-decoration-none d-block">
-
+                        <a asp-area="UserPanel" asp-controller="Product" asp-action="ProductDetails" asp-route-id="@item.Id" class="text-decoration-none d-block">
                             <div class="p-3 product-card-body">
                                 <div class="d-flex gap-3">
-
                                     <div class="product-thumb">
                                         <img src="@item.ImageUrl" alt="@item.Title">
                                     </div>
-
                                     <div class="flex-grow-1" style="min-width: 0;">
-
-                                        <h5 class="font-size-13 text-dark fw-bold mb-2 text-truncate" title="@item.Title"
-                                            style="line-height: 1.5;">
+                                        <h5 class="font-size-13 text-dark fw-bold mb-2 text-truncate" title="@item.Title" style="line-height: 1.5;">
                                             @item.Title
                                         </h5>
 
                                         <div class="d-flex align-items-center gap-1 flex-wrap mb-2">
-                                            <span class="meta-tag active">
-                                                <i class="mdi mdi-radar font-size-9"></i>
-                                                مانیتور
-                                            </span>
-                                            <span class="meta-tag info">
-                                                @item.VariantsCount تنوع
-                                            </span>
-                                            <span class="meta-tag info">
-                                                @item.SellersCount فروشنده
-                                            </span>
-                                        </div>
-
-                                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-1">
-                                            @if (item.LowestPrice > 0)
+                                            @if (item.IsWinningBuyBox)
                                             {
-                                                <div>
-                                                    @if (item.LowestPrice == item.HighestPrice)
-                                                    {
-                                                        <span class="price-main">@item.LowestPrice.ToTomanFormat()</span>
-                                                        <span class="price-unit">ت</span>
-                                                    }
-                                                    else
-                                                    {
-                                                        <span class="price-main">@item.LowestPrice.ToTomanFormat()</span>
-                                                        <span class="price-unit">ت</span>
-                                                        <span class="price-range me-1">
-                                                            تا @item.HighestPrice.ToTomanFormat() ت
-                                                        </span>
-                                                    }
-                                                </div>
+                                                <span class="meta-tag active bg-success-subtle text-success">
+                                                    <i class="mdi mdi-trophy font-size-9"></i>
+                                                    برنده بای‌باکس
+                                                </span>
                                             }
                                             else
                                             {
-                                                <span class="price-main text-muted">ناموجود</span>
+                                                <span class="meta-tag bg-danger-subtle text-danger">
+                                                    <i class="mdi mdi-trophy-off font-size-9"></i>
+                                                    باخته‌اید
+                                                </span>
+                                            }
+                                            <span class="meta-tag info">
+                                                @item.VariantsCount تنوع
+                                            </span>
+                                        </div>
+
+                                        @* SELLER DASHBOARD UI *@
+                                        <div class="d-flex justify-content-between align-items-end mt-2 border-top pt-2">
+                                            <div>
+                                                <small class="font-size-10 text-muted d-block">قیمت شما</small>
+                                                @if (item.YourPrice > 0)
+                                                {
+                                                    <span class="price-main font-size-14 fw-bold text-dark">@item.YourPrice.ToTomanFormat()</span>
+                                                    <span class="price-unit font-size-10">ت</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="price-main text-muted font-size-12">ناموجود</span>
+                                                }
+                                            </div>
+
+                                            @if (isUndercut)
+                                            {
+                                                <div class="text-end">
+                                                    <small class="font-size-10 text-danger d-block">
+                                                        <i class="mdi mdi-alert-outline"></i> رقیب ارزان‌تر!
+                                                    </small>
+                                                    <span class="price-main text-danger font-size-13 fw-bold">@item.CompetitorLowestPrice.ToTomanFormat()</span>
+                                                    <span class="price-unit text-danger font-size-10">ت</span>
+                                                </div>
+                                            }
+                                            else if (item.CompetitorLowestPrice > 0)
+                                            {
+                                                <div class="text-end">
+                                                    <small class="font-size-10 text-muted d-block">ارزان‌ترین رقیب</small>
+                                                    <span class="price-main text-muted font-size-12">@item.CompetitorLowestPrice.ToTomanFormat()</span>
+                                                    <span class="price-unit text-muted font-size-10">ت</span>
+                                                </div>
                                             }
                                         </div>
                                     </div>

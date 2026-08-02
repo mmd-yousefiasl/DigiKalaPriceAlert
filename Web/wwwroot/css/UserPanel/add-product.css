@@ -183,3 +183,73 @@
         padding: 20px 16px !important;
     }
 }
+
+/* ====== Custom SweetAlert2 Styles ====== */
+.swal2-popup.custom-swal-popup {
+    border-radius: 16px !important;
+    padding: 28px 24px !important;
+    box-shadow: 0 12px 50px rgba(0, 0, 0, 0.12) !important;
+    font-family: inherit !important;
+}
+
+.swal2-title.custom-swal-title {
+    font-size: 16px !important;
+    font-weight: 700 !important;
+    color: #1a1a1a !important;
+    margin: 0 0 8px !important;
+    padding: 0 !important;
+}
+
+.swal2-html-container.custom-swal-text {
+    font-size: 13px !important;
+    color: #6b7280 !important;
+    line-height: 1.7 !important;
+    margin: 0 !important;
+}
+
+.swal2-confirm.custom-swal-btn {
+    border-radius: 10px !important;
+    padding: 9px 28px !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    box-shadow: none !important;
+    min-width: 110px;
+}
+
+.swal2-icon.swal2-icon-styled {
+    margin: 0 auto 16px !important;
+}
+
+/* Toast */
+.swal2-popup.custom-toast-popup {
+    border-radius: 12px !important;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.1) !important;
+    padding: 14px 18px !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    margin-top: 16px !important;
+}
+
+/* ====== Button States ====== */
+.btn-add-tracking,
+.btn-tracked,
+.btn-tracked-error {
+    transition: all 0.2s ease;
+    min-width: 130px;
+}
+
+    .btn-add-tracking:hover:not(:disabled) {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+.btn-tracked {
+    cursor: default !important;
+}
+
+.btn-tracked-error {
+    background: #fee2e2 !important;
+    color: #dc2626 !important;
+    border: 1px solid #fecaca !important;
+    opacity: 0.85;
+}

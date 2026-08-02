@@ -17,24 +17,20 @@ namespace Data.Context.Configurations.Users
             builder.Property(up => up.IsRead)
                 .HasDefaultValue(false);
 
-            builder.Property(up => up.DigiKalaSellerCode)
-                .HasMaxLength(50)
-                .IsRequired();
-
-            builder.HasIndex(up => new { up.UserId, up.ProductId })
+            builder.HasIndex(up => new { up.UserId, up.VariantSellerId })
                 .IsUnique();
 
             builder.HasIndex(up => up.UserId);
-            builder.HasIndex(up => up.ProductId);
+            builder.HasIndex(up => up.VariantSellerId);
 
             builder.HasOne(up => up.User)
                 .WithMany(u => u.Products)
                 .HasForeignKey(up => up.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            builder.HasOne(up => up.Product)
+            builder.HasOne(up => up.VariantSeller)
                 .WithMany(p => p.Users)
-                .HasForeignKey(up => up.ProductId)
+                .HasForeignKey(up => up.VariantSellerId)
                 .OnDelete(DeleteBehavior.Cascade);
         }
     }

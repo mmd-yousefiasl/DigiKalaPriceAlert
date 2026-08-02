@@ -2,6 +2,7 @@
 {
     public static class Messages
     {
+
         #region Error Messages
 
         public const string RequiredError = "{0} ضروری می باشد";
@@ -37,6 +38,8 @@
         public const string FailedToCreatePurchaseError = "خطا در صدور فاکتور. لطفا مجدد تلاش کنید";
         public const string ThisProductAlreadyInYourWatchListError = "این محصول قبلاً به لیست پایش شما اضافه شده است";
         public const string SellerNotFoundError = "فروشنده محصول پیدا نشد. لطفا مجدد تلاش کنید";
+        public const string ProductVariantSellerNotFoundError = "تنوع فروشنده مورد نظر یافت نشد";
+        public const string InvalidDataErorr = "اطلاعات ارسالی نامعتبر است. لطفا مجدد تلاش کنید";
 
         #endregion
 
@@ -53,6 +56,7 @@
         public const string PaymentDoneSuccessfully = "پرداخت با موفقیت انجام شد";
         public const string TicketClosedSuccessfully = "تیکت با موفقیت بسته شد";
         public const string YourProfileUpdatedSuccessfully = "اطلاعات حساب کاربری شما با موفقیت بروزرسانی شد";
+        public const string ProductAddedSuccessfully = "محصول با موفقیت به لیست رصد اضافه شد";
 
         #endregion
 
@@ -69,5 +73,6 @@
         public const string TicketStatusUpdatedByAdmin = "وضعیت تیکت توسط ادمین ویرایش شد";
 
         #endregion
+
     }
 }

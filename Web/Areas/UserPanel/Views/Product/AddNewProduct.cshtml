@@ -1,6 +1,5 @@
 ﻿@using Application.Dtos.Products.ClientSide
 @model ClientSideCreateNewProductDto
-
 @{
     ViewData["Title"] = "افزودن محصول جدید";
 }
@@ -10,19 +9,13 @@
 }
 
 <div class="container-fluid">
-
-    @* ── Breadcrumb ────────────────────────────────────── *@
     <div class="row">
         <div class="col-sm-6">
             <div class="page-title-box">
                 <h4>مدیریت محصولات</h4>
                 <ol class="breadcrumb m-0">
-                    <li class="breadcrumb-item">
-                        <a asp-area="UserPanel" asp-controller="Home" asp-action="Index">صفحه نخست</a>
-                    </li>
-                    <li class="breadcrumb-item">
-                        <a asp-area="UserPanel" asp-controller="Product" asp-action="ProductsList">لیست محصولات</a>
-                    </li>
+                    <li class="breadcrumb-item"><a asp-area="UserPanel" asp-controller="Home" asp-action="Index">صفحه نخست</a></li>
+                    <li class="breadcrumb-item"><a asp-area="UserPanel" asp-controller="Product" asp-action="ProductsList">لیست محصولات</a></li>
                     <li class="breadcrumb-item active">@ViewData["Title"]</li>
                 </ol>
             </div>
@@ -31,152 +24,53 @@
 
     <div class="row justify-content-center">
         <div class="col-12 col-md-8 col-lg-6">
-
-            @* ── Main Form Card ────────────────────────────── *@
             <div class="add-card mb-3">
                 <div class="p-4 p-card">
-
                     <div class="text-center mb-4">
-                        <div class="d-inline-flex align-items-center justify-content-center mb-3"
-                             style="width: 56px; height: 56px; border-radius: 14px; background: #f3f4f6;">
+                        <div class="d-inline-flex align-items-center justify-content-center mb-3" style="width: 56px; height: 56px; border-radius: 14px; background: #f3f4f6;">
                             <i class="mdi mdi-magnify-plus-outline font-size-28 text-dark"></i>
                         </div>
                         <h5 class="fw-bold font-size-15 text-dark mb-1">افزودن محصول جدید</h5>
-                        <p class="text-muted font-size-12 mb-0">
-                            لینک یا شناسه محصول دیجی‌کالا را وارد کنید تا رصد آغاز شود
-                        </p>
+                        <p class="text-muted font-size-12 mb-0">لینک محصول دیجی‌کالا را وارد کنید تا تنوع‌ها و فروشندگان آن نمایش داده شوند</p>
                     </div>
 
-                    <form asp-area="UserPanel"
-                          asp-controller="Product"
-                          asp-action="AddNewProduct"
-                          method="post">
-
-                        @* ── Product URL Input ── *@
-                        <div class="mb-4">
-                            <label class="form-label font-size-12 fw-bold text-dark mb-2">
-                                لینک محصول یا شناسه کالا
-                            </label>
-
-                            <div class="input-icon-wrapper">
-                                <i class="mdi mdi-link-variant input-icon"></i>
-                                <input type="text"
-                                       asp-for="Url"
-                                       class="add-input"
-                                       placeholder="https://digikala.com/product/dkp-12345  یا  12345"
-                                       autocomplete="off" />
-                            </div>
-
-                            <span asp-validation-for="Url" class="error-text"></span>
+                    <form id="searchForm" class="d-flex gap-2">
+                        @Html.AntiForgeryToken()
+                        <div class="input-icon-wrapper flex-grow-1">
+                            <i class="mdi mdi-link-variant input-icon"></i>
+                            <input type="text" id="urlInput" class="add-input" placeholder="https://digikala.com/product/dkp-12345" autocomplete="off" required />
                         </div>
-
-                        @* ── Hint for URL ── *@
-                        <div class="hint-card mb-4">
-                            <div class="d-flex align-items-start gap-3">
-                                <div class="hint-icon">
-                                    <i class="mdi mdi-lightbulb-on-outline font-size-18"></i>
-                                </div>
-                                <div>
-                                    <div class="font-size-12 fw-bold text-dark mb-1">راهنما</div>
-                                    <p class="font-size-11 text-muted mb-0" style="line-height: 1.7;">
-                                        صفحه محصول مورد نظر را در دیجی‌کالا باز کنید و لینک آن را اینجا
-                                        وارد کنید. همچنین می‌توانید فقط عدد شناسه (مثلاً <strong class="text-dark">12345</strong>)
-                                        را وارد نمایید.
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-                        @* ── Seller Code Input ── *@
-                        <div class="mb-4">
-                            <label class="form-label font-size-12 fw-bold text-dark mb-2">
-                                کد فروشندگی <span class="text-danger">*</span>
-                            </label>
-
-                            <div class="input-icon-wrapper">
-                                <i class="mdi mdi-store-outline input-icon"></i>
-                                <input type="text"
-                                       asp-for="SellerCode"
-                                       class="add-input"
-                                       placeholder="مثلاً H3NUK"
-                                       required />
-                            </div>
-
-                            <span asp-validation-for="SellerCode" class="error-text"></span>
-                            <small class="font-size-11 text-muted mt-1 d-block">
-                                کد فروشنده در صفحه محصول دیجی‌کالا، زیر دکمه خرید و در بخش مشخصات فروشنده نمایش داده می‌شود.
-                            </small>
-                        </div>
-
-                        @* ── Buttons ── *@
-                        <div class="d-flex flex-column gap-2">
-                            <button type="submit" class="submit-btn btn-submit">
-                                <i class="mdi mdi-radar font-size-16"></i>
-                                شروع رصد و مانیتورینگ
-                            </button>
-
-                            <a asp-area="UserPanel"
-                               asp-controller="Product"
-                               asp-action="ProductsList"
-                               class="cancel-btn">
-                                بازگشت به لیست
-                            </a>
-                        </div>
+                        <button type="submit" class="submit-btn btn-submit mb-0" style="width: auto; padding: 0 20px;">
+                            <i class="mdi mdi-magnify font-size-16"></i>
+                            جستجو
+                        </button>
                     </form>
                 </div>
             </div>
-
-            @* ── Features Card ─────────────────────────────── *@
-            <div class="feature-card mb-5">
-                <div class="feature-item">
-                    <div class="feature-icon icon-1">
-                        <i class="mdi mdi-clock-fast"></i>
-                    </div>
-                    <div>
-                        <div class="font-size-12 fw-bold text-dark mb-1">رصد هر ۱۵ دقیقه</div>
-                        <div class="font-size-11 text-muted" style="line-height: 1.6;">
-                            قیمت و وضعیت بای‌باکس محصول هر ۱۵ دقیقه بررسی می‌شود
-                        </div>
-                    </div>
-                </div>
-
-                <div class="feature-item">
-                    <div class="feature-icon icon-2">
-                        <i class="mdi mdi-store-outline"></i>
-                    </div>
-                    <div>
-                        <div class="font-size-12 fw-bold text-dark mb-1">تمام فروشندگان و رنگ‌ها</div>
-                        <div class="font-size-11 text-muted" style="line-height: 1.6;">
-                            تمام تنوع‌ها و فروشندگان فعال محصول شناسایی و رصد می‌شوند
-                        </div>
-                    </div>
-                </div>
-
-                <div class="feature-item">
-                    <div class="feature-icon icon-3">
-                        <i class="mdi mdi-trophy-outline"></i>
-                    </div>
-                    <div>
-                        <div class="font-size-12 fw-bold text-dark mb-1">تشخیص برنده بای‌باکس</div>
-                        <div class="font-size-11 text-muted" style="line-height: 1.6;">
-                            برنده بای‌باکس هر رنگ به صورت جداگانه تشخیص داده می‌شود
-                        </div>
-                    </div>
-                </div>
-
-                <div class="feature-item">
-                    <div class="feature-icon icon-4">
-                        <i class="mdi mdi-bell-ring-outline"></i>
-                    </div>
-                    <div>
-                        <div class="font-size-12 fw-bold text-dark mb-1">اعلان لحظه‌ای</div>
-                        <div class="font-size-11 text-muted" style="line-height: 1.6;">
-                            در صورت تغییر قیمت یا تغییر برنده بای‌باکس، پیامک دریافت می‌کنید
-                        </div>
-                    </div>
-                </div>
-            </div>
-
         </div>
     </div>
 </div>
+
+<!-- Bootstrap Modal -->
+<div class="modal fade" id="productModal" tabindex="-1" aria-labelledby="productModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content" style="border-radius: 16px; border: none;">
+            <div class="modal-header" style="border-bottom: 1px solid #f0f0f0; padding: 20px;">
+                <h5 class="modal-title fw-bold font-size-14" id="productModalLabel">انتخاب فروشنده برای رصد</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="productModalBody" style="padding: 20px; max-height: 60vh; overflow-y: auto;">
+                <!-- Content will be injected here -->
+            </div>
+            <div class="modal-footer" style="border-top: 1px solid #f0f0f0; padding: 15px 20px;">
+                <a asp-area="UserPanel" asp-controller="Product" asp-action="ProductsList" class="btn btn-sm btn-dark" style="border-radius: 8px;">
+                    <i class="mdi mdi-format-list-bulleted me-1"></i> بازگشت به لیست
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section FooterReferences {
+    <script asp-append-version="true" src="/js/Admin/add-new-product.js"></script>
+}

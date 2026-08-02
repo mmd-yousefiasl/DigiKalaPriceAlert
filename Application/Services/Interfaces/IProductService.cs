@@ -5,8 +5,6 @@ namespace Application.Services.Interfaces
 {
     public interface IProductService
     {
-        Task<Result<int>> ClientSideCreateNewProduct(ClientSideCreateNewProductDto dto);
-
         Task<Result<ClientSideProductDetailsDto>> ClientSideGetProductDetails(int id);
 
         Task<Result<ClientSideFilterProductsDto>> ClientSideFilterProducts(ClientSideFilterProductsDto filter);
@@ -18,5 +16,9 @@ namespace Application.Services.Interfaces
         Task<Result> ClientSideSetProductAsReadForUser(int id);
 
         Task<Result<List<ClientSideUserChangeNotification>>> SyncProductAndDetectChangesAsync(ProductMonitoringTargetDto target, ClientSideScrapedProductDto scraped, CancellationToken ct);
+
+        Task<Result<ClientSideProductSearchResultDto>> SearchProductForModalAsync(string url);
+
+        Task<Result> AddProductToUserTrackingAsync(int productVariantSellerId);
     }
 }

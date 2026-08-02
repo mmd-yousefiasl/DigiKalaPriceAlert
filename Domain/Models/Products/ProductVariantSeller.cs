@@ -1,4 +1,6 @@
-﻿namespace Domain.Models.Products
+﻿using Domain.Models.Users;
+
+namespace Domain.Models.Products
 {
     public class ProductVariantSeller : AuditBaseEntity<int>
     {
@@ -16,6 +18,7 @@
         public ProductVariant Variant { get; set; }
 
         public ICollection<ProductPriceHistory> PriceHistory { get; set; } = new List<ProductPriceHistory>();
+        public ICollection<UserProductMapping> Users { get; set; } = new List<UserProductMapping>();
         #endregion
     }
 }

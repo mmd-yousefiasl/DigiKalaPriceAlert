@@ -39,21 +39,39 @@ namespace Web.Areas.UserPanel.Controllers
         }
 
         [Profile]
-        [HttpPost("/user/products/add"), ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddNewProduct(ClientSideCreateNewProductDto dto)
+        [HttpPost("/user/products/search"), ValidateAntiForgeryToken]
+        public async Task<IActionResult> SearchProduct([FromBody] ClientSideSearchProductDto dto)
         {
             if (!ModelState.IsValid)
-                return View(dto);
-
-            var result = await _productService.ClientSideCreateNewProduct(dto);
-            if (result.IsFailure)
             {
-                TempData[ErrorMessage] = result.Message;
-                return View(dto);
+                var firstError = ModelState.Values.SelectMany(v => v.Errors).FirstOrDefault()?.ErrorMessage ?? Messages.InvalidDataErorr;
+                return Json(new { success = false, message = firstError });
             }
-            TempData[TemporarySuccessMessage] = result.Message;
 
-            return RedirectToAction(nameof(ProductDetails), new { id = result.Value });
+            var result = await _productService.SearchProductForModalAsync(dto.Url);
+
+            if (result.IsFailure)
+                return Json(new { success = false, message = result.Message });
+
+            return Json(new { success = true, data = result.Value });
+        }
+
+        [Profile]
+        [HttpPost("/user/products/add-tracking"), ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddTracking([FromBody] ClientSideAddTrackingDto dto)
+        {
+            if (!ModelState.IsValid)
+            {
+                var firstError = ModelState.Values.SelectMany(v => v.Errors).FirstOrDefault()?.ErrorMessage ?? Messages.InvalidDataErorr;
+                return Json(new { success = false, message = firstError });
+            }
+
+            var result = await _productService.AddProductToUserTrackingAsync(dto.SellerId);
+
+            if (result.IsFailure)
+                return Json(new { success = false, message = result.Message });
+
+            return Json(new { success = true, message = Messages.ProductAddedSuccessfully });
         }
 
         [HttpGet("/user/products/{id}")]
