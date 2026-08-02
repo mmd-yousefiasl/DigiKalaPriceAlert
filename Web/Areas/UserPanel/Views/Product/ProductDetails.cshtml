@@ -3,7 +3,7 @@
 @model ClientSideProductDetailsDto
 
 @{
-    ViewData["Title"] = "جزئیات محصول";
+    ViewData["Title"] = "جزئیات رصد";
 }
 
 @section HeaderReferences {
@@ -42,8 +42,7 @@
                 <div class="flex-grow-1 min-width-0">
 
                     <div class="d-flex flex-wrap gap-1 mb-2">
-                        <span class="badge bg-dark text-white font-size-10 px-2 py-1 rounded-pill">مانیتور فعال</span>
-                        <span class="badge bg-light text-muted border font-size-10 px-2 py-1 rounded-pill">dkp-@Model.DigiKalaId</span>
+                        <span class="badge bg-dark text-white font-size-10 px-2 py-1 rounded-pill">رصد فعال</span>
                     </div>
 
                     <h4 class="text-dark fw-bold font-size-14 font-size-md-15 mb-2" style="line-height: 1.7;">
@@ -51,24 +50,19 @@
                     </h4>
 
                     <div class="d-flex flex-wrap align-items-center gap-2 font-size-12 text-muted">
-                        @* Color dots *@
-                        <div class="d-flex align-items-center gap-1">
-                            @foreach (var cg in Model.ColorGroups.Take(5))
-                            {
-                                @if (cg.ColorHex is not null)
+                        @* Show the specific variant being tracked *@
+                        @if (!string.IsNullOrEmpty(Model.VariantColorName))
+                        {
+                            <div class="d-flex align-items-center gap-1">
+                                @if (!string.IsNullOrEmpty(Model.VariantColorHex))
                                 {
-                                    <span class="cd" style="background-color: @cg.ColorHex;" title="@cg.ColorName"></span>
+                                    <span class="cd" style="background-color: @Model.VariantColorHex; width: 12px; height: 12px; border-radius: 50%; display: inline-block;"></span>
                                 }
-                            }
-                            @if (Model.ColorGroups.Count > 5)
-                            {
-                                <span class="text-muted font-size-10">+@(Model.ColorGroups.Count - 5)</span>
-                            }
-                        </div>
-                        <span>·</span>
-                        <span>@Model.ColorGroups.Count رنگ</span>
-                        <span>·</span>
-                        <span>@Model.TotalSellersCount فروشنده</span>
+                                <span class="fw-bold text-dark">@Model.VariantColorName</span>
+                            </div>
+                            <span>·</span>
+                        }
+                        <span>@Model.TotalActiveSellersInVariant فروشنده فعال</span>
                         <span>·</span>
                         <span><i class="mdi mdi-clock-outline font-size-11"></i> @Model.LastUpdatedDate.ToPersianRelativeTime()</span>
                     </div>
@@ -86,215 +80,141 @@
     @* ── Stats ─────────────────────────────────────────── *@
     <div class="d-flex gap-2 mb-3 flex-wrap">
         <div class="stat-pill">
-            <div class="stat-label">ارزان‌ترین</div>
+            <div class="stat-label">وضعیت شما</div>
             <div class="stat-value">
-                @if (Model.LowestCurrentPrice > 0)
+                @if (Model.TrackedSeller?.IsBuyBoxWinner == true)
                 {
-                    @Model.LowestCurrentPrice.ToTomanFormat()
-                    <span class="stat-unit">ت</span>
+                    <span class="text-success"><i class="mdi mdi-trophy"></i> برنده</span>
                 }
                 else
                 {
-                    @:—
+                    <span class="text-danger"><i class="mdi mdi-trophy-off"></i> شکست</span>
                 }
             </div>
         </div>
         <div class="stat-pill">
-            <div class="stat-label">گران‌ترین</div>
+            <div class="stat-label">قیمت شما</div>
             <div class="stat-value">
-                @if (Model.HighestCurrentPrice > 0)
+                @if (Model.TrackedSeller?.CurrentPrice > 0)
                 {
-                    @Model.HighestCurrentPrice.ToTomanFormat()
+                    @Model.TrackedSeller.CurrentPrice.ToTomanFormat()
                     <span class="stat-unit">ت</span>
                 }
                 else
                 {
-                    @:—
+                    @:ناموجود
                 }
             </div>
         </div>
         <div class="stat-pill">
-            <div class="stat-label">اختلاف</div>
+            <div class="stat-label">تغییرات اخیر</div>
             <div class="stat-value">
-                @if (Model.LowestCurrentPrice > 0 && Model.HighestCurrentPrice > Model.LowestCurrentPrice)
-                {
-                    @((Model.HighestCurrentPrice - Model.LowestCurrentPrice).ToTomanFormat())
-                    <span class="stat-unit">ت</span>
-                }
-                else
-                {
-                    @:—
-                }
-            </div>
-        </div>
-        <div class="stat-pill">
-            <div class="stat-label">تغییرات</div>
-            <div class="stat-value">
-                @Model.ColorGroups.Sum(g => g.RecentHistory.Count) <span class="stat-unit">مورد</span>
+                @Model.RecentHistory.Count <span class="stat-unit">مورد</span>
             </div>
         </div>
     </div>
 
-    @* ── Color Groups (Sellers per Color) ──────────────── *@
+    @* ── Sellers Arena (You vs Winner vs Others) ───────── *@
     <div class="pd-card mb-3">
         <div class="section-header">
             <div class="section-title">
-                <i class="mdi mdi-store-outline"></i>
-                رقابت فروشندگان
+                <i class="mdi mdi-sword-cross"></i>
+                میدان رقابت این تنوع
             </div>
-            <span class="section-count">@Model.ColorGroups.Count رنگ · @Model.TotalSellersCount فروشنده</span>
         </div>
 
         <div class="p-2 p-md-3">
-            @{
-                int colorIdx = 0;
-            }
-            @foreach (var group in Model.ColorGroups)
+
+            @* 1. The User's Tracked Seller *@
+            @if (Model.TrackedSeller != null)
             {
-                colorIdx++;
-                var winner = group.Winner;
-                if (winner is null) continue;
-
-                var hasOthers = group.OtherSellers.Any();
-
-                <div class="color-section">
-
-                    @* ── Color Header (Winner) ── *@
-                    <div class="color-header @(hasOthers ? "" : "")"
-                         id="ch-@colorIdx"
-                        @(hasOthers ? $"onclick=toggleColor({colorIdx})" : "")
-                         style="@(hasOthers ? "cursor:pointer;" : "")">
-
-                        <div class="ch-left">
-                            @if (group.ColorHex is not null)
-                            {
-                                <span class="cd cd-lg" style="background-color: @group.ColorHex;"></span>
-                            }
-                            <div>
-                                <div class="d-flex align-items-center gap-2">
-                                    <span class="fw-bold font-size-13">@group.ColorName</span>
-                                    @if (group.LastUpdatedDate > DateTime.MinValue)
-                                    {
-                                        <span class="font-size-10 text-muted">
-                                            <i class="mdi mdi-clock-outline font-size-10"></i>
-                                            @group.LastUpdatedDate.ToPersianRelativeTime()
-                                        </span>
-                                    }
-                                </div>
-                                <div class="d-flex align-items-center gap-2 mt-1">
-                                    <span class="winner-badge">
-                                        <i class="mdi mdi-trophy font-size-11"></i>
-                                        @winner.SellerName
-                                    </span>
-                                    @if (winner.SellerRating.HasValue && winner.SellerRating > 0)
-                                    {
-                                        <span class="rating-badge">
-                                            <i class="mdi mdi-star"></i> @winner.SellerRating.Value.ToString("N0")
-                                        </span>
-                                    }
-                                </div>
-                            </div>
+                var s = Model.TrackedSeller;
+                <div class="seller-row" style="border: 2px solid #3b82f6; background-color: #eff6ff; border-radius: 8px; margin-bottom: 8px;">
+                    <div class="sr-info">
+                        <div class="sr-name fw-bold text-dark">
+                            <i class="mdi mdi-account-check text-primary font-size-14"></i> @s.SellerName (شما)
                         </div>
-
-                        <div class="ch-right">
-                            <div class="text-end">
-                                <div>
-                                    @if (winner.CurrentPrice > 0)
-                                    {
-                                        <span class="fw-bold font-size-14">@winner.CurrentPrice.ToTomanFormat()</span>
-                                        <span class="font-size-10 text-muted">ت</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="text-muted">ناموجود</span>
-                                    }
-                                </div>
-                                @{
-                                    var wChange = winner.PriceChange;
-                                    var wPercent = winner.PriceChangePercent;
-                                }
-                                @if (wChange.HasValue && wChange != 0)
-                                {
-                                    var wUp = wChange > 0;
-                                    <span class="price-change @(wUp ? "up" : "down")">
-                                        @(wUp ? "▲" : "▼") @Math.Abs(wPercent ?? 0).ToString("N1")%
-                                    </span>
-                                }
-                            </div>
-
-                            @if (hasOthers)
+                        <div class="sr-meta">
+                            @if (s.IsBuyBoxWinner)
                             {
-                                <div class="d-flex align-items-center gap-1">
-                                    <span class="font-size-11 text-muted">+@group.OtherSellers.Count</span>
-                                    <i class="mdi mdi-chevron-down chevron-icon" id="chev-@colorIdx"></i>
-                                </div>
+                                <span class="winner-badge"><i class="mdi mdi-trophy font-size-11"></i> برنده بای‌باکس</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger-subtle text-danger font-size-9">بای‌باکس را از دست داده‌اید</span>
                             }
                         </div>
                     </div>
+                    <div class="sr-price">
+                        @if (s.CurrentPrice > 0)
+                        {
+                            <span class="sr-price-value fw-bold">@s.CurrentPrice.ToTomanFormat()</span>
+                            <span class="sr-price-unit"> ت</span>
+                        }
+                        else
+                        {
+                            <span class="text-danger">ناموجود</span>
+                        }
+                    </div>
+                </div>
+            }
 
-                    @* ── Other Sellers (Collapsible) ── *@
-                    @if (hasOthers)
-                    {
-                        <div class="color-body" id="cb-@colorIdx">
-                            @foreach (var seller in group.OtherSellers)
-                            {
-                                var sChange = seller.PriceChange;
-                                var sPercent = seller.PriceChangePercent;
-
-                                <div class="seller-row">
-                                    <div class="sr-info">
-                                        <div class="sr-name">@seller.SellerName</div>
-                                        <div class="sr-meta">
-                                            @if (seller.SellerRating.HasValue && seller.SellerRating > 0)
-                                            {
-                                                <span class="rating-badge">
-                                                    <i class="mdi mdi-star"></i> @seller.SellerRating.Value.ToString("N0")
-                                                </span>
-                                            }
-                                            <span class="badge @(seller.IsActive ? "bg-success" : "bg-secondary") font-size-9" style="padding: 1px 5px;">
-                                                @(seller.IsActive ? "فعال" : "غیرفعال")
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <div class="sr-price">
-                                        @if (seller.CurrentPrice > 0)
-                                        {
-                                            <span class="sr-price-value">@seller.CurrentPrice.ToTomanFormat()</span>
-                                            <span class="sr-price-unit"> ت</span>
-                                        }
-                                        @if (sChange.HasValue && sChange != 0)
-                                        {
-                                            var sUp = sChange > 0;
-                                            <span class="price-change @(sUp ? "up" : "down") ms-2">
-                                                @(sUp ? "▲" : "▼") @Math.Abs(sPercent ?? 0).ToString("N1")%
-                                            </span>
-                                        }
-                                    </div>
-                                </div>
-                            }
+            @* 2. The Current Winner (If it's not the user) *@
+            @if (Model.WinnerSeller != null && Model.WinnerSeller.Id != Model.TrackedSeller?.Id)
+            {
+                var w = Model.WinnerSeller;
+                <div class="seller-row" style="border: 1px solid #f0f0f0; border-radius: 8px; margin-bottom: 8px;">
+                    <div class="sr-info">
+                        <div class="sr-name text-success fw-bold">
+                            <i class="mdi mdi-crown font-size-14"></i> @w.SellerName
                         </div>
-                    }
+                        <div class="sr-meta">
+                            <span class="winner-badge"><i class="mdi mdi-trophy font-size-11"></i> برنده فعلی</span>
+                        </div>
+                    </div>
+                    <div class="sr-price">
+                        @if (w.CurrentPrice > 0)
+                        {
+                            <span class="sr-price-value text-success fw-bold">@w.CurrentPrice.ToTomanFormat()</span>
+                            <span class="sr-price-unit"> ت</span>
+                        }
+                    </div>
+                </div>
+            }
+
+            @* 3. Other Competitors *@
+            @foreach (var seller in Model.Opponents)
+            {
+                <div class="seller-row" style="border-bottom: 1px solid #f9fafb; padding: 10px 0;">
+                    <div class="sr-info">
+                        <div class="sr-name text-muted font-size-12">@seller.SellerName</div>
+                    </div>
+                    <div class="sr-price">
+                        @if (seller.CurrentPrice > 0)
+                        {
+                            <span class="sr-price-value text-muted">@seller.CurrentPrice.ToTomanFormat()</span>
+                            <span class="sr-price-unit text-muted"> ت</span>
+                        }
+                        else
+                        {
+                            <span class="text-muted font-size-11">ناموجود</span>
+                        }
+                    </div>
                 </div>
             }
         </div>
     </div>
 
-    @* ── Price History with Filters ───────────────────────── *@
+    @* ── Price History (Strictly for this variant) ────── *@
     @{
-        var allHistory = Model.ColorGroups
-            .SelectMany(g => g.RecentHistory.Select(h => new { g.ColorName, g.ColorHex, History = h }))
-            .OrderByDescending(x => x.History.CreatedDate)
+        var allHistory = Model.RecentHistory
+            .OrderByDescending(h => h.CreatedDate)
             .Take(100)
             .ToList();
 
-        var uniqueColors = Model.ColorGroups
-            .Where(g => g.ColorHex is not null)
-            .Select(g => new { g.ColorName, g.ColorHex })
-            .ToList();
-
         var uniqueSellers = allHistory
-            .Where(h => h.History.SellerName is not null)
-            .Select(h => h.History.SellerName)
+            .Where(h => !string.IsNullOrEmpty(h.SellerName))
+            .Select(h => h.SellerName)
             .Distinct()
             .ToList();
     }
@@ -310,112 +230,84 @@
                 <span class="section-count" id="history-count">@allHistory.Count تغییر</span>
             </div>
 
-            @* ── Filter Chips ── *@
-            <div class="history-filters">
-
-                @* Color filters *@
-                <div class="filter-group">
-                    <span class="filter-label">رنگ:</span>
-                    <button class="filter-chip active" onclick="filterHistory('color', 'all', this)">
-                        همه
-                    </button>
-                    @foreach (var color in uniqueColors)
-                    {
-                        <button class="filter-chip" onclick="filterHistory('color', '@color.ColorName', this)">
-                            <span class="cd" style="background-color: @color.ColorHex; width:10px; height:10px;"></span>
-                            @color.ColorName
-                        </button>
-                    }
-                </div>
-
-                @* Seller filters *@
-                @if (uniqueSellers.Count > 1)
-                {
+            @* ── Seller Filters (No color filters needed anymore) ── *@
+            @if (uniqueSellers.Count > 1)
+            {
+                <div class="history-filters p-3 border-bottom">
                     <div class="filter-group">
                         <span class="filter-label">فروشنده:</span>
-                        <button class="filter-chip active" onclick="filterHistory('seller', 'all', this)">
+                        <button class="filter-chip active" onclick="filterHistory('all', this)">
                             همه
                         </button>
                         @foreach (var seller in uniqueSellers)
                         {
-                            <button class="filter-chip" onclick="filterHistory('seller', '@seller', this)">
+                            <button class="filter-chip" onclick="filterHistory('@seller', this)">
                                 @seller
                             </button>
                         }
                     </div>
-                }
-            </div>
+                </div>
+            }
 
             @* ── History Items ── *@
-            <div id="history-container">
-                @{
-                    int hIdx = 0;
-                }
+            <div id="history-container" class="p-3">
                 @foreach (var item in allHistory)
                 {
-                    hIdx++;
-                    var isUp = item.History.NewPrice > item.History.OldPrice;
-                    // Determine dot color based on actual price change, neutral if no price change
-                    var dotClass = item.History.ChangePercent != 0 ? (isUp ? "up" : "down") : "neutral";
+                    var isUp = item.NewPrice > item.OldPrice;
+                    var dotClass = item.ChangePercent != 0 ? (isUp ? "up" : "down") : "neutral";
+                    var isYou = item.SellerName == Model.TrackedSeller?.SellerName;
 
-                    <div class="history-item"
-                         data-color="@item.ColorName"
-                         data-seller="@item.History.SellerName">
+                    <div class="history-item" data-seller="@item.SellerName" style="@(isYou ? "background-color: #eff6ff; border-radius: 8px; padding: 8px;" : "")">
 
                         <span class="hi-dot @dotClass"></span>
 
                         <div class="hi-body">
                             <div class="hi-header">
                                 <div class="d-flex align-items-center gap-2">
-                                    @if (item.ColorHex is not null)
+                                    <span class="hi-seller @(isYou ? "fw-bold text-primary" : "")">@item.SellerName</span>
+                                    @if (isYou)
                                     {
-                                        <span class="cd" style="background-color: @item.ColorHex;"></span>
+                                        <span class="badge bg-primary font-size-9">شما</span>
                                     }
-                                    <span class="hi-seller">@item.History.SellerName</span>
-                                    <span class="font-size-11 text-muted">@item.ColorName</span>
                                 </div>
-                                <span class="hi-time">@item.History.CreatedDate.ToPersianRelativeTime()</span>
+                                <span class="hi-time">@item.CreatedDate.ToPersianRelativeTime()</span>
                             </div>
 
                             <div class="hi-prices">
-                                @* LOGIC FIX START: Check if price actually changed *@
-                                @if (item.History.OldPrice == item.History.NewPrice)
+                                @if (item.OldPrice == item.NewPrice)
                                 {
-                                    @* Scenario: Price is stable, only BuyBox changed *@
                                     <span class="hi-price-stable">
-                                        @item.History.NewPrice.ToTomanFormat()
+                                        @item.NewPrice.ToTomanFormat()
                                         <span class="font-size-10 text-muted fw-normal">ت</span>
                                     </span>
                                 }
                                 else
                                 {
-                                    @* Scenario: Actual price change occurred *@
-                                    @if (item.History.OldPrice > 0)
+                                    @if (item.OldPrice > 0)
                                     {
-                                        <span class="hi-old">@item.History.OldPrice.ToTomanFormat()</span>
+                                        <span class="hi-old">@item.OldPrice.ToTomanFormat()</span>
                                         <span class="hi-arrow">←</span>
                                     }
                                     <span class="hi-new">
-                                        @item.History.NewPrice.ToTomanFormat()
+                                        @item.NewPrice.ToTomanFormat()
                                         <span class="font-size-10 text-muted fw-normal">ت</span>
                                     </span>
 
-                                    @if (item.History.ChangePercent != 0)
+                                    @if (item.ChangePercent != 0)
                                     {
                                         <span class="price-change @(isUp ? "up" : "down")">
-                                            @(isUp ? "▲" : "▼") @Math.Abs(item.History.ChangePercent).ToString("N1")%
+                                            @(isUp ? "▲" : "▼") @Math.Abs(item.ChangePercent).ToString("N1")%
                                         </span>
                                     }
                                 }
-                                @* LOGIC FIX END *@
 
-                                @if (item.History.BuyBoxChanged)
+                                @if (item.BuyBoxChanged)
                                 {
-                                    @if (item.History.IsBuyBoxWinner)
+                                    @if (item.IsBuyBoxWinner)
                                     {
                                         <span class="buybox-badge win" title="این فروشنده بای‌باکس را فتح کرد">
                                             <i class="mdi mdi-trophy font-size-11"></i>
-                                            برنده جدید بای‌باکس
+                                            فتح بای‌باکس
                                         </span>
                                     }
                                     else
@@ -428,12 +320,11 @@
                                 }
                             </div>
 
-                            @* ── Change Description ── *@
-                            @if (!string.IsNullOrWhiteSpace(item.History.ChangeDescription))
+                            @if (!string.IsNullOrWhiteSpace(item.ChangeDescription))
                             {
                                 <div class="hi-description">
                                     <i class="mdi mdi-information-outline"></i>
-                                    <span>@item.History.ChangeDescription</span>
+                                    <span>@item.ChangeDescription</span>
                                 </div>
                             }
                         </div>

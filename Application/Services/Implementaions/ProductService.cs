@@ -2,6 +2,7 @@
 using Application.Services.Interfaces;
 using Application.Tools;
 using Data.Context;
+using Domain.Enums.Products;
 using Domain.Models.Products;
 using Domain.Models.Users;
 using Domain.Shared;
@@ -39,369 +40,226 @@ namespace Application.Services.Implementaions
 
         public async Task<Result<ClientSideProductDetailsDto>> ClientSideGetProductDetails(int id)
         {
-            return Result.Failure<ClientSideProductDetailsDto>("This method is currently disabled for performance reasons. Please contact support for assistance.");
-            /*            if (id < 1)
-                            return Result.Failure<ClientSideProductDetailsDto>(Messages.OperationFailedError);
+            if (id < 1)
+                return Result.Failure<ClientSideProductDetailsDto>(Messages.OperationFailedError);
 
-                        var userId = _httpContextAccessor.HttpContext.User.GetUserId();
-                        if (userId < 1)
-                            return Result.Failure<ClientSideProductDetailsDto>(Messages.OperationFailedError);
+            var userId = _httpContextAccessor.HttpContext.User.GetUserId();
+            if (userId < 1)
+                return Result.Failure<ClientSideProductDetailsDto>(Messages.OperationFailedError);
 
-                        var thirtyDaysAgo = DateTime.UtcNow.AddDays(-30);
+            var thirtyDaysAgo = DateTime.UtcNow.AddDays(-30);
 
-                        var product = await _context.Products
-                            .AsNoTracking()
-                            .Where(p => p.Id == id &&
-                                        !p.IsDeleted &&
-                                        p.Users.Any(u => u.UserId == userId && !u.IsDeleted))
-                            .Select(p => new ProductDetailsHeaderRow(
-                                p.Id,
-                                p.Title,
-                                p.DigiKalaId,
-                                p.Url,
-                                p.ImageUrl,
-                                p.CreatedDate,
-                                p.LastUpdatedDate
-                            ))
-                            .FirstOrDefaultAsync();
-
-                        if (product is null)
-                            return Result.Failure<ClientSideProductDetailsDto>(Messages.OperationFailedError);
-
-                        // ── Query 2: Active sellers (flat) ───────────────────────────────
-                        var sellers = await _context.ProductVariants
-                            .AsNoTracking()
-                            .Where(v => v.ProductId == id && v.IsActive && !v.IsDeleted)
-                            .SelectMany(v => v.Sellers
-                                .Where(s => s.IsActive && !s.IsDeleted)
-                                .Select(s => new ProductSellerRow(
-                                    s.Id,
-                                    s.SellerName,
-                                    s.DigiKalaSellerId,
-                                    s.CurrentPrice,
-                                    s.PreviousPrice,
-                                    s.IsBuyBoxWinner,
-                                    s.SellerRating,
-                                    s.IsActive,
-                                    v.ColorName,
-                                    v.ColorHex,
-                                    s.LastUpdatedDate
-                                )))
-                            .ToListAsync();
-
-                        if (sellers.Count == 0)
-                            return Result.Failure<ClientSideProductDetailsDto>(Messages.OperationFailedError);
-
-                        // ── Query 3: Recent meaningful history only ──────────────────────
-                        var sellerIds = sellers.Select(s => s.SellerId).ToList();
-
-                        var historyRows = await _context.ProductPriceHistory
-                            .AsNoTracking()
-                            .Where(h =>
-                                !h.IsDeleted &&
-                                sellerIds.Contains(h.ProductVariantSellerId) &&
-                                h.CreatedDate >= thirtyDaysAgo &&
-                                (h.OldPrice != h.NewPrice || h.BuyBoxChanged))
-                            .OrderByDescending(h => h.CreatedDate)
-                            .Select(h => new SellerHistoryRow(
-                                h.ProductVariantSellerId,
-                                h.OldPrice,
-                                h.NewPrice,
-                                h.ChangePercent,
-                                h.BuyBoxChanged,
-                                h.IsBuyBoxWinner,
-                                h.CreatedDate,
-                                h.ChangeDescription
-                            ))
-                            .ToListAsync();
-
-                        var historyBySeller = historyRows
-                            .GroupBy(h => h.ProductVariantSellerId)
-                            .ToDictionary(g => g.Key, g => g.ToList());
-
-                        // ── Build grouped color sections in memory ───────────────────────
-                        var colorGroups = BuildColorGroups(sellers, historyBySeller);
-
-                        // ── Final DTO ────────────────────────────────────────────────────
-                        var dto = new ClientSideProductDetailsDto
-                        {
-                            Id = product.Id,
-                            Title = product.Title,
-                            DigiKalaId = product.DigiKalaId,
-                            Url = product.Url,
-                            ImageUrl = product.ImageUrl,
-                            CreatedDate = product.CreatedDate,
-                            LastUpdatedDate = product.LastUpdatedDate,
-
-                            TotalVariantsCount = colorGroups.Count,
-                            TotalSellersCount = sellers.Count,
-
-                            LowestCurrentPrice = sellers
-                                .Where(s => s.CurrentPrice > 0)
-                                .Min(s => (decimal?)s.CurrentPrice) ?? 0,
-
-                            HighestCurrentPrice = sellers
-                                .Where(s => s.CurrentPrice > 0)
-                                .Max(s => (decimal?)s.CurrentPrice) ?? 0,
-
-                            ColorGroups = colorGroups
-                        };
-
-                        return Result.Success(dto);*/
-        }
-
-        #region Product Details Private Methods
-
-        private List<ClientSideColorGroupDto> BuildColorGroups(
-            List<ProductSellerRow> sellers,
-            Dictionary<int, List<SellerHistoryRow>> historyBySeller)
-        {
-            return sellers
-                .GroupBy(s => new { s.ColorName, s.ColorHex })
-                .Select(group =>
+            // ── Query 1: Get context (Product Info + The exact Color the user is tracking) ──
+            var trackingContext = await _context.UserProductMappings
+                .AsNoTracking()
+                .Where(m => m.Id == id && m.UserId == userId && !m.IsDeleted)
+                .Select(m => new
                 {
-                    var sellerRows = group
-                        .OrderByDescending(s => s.IsBuyBoxWinner)
-                        .ThenBy(s => s.CurrentPrice)
-                        .ToList();
+                    ProductId = m.VariantSeller.Variant.Product.Id,
+                    Title = m.VariantSeller.Variant.Product.Title,
+                    DigiKalaId = m.VariantSeller.Variant.Product.DigiKalaId,
+                    ImageUrl = m.VariantSeller.Variant.Product.ImageUrl,
+                    Url = m.VariantSeller.Variant.Product.Url,
+                    LastUpdatedDate = m.VariantSeller.Variant.Product.LastUpdatedDate,
 
-                    var winner = sellerRows.FirstOrDefault(s => s.IsBuyBoxWinner)
-                                 ?? sellerRows.FirstOrDefault();
-
-                    var otherSellers = sellerRows
-                        .Where(s => winner == null || s.SellerId != winner.SellerId)
-                        .OrderBy(s => s.CurrentPrice)
-                        .ToList();
-
-                    var recentHistory = sellerRows
-                        .SelectMany(s =>
-                        {
-                            historyBySeller.TryGetValue(s.SellerId, out var sellerHistory);
-
-                            return (sellerHistory ?? new List<SellerHistoryRow>())
-                                .Select(h => new ClientSideSellerPriceHistoryDto
-                                {
-                                    SellerName = s.SellerName,
-                                    OldPrice = h.OldPrice,
-                                    NewPrice = h.NewPrice,
-                                    ChangePercent = h.ChangePercent,
-                                    BuyBoxChanged = h.BuyBoxChanged,
-                                    IsBuyBoxWinner = h.IsBuyBoxWinner,
-                                    CreatedDate = h.CreatedDate,
-                                    ChangeDescription = h.ChangeDescription
-                                });
-                        })
-                        .OrderByDescending(h => h.CreatedDate)
-                        .ToList();
-
-                    return new ClientSideColorGroupDto
-                    {
-                        ColorName = group.Key.ColorName,
-                        ColorHex = group.Key.ColorHex,
-                        SellersCount = sellerRows.Count,
-                        LastUpdatedDate = sellerRows.Max(s => s.LastUpdatedDate),
-
-                        Winner = winner is null
-                            ? null
-                            : MapSeller(winner, historyBySeller),
-
-                        OtherSellers = otherSellers
-                            .Select(s => MapSeller(s, historyBySeller))
-                            .ToList(),
-
-                        RecentHistory = recentHistory
-                    };
+                    // We grab the ColorName to find ALL variants of this color!
+                    VariantColorName = m.VariantSeller.Variant.ColorName,
+                    VariantColorHex = m.VariantSeller.Variant.ColorHex,
+                    TrackedSellerId = m.VariantSellerId
                 })
-                .OrderBy(g => g.ColorName == "بدون رنگ" ? 0 : 1)
-                .ThenBy(g => g.Winner?.CurrentPrice ?? decimal.MaxValue)
-                .ToList();
-        }
+                .FirstOrDefaultAsync();
 
-        private static ClientSideVariantSellerDto MapSeller(
-            ProductSellerRow seller,
-            Dictionary<int, List<SellerHistoryRow>> historyBySeller)
-        {
-            historyBySeller.TryGetValue(seller.SellerId, out var sellerHistory);
+            if (trackingContext is null)
+                return Result.Failure<ClientSideProductDetailsDto>(Messages.OperationFailedError);
 
-            return new ClientSideVariantSellerDto
+            // ── Query 2: Get ALL sellers for this Product AND this specific Color ──
+            // This solves the issue of multiple VariantIds for the same color.
+            var sellers = await _context.ProductVariantSellers
+                .AsNoTracking()
+                .Where(s => s.Variant.ProductId == trackingContext.ProductId
+                         && s.Variant.ColorName == trackingContext.VariantColorName
+                         && !s.IsDeleted)
+                .Select(s => new ClientSideVariantSellerDto
+                {
+                    Id = s.Id,
+                    SellerName = s.SellerName,
+                    CurrentPrice = s.CurrentPrice,
+                    PreviousPrice = s.PreviousPrice,
+                    IsBuyBoxWinner = s.IsBuyBoxWinner,
+                    IsUserTracked = (s.Id == trackingContext.TrackedSellerId),
+                    IsActive = s.IsActive,
+                    SellerRating = s.SellerRating
+                })
+                .ToListAsync();
+
+            if (sellers.Count == 0)
+                return Result.Failure<ClientSideProductDetailsDto>(Messages.OperationFailedError);
+
+            // Identify the winner explicitly
+            var winnerId = sellers.FirstOrDefault(s => s.IsBuyBoxWinner)?.Id ?? 0;
+
+            // ── Query 3: Get history for these sellers ──
+            var sellerIds = sellers.Select(s => s.Id).ToList();
+
+            var history = await _context.ProductPriceHistory
+                .AsNoTracking()
+                .Where(h => !h.IsDeleted &&
+                            sellerIds.Contains(h.ProductVariantSellerId) &&
+                            h.CreatedDate >= thirtyDaysAgo &&
+                            (h.OldPrice != h.NewPrice || h.BuyBoxChanged))
+                .OrderByDescending(h => h.CreatedDate)
+                .Select(h => new ClientSideSellerPriceHistoryDto
+                {
+                    SellerName = h.VariantSeller.SellerName,
+                    OldPrice = h.OldPrice,
+                    NewPrice = h.NewPrice,
+                    ChangePercent = h.ChangePercent,
+                    BuyBoxChanged = h.BuyBoxChanged,
+                    IsBuyBoxWinner = h.IsBuyBoxWinner,
+                    CreatedDate = h.CreatedDate,
+                    ChangeDescription = h.ChangeDescription
+                })
+                .ToListAsync();
+
+            // ── Map to final DTO ──
+            var dto = new ClientSideProductDetailsDto
             {
-                Id = seller.SellerId,
-                SellerName = seller.SellerName,
-                DigiKalaSellerId = seller.DigiKalaSellerId,
-                CurrentPrice = seller.CurrentPrice,
-                PreviousPrice = seller.PreviousPrice,
-                IsBuyBoxWinner = seller.IsBuyBoxWinner,
-                SellerRating = seller.SellerRating,
-                IsActive = seller.IsActive,
+                ProductId = trackingContext.ProductId,
+                Title = trackingContext.Title,
+                DigiKalaId = trackingContext.DigiKalaId,
+                ImageUrl = trackingContext.ImageUrl,
+                Url = trackingContext.Url,
+                LastUpdatedDate = trackingContext.LastUpdatedDate,
+                VariantColorName = trackingContext.VariantColorName,
+                VariantColorHex = trackingContext.VariantColorHex,
+                TotalActiveSellersInVariant = sellers.Count(s => s.IsActive),
 
-                RecentHistory = (sellerHistory ?? new List<SellerHistoryRow>())
-                    .Select(h => new ClientSideSellerPriceHistoryDto
-                    {
-                        SellerName = seller.SellerName,
-                        OldPrice = h.OldPrice,
-                        NewPrice = h.NewPrice,
-                        ChangePercent = h.ChangePercent,
-                        BuyBoxChanged = h.BuyBoxChanged,
-                        IsBuyBoxWinner = h.IsBuyBoxWinner,
-                        CreatedDate = h.CreatedDate
-                    })
-                    .ToList()
+                LowestCurrentPrice = sellers.Where(s => s.CurrentPrice > 0 && s.IsActive).Min(s => (decimal?)s.CurrentPrice) ?? 0,
+                HighestCurrentPrice = sellers.Where(s => s.CurrentPrice > 0 && s.IsActive).Max(s => (decimal?)s.CurrentPrice) ?? 0,
+
+                TrackedSeller = sellers.FirstOrDefault(s => s.Id == trackingContext.TrackedSellerId),
+                WinnerSeller = sellers.FirstOrDefault(s => s.Id == winnerId),
+
+                // Opponents = everyone EXCEPT the tracked seller and the winner
+                Opponents = sellers
+                    .Where(s => s.Id != trackingContext.TrackedSellerId && s.Id != winnerId)
+                    .OrderBy(s => s.CurrentPrice)
+                    .ToList(),
+
+                RecentHistory = history
             };
+
+            return Result.Success(dto);
         }
-
-        private sealed record ProductDetailsHeaderRow(
-            int Id,
-            string Title,
-            string DigiKalaId,
-            string Url,
-            string? ImageUrl,
-            DateTime CreatedDate,
-            DateTime LastUpdatedDate
-        );
-
-        private sealed record ProductSellerRow(
-            int SellerId,
-            string SellerName,
-            string DigiKalaSellerId,
-            decimal CurrentPrice,
-            decimal? PreviousPrice,
-            bool IsBuyBoxWinner,
-            decimal? SellerRating,
-            bool IsActive,
-            string ColorName,
-            string? ColorHex,
-            DateTime LastUpdatedDate
-        );
-
-        private sealed record SellerHistoryRow(
-            int ProductVariantSellerId,
-            decimal OldPrice,
-            decimal NewPrice,
-            decimal ChangePercent,
-            bool BuyBoxChanged,
-            bool IsBuyBoxWinner,
-            DateTime CreatedDate,
-            string ChangeDescription
-        );
-
-        #endregion
 
         public async Task<Result<ClientSideFilterProductsDto>> ClientSideFilterProducts(ClientSideFilterProductsDto filter)
         {
-            return Result.Failure<ClientSideFilterProductsDto>("This method is currently disabled for performance reasons. Please contact support for assistance.");
-            /*            if (filter is null)
-                            return Result.Failure<ClientSideFilterProductsDto>(Messages.OperationFailedError);
+            if (filter is null)
+                return Result.Failure<ClientSideFilterProductsDto>(Messages.OperationFailedError);
 
-                        var userId = _httpContextAccessor.HttpContext.User.GetUserId();
-                        if (userId < 1)
-                            return Result.Failure<ClientSideFilterProductsDto>(Messages.OperationFailedError);
+            var userId = _httpContextAccessor.HttpContext.User.GetUserId();
+            if (userId < 1)
+                return Result.Failure<ClientSideFilterProductsDto>(Messages.OperationFailedError);
 
-                        var conditions = Filter.GenerateConditions<Product>();
+            IQueryable<UserProductMapping> query = _context.UserProductMappings
+                .Where(m => m.UserId == userId);
 
-                        conditions.Add(n => n.Users.Any(u => u.UserId == userId));
+            if (!string.IsNullOrWhiteSpace(filter.Search))
+            {
+                query = query.Where(m => m.VariantSeller.Variant.Product.Title.Contains(filter.Search));
+            }
 
-                        if (!string.IsNullOrWhiteSpace(filter.Search))
-                            conditions.Add(n => n.Title.Contains(filter.Search));
+            // Unread Filter
+            if (filter.SortType == ProductSortTypeEnum.UnreadOnly)
+            {
+                query = query.Where(m => !m.IsRead);
+            }
 
-                        if (filter.SortType == ProductSortTypeEnum.UnreadOnly)
-                            conditions.Add(n => n.Users.Any(u => u.UserId == userId && !u.IsRead));
+            var projectedQuery = query.Select(m => new ClientSideProductDto
+            {
+                Id = m.Id,
+                ProductId = m.VariantSeller.Variant.ProductId,
+                Title = m.VariantSeller.Variant.Product.Title,
+                ImageUrl = m.VariantSeller.Variant.Product.ImageUrl,
+                Url = m.VariantSeller.Variant.Product.Url,
+                LastUpdatedDate = m.VariantSeller.Variant.Product.LastUpdatedDate,
+                IsRead = m.IsRead,
 
-                        IQueryable<Product> query = _context.Products;
+                VariantSellerId = m.VariantSellerId,
+                SellerName = m.VariantSeller.SellerName,
+                VariantColorName = m.VariantSeller.Variant.ColorName,
+                YourPrice = m.VariantSeller.CurrentPrice,
+                IsWinningBuyBox = m.VariantSeller.IsBuyBoxWinner,
 
-                        foreach (var item in conditions)
-                            query = query.Where(item);
+                // FIX: Search across ALL variants of this Product that have the SAME ColorName
+                CompetitorLowestPrice = m.VariantSeller.Variant.Product.Variants
+                    .Where(v => v.ColorName == m.VariantSeller.Variant.ColorName)
+                    .SelectMany(v => v.Sellers)
+                    .Where(s => s.IsActive && s.Id != m.VariantSellerId && s.CurrentPrice > 0)
+                    .Min(s => (decimal?)s.CurrentPrice) ?? 0,
 
-                        var projectedQuery = query.Select(n => new ClientSideProductDto
-                        {
-                            Id = n.Id,
-                            Title = n.Title,
-                            ImageUrl = n.ImageUrl,
-                            Url = n.Url,
-                            LastUpdatedDate = n.LastUpdatedDate,
+                IsUndercut = m.VariantSeller.Variant.Product.Variants
+                    .Where(v => v.ColorName == m.VariantSeller.Variant.ColorName)
+                    .SelectMany(v => v.Sellers)
+                    .Any(s => s.IsActive && s.Id != m.VariantSellerId && s.CurrentPrice < m.VariantSeller.CurrentPrice),
 
-                            IsRead = n.Users
-                                .Where(u => u.UserId == userId)
-                                .Select(u => u.IsRead)
-                                .FirstOrDefault(),
+                // Overall Product Context
+                VariantsCount = m.VariantSeller.Variant.Product.Variants.Count(v => v.IsActive),
+                SellersCount = m.VariantSeller.Variant.Product.Variants
+                    .SelectMany(v => v.Sellers)
+                    .Count(s => s.IsActive)
+            });
 
-                            VariantsCount = n.Variants.Count(v => v.IsActive),
-                            SellersCount = n.Variants.SelectMany(v => v.Sellers).Count(s => s.IsActive),
+            // Sorting
+            IOrderedQueryable<ClientSideProductDto> sortedQuery;
 
-                            // Get the user's tracked seller code for this product
-                            UserSellerCode = n.Users
-                                .Where(u => u.UserId == userId)
-                                .Select(u => u.DigiKalaSellerCode)
-                                .FirstOrDefault() ?? string.Empty,
+            switch (filter.SortType)
+            {
+                case ProductSortTypeEnum.OldestUpdate:
+                    sortedQuery = projectedQuery.OrderBy(n => n.LastUpdatedDate);
+                    break;
+                case ProductSortTypeEnum.HighestPrice:
+                    sortedQuery = projectedQuery.OrderByDescending(n => n.YourPrice);
+                    break;
+                case ProductSortTypeEnum.LowestPrice:
+                    sortedQuery = projectedQuery.OrderBy(n => n.YourPrice);
+                    break;
+                case ProductSortTypeEnum.UnreadOnly:
+                    sortedQuery = projectedQuery.OrderByDescending(n => n.LastUpdatedDate);
+                    break;
+                case ProductSortTypeEnum.NewestUpdate:
+                default:
+                    // Unread items first, then by newest update
+                    sortedQuery = projectedQuery
+                        .OrderBy(n => n.IsRead)
+                        .ThenByDescending(n => n.LastUpdatedDate);
+                    break;
+            }
 
-                            // Calculate Your Price
-                            YourPrice = n.Variants
-                                .SelectMany(v => v.Sellers)
-                                .Where(s => s.IsActive && s.DigiKalaSellerId == n.Users.Where(u => u.UserId == userId).Select(u => u.DigiKalaSellerCode).FirstOrDefault())
-                                .Min(s => (decimal?)s.CurrentPrice) ?? 0,
+            // Paging is fully translatable to SQL OFFSET/FETCH
+            await filter.Paging(sortedQuery);
 
-                            // Calculate if winning buy box
-                            IsWinningBuyBox = n.Variants
-                                .SelectMany(v => v.Sellers)
-                                .Any(s => s.IsActive && s.IsBuyBoxWinner && s.DigiKalaSellerId == n.Users.Where(u => u.UserId == userId).Select(u => u.DigiKalaSellerCode).FirstOrDefault()),
-
-                            // Calculate Competitor Lowest Price
-                            CompetitorLowestPrice = n.Variants
-                                .SelectMany(v => v.Sellers)
-                                .Where(s => s.IsActive && s.CurrentPrice > 0 && s.DigiKalaSellerId != n.Users.Where(u => u.UserId == userId).Select(u => u.DigiKalaSellerCode).FirstOrDefault())
-                                .Min(s => (decimal?)s.CurrentPrice) ?? 0
-                        });
-
-                        // REMOVED the .AsEnumerable() block here! 
-
-                        IOrderedQueryable<ClientSideProductDto> sortedQuery;
-
-                        switch (filter.SortType)
-                        {
-                            case ProductSortTypeEnum.OldestUpdate:
-                                sortedQuery = projectedQuery.OrderBy(n => n.LastUpdatedDate);
-                                break;
-                            case ProductSortTypeEnum.HighestPrice:
-                                sortedQuery = projectedQuery.OrderByDescending(n => n.YourPrice);
-                                break;
-                            case ProductSortTypeEnum.LowestPrice:
-                                sortedQuery = projectedQuery.OrderBy(n => n.YourPrice);
-                                break;
-                            case ProductSortTypeEnum.UnreadOnly:
-                                sortedQuery = projectedQuery.OrderByDescending(n => n.LastUpdatedDate);
-                                break;
-                            case ProductSortTypeEnum.NewestUpdate:
-                            default:
-                                sortedQuery = projectedQuery
-                                    .OrderBy(n => n.IsRead)
-                                    .ThenByDescending(n => n.LastUpdatedDate);
-                                break;
-                        }
-
-                        // Paging will now work perfectly because 'sortedQuery' is still an EF Core IQueryable
-                        await filter.Paging(sortedQuery);
-
-                        return filter;*/
+            return filter;
         }
 
         public async Task<Result> ClientSideDeleteUserProduct(int id)
         {
-            return Result.Failure("This method is currently disabled for performance reasons. Please contact support for assistance.");
-            /*            if (id < 1)
-                            return Result.Failure(Messages.OperationFailedError);
+            if (id < 1)
+                return Result.Failure(Messages.OperationFailedError);
 
-                        var userId = _httpContextAccessor.HttpContext.User.GetUserId();
-                        if (userId < 1)
-                            return Result.Failure(Messages.OperationFailedError);
+            var userId = _httpContextAccessor.HttpContext.User.GetUserId();
+            if (userId < 1)
+                return Result.Failure(Messages.OperationFailedError);
 
-                        var userProduct = await _context.UserProductMappings
-                            .FirstOrDefaultAsync(n => n.UserId == userId && n.ProductId == id);
-                        if (userProduct is null)
-                            return Result.Failure(Messages.OperationFailedError);
+            var userProduct = await _context.UserProductMappings
+                .FirstOrDefaultAsync(n => n.UserId == userId && n.Id == id);
+            if (userProduct is null)
+                return Result.Failure(Messages.OperationFailedError);
 
-                        _context.UserProductMappings.Remove(userProduct);
-                        await _context.SaveChangesAsync();
+            _context.UserProductMappings.Remove(userProduct);
+            await _context.SaveChangesAsync();
 
-                        return Result.Success();*/
+            return Result.Success();
         }
 
         public async Task<Result> ClientSideSetProductAsReadForUser(int id)

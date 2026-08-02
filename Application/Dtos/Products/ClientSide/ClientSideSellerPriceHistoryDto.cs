@@ -2,7 +2,7 @@
 {
     public class ClientSideSellerPriceHistoryDto
     {
-        public string? SellerName { get; set; }
+        public string SellerName { get; set; }
         public decimal OldPrice { get; set; }
         public decimal NewPrice { get; set; }
         public decimal ChangePercent { get; set; }

@@ -68,7 +68,7 @@
     {
         <div class="summary-bar">
             <span>
-                <strong class="text-dark">@Model.Entities.Count</strong> محصول در این صفحه
+                <strong class="text-dark">@Model.Entities.Count</strong> رصد در این صفحه
             </span>
             @{
                 var unreadCount = Model.Entities.Count(e => !e.IsRead);
@@ -85,8 +85,6 @@
         <div class="row g-2">
             @foreach (var item in Model.Entities)
             {
-                var isUndercut = item.CompetitorLowestPrice > 0 && item.CompetitorLowestPrice < item.YourPrice;
-
                 <div class="col-12 col-md-6 col-xl-4">
                     <div class="product-card @(!item.IsRead ? "unread" : "")">
 
@@ -95,10 +93,12 @@
                             <span class="unread-dot" title="تغییر قیمت جدید"></span>
                         }
 
-                        <form class="delete-product-form" asp-area="UserPanel" asp-controller="Product" asp-action="DeleteProduct" asp-route-id="@item.Id" onclick="ConfirmDelete(this)" title="حذف از لیست">
+                        @* Delete Form uses Mapping Id (item.Id) *@
+                        <form class="delete-product-form" asp-area="UserPanel" asp-controller="Product" asp-action="DeleteProduct" asp-route-id="@item.Id" onclick="ConfirmDelete(this)" title="حذف از لیست رصد">
                             <div class="delete-btn"><i class="mdi mdi-close font-size-12"></i></div>
                         </form>
 
+                        @* Details link uses Product Id (item.ProductId) *@
                         <a asp-area="UserPanel" asp-controller="Product" asp-action="ProductDetails" asp-route-id="@item.Id" class="text-decoration-none d-block">
                             <div class="p-3 product-card-body">
                                 <div class="d-flex gap-3">
@@ -125,15 +125,23 @@
                                                     باخته‌اید
                                                 </span>
                                             }
-                                            <span class="meta-tag info">
-                                                @item.VariantsCount تنوع
-                                            </span>
+
+                                            @if (!string.IsNullOrWhiteSpace(item.VariantColorName))
+                                            {
+                                                <span class="meta-tag bg-light text-muted font-size-10">
+                                                    <i class="mdi mdi-palette-outline font-size-9"></i>
+                                                    @item.VariantColorName
+                                                </span>
+                                            }
                                         </div>
 
-                                        @* SELLER DASHBOARD UI *@
+                                        @* SELLER & PRICE DASHBOARD *@
                                         <div class="d-flex justify-content-between align-items-end mt-2 border-top pt-2">
-                                            <div>
-                                                <small class="font-size-10 text-muted d-block">قیمت شما</small>
+                                            <div style="min-width: 0;">
+                                                <small class="font-size-10 text-muted d-block text-truncate" title="@item.SellerName">
+                                                    <i class="mdi mdi-store-outline font-size-10"></i> @item.SellerName
+                                                </small>
+                                                <small class="font-size-10 text-muted d-block mt-1">قیمت شما</small>
                                                 @if (item.YourPrice > 0)
                                                 {
                                                     <span class="price-main font-size-14 fw-bold text-dark">@item.YourPrice.ToTomanFormat()</span>
@@ -141,11 +149,11 @@
                                                 }
                                                 else
                                                 {
-                                                    <span class="price-main text-muted font-size-12">ناموجود</span>
+                                                    <span class="price-main text-danger font-size-12">ناموجود</span>
                                                 }
                                             </div>
 
-                                            @if (isUndercut)
+                                            @if (item.IsUndercut && item.CompetitorLowestPrice > 0)
                                             {
                                                 <div class="text-end">
                                                     <small class="font-size-10 text-danger d-block">
@@ -162,6 +170,27 @@
                                                     <span class="price-main text-muted font-size-12">@item.CompetitorLowestPrice.ToTomanFormat()</span>
                                                     <span class="price-unit text-muted font-size-10">ت</span>
                                                 </div>
+                                            }
+                                            else
+                                            {
+                                                // No competitor price found (CompetitorLowestPrice == 0)
+                                                if (item.IsWinningBuyBox)
+                                                {
+                                                    <div class="text-end">
+                                                        <small class="font-size-10 text-success d-block">
+                                                            <i class="mdi mdi-shield-check-outline"></i> انحصار فروش
+                                                        </small>
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    <div class="text-end">
+                                                        <small class="font-size-10 text-warning d-block">
+                                                            <i class="mdi mdi-pause-circle-outline"></i> بدون رقیب فعال
+                                                        </small>
+                                                        <span class="font-size-10 text-muted">نیاز به بررسی</span>
+                                                    </div>
+                                                }
                                             }
                                         </div>
                                     </div>
@@ -186,7 +215,7 @@
             <p class="text-muted font-size-12 mb-3">هنوز محصولی برای رصد اضافه نکرده‌اید یا فیلتر شما نتیجه‌ای ندارد.</p>
             <a asp-area="UserPanel" asp-controller="Product" asp-action="AddNewProduct"
                class="btn btn-dark btn-sm px-4 font-size-12" style="border-radius: 8px;">
-                <i class="mdi mdi-plus me-1"></i>
+                <i class="mdi mdi-plus me-1"></i> افزودن محصول جدید
             </a>
         </div>
     }

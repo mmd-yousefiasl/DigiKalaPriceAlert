@@ -1,14 +1,10 @@
-
 // ── History Filtering ──────────────────────────────────
-var activeColorFilter = 'all';
 var activeSellerFilter = 'all';
 
-function filterHistory(type, value, clickedChip) {
-    // Update active filter
-    if (type === 'color') activeColorFilter = value;
-    if (type === 'seller') activeSellerFilter = value;
+function filterHistory(value, clickedChip) {
+    activeSellerFilter = value;
 
-    // Update chip active states within the same group
+    // Update chip active states
     var parentGroup = clickedChip.parentElement;
     var siblings = parentGroup.querySelectorAll('.filter-chip');
     for (var i = 0; i < siblings.length; i++) {
@@ -22,13 +18,11 @@ function filterHistory(type, value, clickedChip) {
 
     for (var i = 0; i < items.length; i++) {
         var item = items[i];
-        var itemColor = item.getAttribute('data-color');
         var itemSeller = item.getAttribute('data-seller');
 
-        var colorMatch = activeColorFilter === 'all' || itemColor === activeColorFilter;
         var sellerMatch = activeSellerFilter === 'all' || itemSeller === activeSellerFilter;
 
-        if (colorMatch && sellerMatch) {
+        if (sellerMatch) {
             item.classList.remove('hidden');
             visibleCount++;
         } else {
@@ -43,24 +37,4 @@ function filterHistory(type, value, clickedChip) {
     // Show/hide empty state
     var emptyEl = document.getElementById('history-empty');
     if (emptyEl) emptyEl.style.display = visibleCount === 0 ? 'block' : 'none';
-}
-
-function toggleColor(id) {
-    var body = document.getElementById('cb-' + id);
-    var header = document.getElementById('ch-' + id);
-    var chevron = document.getElementById('chev-' + id);
-
-    if (!body) return;
-
-    var isOpen = body.classList.contains('show');
-
-    if (isOpen) {
-        body.classList.remove('show');
-        header.classList.remove('expanded');
-        if (chevron) chevron.classList.remove('rotated');
-    } else {
-        body.classList.add('show');
-        header.classList.add('expanded');
-        if (chevron) chevron.classList.add('rotated');
-    }
 }
