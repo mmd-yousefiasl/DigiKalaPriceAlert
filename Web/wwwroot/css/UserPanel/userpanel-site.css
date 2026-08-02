@@ -125,6 +125,7 @@ input, select, textarea, button {
     font-weight: 600;
     padding: 0.4em 0.6em;
 }
+
 .bg-soft-danger {
     background-color: rgba(244, 106, 106, 0.18) !important;
     color: #f46a6a !important;
@@ -171,4 +172,8 @@ input, select, textarea, button {
 
 .fs-30 {
     font-size: 30px;
+}
+
+.fs-small {
+    font-size: small !important;
 }

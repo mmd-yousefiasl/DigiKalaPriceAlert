@@ -13,9 +13,14 @@ namespace Domain.Models.Products
         public decimal? SellerRating { get; set; }
         public bool IsActive { get; set; }
 
+        // NEW: Color info moved here directly!
+        public long DigiKalaVariantId { get; set; }
+        public string ColorName { get; set; }
+        public string? ColorHex { get; set; }
+
         #region Relations
-        public int ProductVariantId { get; set; }
-        public ProductVariant Variant { get; set; }
+        public int ProductId { get; set; }
+        public Product Product { get; set; }
 
         public ICollection<ProductPriceHistory> PriceHistory { get; set; } = new List<ProductPriceHistory>();
         public ICollection<UserProductMapping> Users { get; set; } = new List<UserProductMapping>();

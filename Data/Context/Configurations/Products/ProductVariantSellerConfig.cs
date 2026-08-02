@@ -41,17 +41,35 @@ namespace Data.Context.Configurations.Products
             builder.Property(s => s.IsActive)
                 .HasDefaultValue(true);
 
-            builder.HasIndex(s => new { s.ProductVariantId, s.DigiKalaSellerId })
+            builder.Property(s => s.DigiKalaVariantId)
+                .IsRequired();
+
+            builder.Property(s => s.ColorName)
+                .IsRequired()
+                .HasMaxLength(100);
+
+            builder.Property(s => s.ColorHex)
+                .HasMaxLength(20);
+
+            // UPDATED INDEX: A seller can sell multiple colors of the same product.
+            // So the unique constraint must include the VariantId (or ColorName).
+            builder.HasIndex(s => new { s.ProductId, s.DigiKalaVariantId, s.DigiKalaSellerId })
                 .IsUnique();
 
-            builder.HasIndex(s => new { s.ProductVariantId, s.IsBuyBoxWinner })
+            // NEW INDEX: Highly optimizes the "Competitor Lookup" queries 
+            // where we filter by ProductId and ColorName to find rivals.
+            builder.HasIndex(s => new { s.ProductId, s.ColorName })
+                .IncludeProperties(s => new { s.CurrentPrice, s.IsActive, s.IsBuyBoxWinner });
+
+            // INDEX: For finding the buy box winner of a product quickly
+            builder.HasIndex(s => new { s.ProductId, s.IsBuyBoxWinner })
                 .HasFilter("\"IsBuyBoxWinner\" = true");
 
             builder.HasIndex(s => s.DigiKalaSellerId);
 
-            builder.HasOne(s => s.Variant)
-                .WithMany(v => v.Sellers)
-                .HasForeignKey(s => s.ProductVariantId)
+            builder.HasOne(s => s.Product)
+                .WithMany(p => p.Sellers)
+                .HasForeignKey(s => s.ProductId)
                 .OnDelete(DeleteBehavior.Cascade);
         }
     }

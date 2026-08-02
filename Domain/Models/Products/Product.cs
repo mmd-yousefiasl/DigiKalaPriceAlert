@@ -8,7 +8,7 @@
         public string? ImageUrl { get; set; }
 
         #region Relations
-        public ICollection<ProductVariant> Variants { get; set; } = new List<ProductVariant>();
+        public ICollection<ProductVariantSeller> Sellers { get; set; } = new List<ProductVariantSeller>();
         #endregion
     }
 }

@@ -25,14 +25,15 @@ namespace Application.Services.Implementaions
                 if (product is null)
                     return Result.Failure<ClientSideScrapedProductDto>(DigiKalaErrors.MalformedResponse);
 
-                var variants = MapVariants(product.Variants).ToList();
-                if (variants.Count == 0)
+                var sellers = MapSellers(product.Variants).ToList();
+                if (sellers.Count == 0)
                 {
-                    _logger.LogWarning("No variants for DKP {Id}", digiKalaId);
+                    _logger.LogWarning("No valid sellers for DKP {Id}", digiKalaId);
                     return Result.Failure<ClientSideScrapedProductDto>(DigiKalaErrors.NoVariants);
                 }
 
-                _buyBox.AssignWinners(variants);
+                // Assign buy box winners based on color groups
+                _buyBox.AssignWinners(sellers);
 
                 return Result.Success(new ClientSideScrapedProductDto
                 {
@@ -41,7 +42,7 @@ namespace Application.Services.Implementaions
                     Url = $"https://www.digikala.com/product/dkp-{digiKalaId}/",
                     ImageUrl = product.Images?.Main?.Urls?.FirstOrDefault(),
                     DefaultVariantId = product.DefaultVariant?.Id ?? 0,
-                    Variants = variants
+                    Sellers = sellers
                 });
             }
             catch (Exception ex)
@@ -51,7 +52,7 @@ namespace Application.Services.Implementaions
             }
         }
 
-        private IEnumerable<ClientSideScrapedVariantDto> MapVariants(List<DigiKalaVariant>? variants)
+        private IEnumerable<ClientSideScrapedSellerDto> MapSellers(List<DigiKalaVariant>? variants)
         {
             if (variants is null) yield break;
 
@@ -61,22 +62,15 @@ namespace Application.Services.Implementaions
                     continue;
 
                 var price = (v.Price?.SellingPrice ?? 0) / DigiKalaDefaults.RialPerToman;
-
-                // Since IsMarketable is computed from Status, we just evaluate it here:
                 var isMarketable = v.Status == "marketable";
 
                 // Skip unmarketable items with no price
                 if (price == 0 && !isMarketable)
                     continue;
 
-                yield return new ClientSideScrapedVariantDto
+                yield return new ClientSideScrapedSellerDto
                 {
                     DigiKalaVariantId = v.Id,
-                    Status = v.Status ?? "unknown",
-                    // IsMarketable is removed from here! It computes automatically.
-                    Rank = v.Rank,
-                    IsBuyBoxWinner = false,
-
                     ColorId = v.Color?.Id,
                     ColorName = v.Color?.Title ?? DigiKalaDefaults.NoColor,
                     ColorHex = v.Color?.HexCode,
@@ -86,7 +80,10 @@ namespace Application.Services.Implementaions
                     SellerCode = v.Seller.Code ?? string.Empty,
                     SellerRating = v.Seller.Rating?.TotalRate,
 
-                    Price = price
+                    Price = price,
+                    Rank = v.Rank,
+                    Status = v.Status ?? "unknown",
+                    IsBuyBoxWinner = false
                 };
             }
         }

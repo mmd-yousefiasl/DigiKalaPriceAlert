@@ -5,15 +5,19 @@ namespace Application.Services.Implementaions
 {
     public sealed class HighestRankBuyBoxStrategy : IBuyBoxStrategy
     {
-        public void AssignWinners(List<ClientSideScrapedVariantDto> variants)
+        public void AssignWinners(List<ClientSideScrapedSellerDto> sellers)
         {
-            foreach (var winner in variants
-                         .Where(v => v.IsMarketable)
-                         .GroupBy(v => v.ColorName)
-                         .Select(g => g.OrderByDescending(v => v.Rank).FirstOrDefault())
-                         .Where(w => w is not null))
+            // Group by color — that's where competition actually happens.
+            // Use a stable key: ColorId if present, otherwise fall back to hex/name.
+            var groups = sellers.GroupBy(s =>
+                s.ColorId.HasValue ? $"id:{s.ColorId.Value}" : $"hex:{s.ColorHex}|{s.ColorName}");
+
+            foreach (var group in groups)
             {
-                winner!.IsBuyBoxWinner = true;
+                var winner = group.FirstOrDefault();
+
+                if (winner is not null)
+                    winner.IsBuyBoxWinner = true;
             }
         }
     }

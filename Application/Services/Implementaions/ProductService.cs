@@ -49,22 +49,20 @@ namespace Application.Services.Implementaions
 
             var thirtyDaysAgo = DateTime.UtcNow.AddDays(-30);
 
-            // ── Query 1: Get context (Product Info + The exact Color the user is tracking) ──
             var trackingContext = await _context.UserProductMappings
                 .AsNoTracking()
                 .Where(m => m.Id == id && m.UserId == userId && !m.IsDeleted)
                 .Select(m => new
                 {
-                    ProductId = m.VariantSeller.Variant.Product.Id,
-                    Title = m.VariantSeller.Variant.Product.Title,
-                    DigiKalaId = m.VariantSeller.Variant.Product.DigiKalaId,
-                    ImageUrl = m.VariantSeller.Variant.Product.ImageUrl,
-                    Url = m.VariantSeller.Variant.Product.Url,
-                    LastUpdatedDate = m.VariantSeller.Variant.Product.LastUpdatedDate,
+                    ProductId = m.VariantSeller.ProductId,
+                    Title = m.VariantSeller.Product.Title,
+                    DigiKalaId = m.VariantSeller.Product.DigiKalaId,
+                    ImageUrl = m.VariantSeller.Product.ImageUrl,
+                    Url = m.VariantSeller.Product.Url,
+                    LastUpdatedDate = m.VariantSeller.Product.LastUpdatedDate,
 
-                    // We grab the ColorName to find ALL variants of this color!
-                    VariantColorName = m.VariantSeller.Variant.ColorName,
-                    VariantColorHex = m.VariantSeller.Variant.ColorHex,
+                    VariantColorName = m.VariantSeller.ColorName,
+                    VariantColorHex = m.VariantSeller.ColorHex,
                     TrackedSellerId = m.VariantSellerId
                 })
                 .FirstOrDefaultAsync();
@@ -72,12 +70,10 @@ namespace Application.Services.Implementaions
             if (trackingContext is null)
                 return Result.Failure<ClientSideProductDetailsDto>(Messages.OperationFailedError);
 
-            // ── Query 2: Get ALL sellers for this Product AND this specific Color ──
-            // This solves the issue of multiple VariantIds for the same color.
             var sellers = await _context.ProductVariantSellers
                 .AsNoTracking()
-                .Where(s => s.Variant.ProductId == trackingContext.ProductId
-                         && s.Variant.ColorName == trackingContext.VariantColorName
+                .Where(s => s.ProductId == trackingContext.ProductId
+                         && s.ColorName == trackingContext.VariantColorName
                          && !s.IsDeleted)
                 .Select(s => new ClientSideVariantSellerDto
                 {
@@ -95,10 +91,8 @@ namespace Application.Services.Implementaions
             if (sellers.Count == 0)
                 return Result.Failure<ClientSideProductDetailsDto>(Messages.OperationFailedError);
 
-            // Identify the winner explicitly
             var winnerId = sellers.FirstOrDefault(s => s.IsBuyBoxWinner)?.Id ?? 0;
 
-            // ── Query 3: Get history for these sellers ──
             var sellerIds = sellers.Select(s => s.Id).ToList();
 
             var history = await _context.ProductPriceHistory
@@ -121,7 +115,6 @@ namespace Application.Services.Implementaions
                 })
                 .ToListAsync();
 
-            // ── Map to final DTO ──
             var dto = new ClientSideProductDetailsDto
             {
                 ProductId = trackingContext.ProductId,
@@ -140,7 +133,6 @@ namespace Application.Services.Implementaions
                 TrackedSeller = sellers.FirstOrDefault(s => s.Id == trackingContext.TrackedSellerId),
                 WinnerSeller = sellers.FirstOrDefault(s => s.Id == winnerId),
 
-                // Opponents = everyone EXCEPT the tracked seller and the winner
                 Opponents = sellers
                     .Where(s => s.Id != trackingContext.TrackedSellerId && s.Id != winnerId)
                     .OrderBy(s => s.CurrentPrice)
@@ -166,7 +158,8 @@ namespace Application.Services.Implementaions
 
             if (!string.IsNullOrWhiteSpace(filter.Search))
             {
-                query = query.Where(m => m.VariantSeller.Variant.Product.Title.Contains(filter.Search));
+                // Updated: Direct path to Product
+                query = query.Where(m => m.VariantSeller.Product.Title.Contains(filter.Search));
             }
 
             // Unread Filter
@@ -178,36 +171,31 @@ namespace Application.Services.Implementaions
             var projectedQuery = query.Select(m => new ClientSideProductDto
             {
                 Id = m.Id,
-                ProductId = m.VariantSeller.Variant.ProductId,
-                Title = m.VariantSeller.Variant.Product.Title,
-                ImageUrl = m.VariantSeller.Variant.Product.ImageUrl,
-                Url = m.VariantSeller.Variant.Product.Url,
-                LastUpdatedDate = m.VariantSeller.Variant.Product.LastUpdatedDate,
+                ProductId = m.VariantSeller.ProductId,
+                Title = m.VariantSeller.Product.Title,
+                ImageUrl = m.VariantSeller.Product.ImageUrl,
+                Url = m.VariantSeller.Product.Url,
+                LastUpdatedDate = m.VariantSeller.Product.LastUpdatedDate,
                 IsRead = m.IsRead,
 
                 VariantSellerId = m.VariantSellerId,
                 SellerName = m.VariantSeller.SellerName,
-                VariantColorName = m.VariantSeller.Variant.ColorName,
+                VariantColorName = m.VariantSeller.ColorName, // Updated: Direct from Seller
                 YourPrice = m.VariantSeller.CurrentPrice,
                 IsWinningBuyBox = m.VariantSeller.IsBuyBoxWinner,
 
-                // FIX: Search across ALL variants of this Product that have the SAME ColorName
-                CompetitorLowestPrice = m.VariantSeller.Variant.Product.Variants
-                    .Where(v => v.ColorName == m.VariantSeller.Variant.ColorName)
-                    .SelectMany(v => v.Sellers)
-                    .Where(s => s.IsActive && s.Id != m.VariantSellerId && s.CurrentPrice > 0)
+                // Updated: Search directly in Product.Sellers for the SAME ColorName
+                CompetitorLowestPrice = m.VariantSeller.Product.Sellers
+                    .Where(s => s.IsActive && s.Id != m.VariantSellerId && s.CurrentPrice > 0 && s.ColorName == m.VariantSeller.ColorName)
                     .Min(s => (decimal?)s.CurrentPrice) ?? 0,
 
-                IsUndercut = m.VariantSeller.Variant.Product.Variants
-                    .Where(v => v.ColorName == m.VariantSeller.Variant.ColorName)
-                    .SelectMany(v => v.Sellers)
-                    .Any(s => s.IsActive && s.Id != m.VariantSellerId && s.CurrentPrice < m.VariantSeller.CurrentPrice),
+                IsUndercut = m.VariantSeller.Product.Sellers
+                    .Any(s => s.IsActive && s.Id != m.VariantSellerId && s.ColorName == m.VariantSeller.ColorName && s.CurrentPrice < m.VariantSeller.CurrentPrice),
 
                 // Overall Product Context
-                VariantsCount = m.VariantSeller.Variant.Product.Variants.Count(v => v.IsActive),
-                SellersCount = m.VariantSeller.Variant.Product.Variants
-                    .SelectMany(v => v.Sellers)
-                    .Count(s => s.IsActive)
+                // Updated: Count distinct colors among all sellers for this product
+                VariantsCount = m.VariantSeller.Product.Sellers.Select(s => s.ColorName).Distinct().Count(),
+                SellersCount = m.VariantSeller.Product.Sellers.Count(s => s.IsActive)
             });
 
             // Sorting
@@ -712,8 +700,9 @@ namespace Application.Services.Implementaions
         public async Task<Result> AddProductToUserTrackingAsync(int productVariantSellerId)
         {
             var userResult = await _userService.ClientSideCanUserAddProduct();
+
             if (userResult.IsFailure)
-                return Result.Failure<ClientSideProductSearchResultDto>(userResult.Message!);
+                return Result.Failure(userResult.Message!);
 
             var userId = _httpContextAccessor.HttpContext.User.GetUserId();
             if (userId < 1)
@@ -748,36 +737,51 @@ namespace Application.Services.Implementaions
 
         private async Task<Result<ClientSideProductSearchResultDto>> GetProductModalDataAsync(int productId)
         {
-            var modalData = await _context.Products
+            var flatSellers = await _context.ProductVariantSellers
                 .AsNoTracking()
-                .AsSplitQuery()
-                .Where(p => p.Id == productId)
-                .Select(p => new ClientSideProductSearchResultDto
+                .Where(s => s.ProductId == productId && s.IsActive)
+                .Select(s => new
                 {
-                    ProductId = p.Id,
-                    Title = p.Title,
-                    ImageUrl = p.ImageUrl,
-                    Options = p.Variants
-                        .Where(v => v.IsActive)
-                        .Select(v => new ClientSideProductOptionDto
-                        {
-                            VariantId = v.Id,
-                            ColorName = v.ColorName,
-                            ColorHex = v.ColorHex,
-                            Sellers = v.Sellers
-                                .Where(s => s.IsActive)
-                                .Select(s => new ClientSideProductSellerOptionDto
-                                {
-                                    SellerId = s.Id,
-                                    SellerName = s.SellerName,
-                                    Price = s.CurrentPrice,
-                                    IsBuyBoxWinner = s.IsBuyBoxWinner
-                                }).ToList()
-                        }).ToList()
-                }).FirstOrDefaultAsync();
+                    s.Id,
+                    s.SellerName,
+                    s.CurrentPrice,
+                    s.IsBuyBoxWinner,
+                    s.ColorName,
+                    s.ColorHex,
+                    s.DigiKalaVariantId
+                })
+                .ToListAsync();
 
-            if (modalData == null)
+            if (flatSellers == null || flatSellers.Count == 0)
                 return Result.Failure<ClientSideProductSearchResultDto>(Messages.OperationFailedError);
+
+            var productInfo = await _context.Products
+                .AsNoTracking()
+                .Where(p => p.Id == productId)
+                .Select(p => new { p.Title, p.ImageUrl })
+                .FirstAsync();
+
+            // 2. Group them by Color in memory for the Modal UI
+            var modalData = new ClientSideProductSearchResultDto
+            {
+                ProductId = productId,
+                Title = productInfo.Title,
+                ImageUrl = productInfo.ImageUrl,
+                Options = flatSellers
+                    .GroupBy(s => new { s.DigiKalaVariantId, s.ColorName, s.ColorHex })
+                    .Select(g => new ClientSideProductOptionDto
+                    {
+                        ColorName = g.Key.ColorName,
+                        ColorHex = g.Key.ColorHex,
+                        Sellers = g.Select(s => new ClientSideProductSellerOptionDto
+                        {
+                            SellerId = s.Id,
+                            SellerName = s.SellerName,
+                            Price = s.CurrentPrice,
+                            IsBuyBoxWinner = s.IsBuyBoxWinner
+                        }).ToList()
+                    }).ToList()
+            };
 
             return Result.Success(modalData);
         }
@@ -796,43 +800,40 @@ namespace Application.Services.Implementaions
                 Title = scraped.Title,
                 Url = scraped.Url,
                 ImageUrl = scraped.ImageUrl,
-                LastUpdatedDate = DateTime.UtcNow
+                LastUpdatedDate = DateTime.UtcNow,
+                Sellers = new List<ProductVariantSeller>()
             };
 
-            foreach (var scrapedVariant in scraped.Variants)
+            foreach (var scrapedSeller in scraped.Sellers)
             {
-                var variant = new ProductVariant
-                {
-                    DigiKalaVariantId = scrapedVariant.DigiKalaVariantId,
-                    ColorName = scrapedVariant.ColorName,
-                    ColorHex = scrapedVariant.ColorHex,
-                    IsActive = scrapedVariant.IsMarketable
-                };
+                var sellerKey = scrapedSeller.SellerCode ?? scrapedSeller.SellerId.ToString();
 
                 var seller = new ProductVariantSeller
                 {
-                    DigiKalaSellerId = scrapedVariant.SellerCode ?? scrapedVariant.SellerId.ToString(),
-                    SellerName = scrapedVariant.SellerName,
-                    CurrentPrice = scrapedVariant.Price,
+                    DigiKalaVariantId = scrapedSeller.DigiKalaVariantId,
+                    ColorName = scrapedSeller.ColorName,
+                    ColorHex = scrapedSeller.ColorHex,
+                    DigiKalaSellerId = sellerKey,
+                    SellerName = scrapedSeller.SellerName,
+                    CurrentPrice = scrapedSeller.Price,
                     PreviousPrice = null,
-                    IsBuyBoxWinner = scrapedVariant.IsBuyBoxWinner,
-                    WasBuyBoxWinner = scrapedVariant.IsBuyBoxWinner,
-                    SellerRating = scrapedVariant.SellerRating,
-                    IsActive = scrapedVariant.IsMarketable
+                    IsBuyBoxWinner = scrapedSeller.IsBuyBoxWinner,
+                    WasBuyBoxWinner = scrapedSeller.IsBuyBoxWinner,
+                    SellerRating = scrapedSeller.SellerRating,
+                    IsActive = scrapedSeller.Status == "marketable",
+                    PriceHistory = new List<ProductPriceHistory>()
                 };
 
-                var initialHistory = new ProductPriceHistory
+                seller.PriceHistory.Add(new ProductPriceHistory
                 {
-                    OldPrice = scrapedVariant.Price,
-                    NewPrice = scrapedVariant.Price,
+                    OldPrice = scrapedSeller.Price,
+                    NewPrice = scrapedSeller.Price,
                     ChangePercent = 0,
                     BuyBoxChanged = false,
-                    IsBuyBoxWinner = scrapedVariant.IsBuyBoxWinner
-                };
+                    IsBuyBoxWinner = scrapedSeller.IsBuyBoxWinner
+                });
 
-                seller.PriceHistory = new List<ProductPriceHistory> { initialHistory };
-                variant.Sellers = new List<ProductVariantSeller> { seller };
-                product.Variants.Add(variant);
+                product.Sellers.Add(seller);
             }
 
             _context.Products.Add(product);
@@ -844,11 +845,8 @@ namespace Application.Services.Implementaions
             }
             catch (DbUpdateException ex)
             {
-                // Check if the inner exception is a Postgres unique constraint violation
-                if (ex.InnerException is PostgresException pgEx &&
-                    pgEx.SqlState == PostgresErrorCodes.UniqueViolation)
+                if (ex.InnerException is PostgresException pgEx && pgEx.SqlState == PostgresErrorCodes.UniqueViolation)
                 {
-                    // Race condition: Another process added this product milliseconds ago!
                     var existingId = await _context.Products
                         .AsNoTracking()
                         .Where(p => p.DigiKalaId == digiKalaId)
@@ -857,8 +855,6 @@ namespace Application.Services.Implementaions
 
                     return Result.Success(existingId);
                 }
-
-                // If it's a different database error, rethrow it
                 throw;
             }
         }
@@ -872,95 +868,98 @@ namespace Application.Services.Implementaions
             var scraped = scrapeResult.Value;
 
             var dbProduct = await _context.Products
-                .Include(p => p.Variants)
-                    .ThenInclude(v => v.Sellers)
+                .Include(p => p.Sellers)
+                    .ThenInclude(s => s.PriceHistory)
                 .FirstOrDefaultAsync(p => p.Id == productId);
 
-            if (dbProduct == null) return Result.Failure(Messages.InvalidDigiKalaProductUrlError);
-
+            if (dbProduct == null)
+                return Result.Failure(Messages.InvalidDigiKalaProductUrlError);
 
             dbProduct.Title = scraped.Title;
             dbProduct.ImageUrl = scraped.ImageUrl;
             dbProduct.LastUpdatedDate = DateTime.UtcNow;
 
-            var scrapedVariantsGrouped = scraped.Variants
-                .GroupBy(v => v.DigiKalaVariantId)
-                .ToDictionary(g => g.Key, g => g.ToList());
 
-            var dbVariantsDict = dbProduct.Variants.ToDictionary(v => v.DigiKalaVariantId);
+            var dbSellersDict = dbProduct.Sellers.ToDictionary(s => (s.DigiKalaVariantId, s.DigiKalaSellerId));
+            var seenSellerKeys = new HashSet<(long, string)>();
 
-            foreach (var variantGroup in scrapedVariantsGrouped)
+            foreach (var scrapedSeller in scraped.Sellers)
             {
-                var digiVariantId = variantGroup.Key;
-                var scrapedSellersList = variantGroup.Value;
+                var sellerKey = (scrapedSeller.DigiKalaVariantId, scrapedSeller.SellerCode ?? scrapedSeller.SellerId.ToString());
+                seenSellerKeys.Add(sellerKey);
 
-                var firstScraped = scrapedSellersList.First();
-
-                if (!dbVariantsDict.TryGetValue(digiVariantId, out var dbVariant))
+                if (!dbSellersDict.TryGetValue(sellerKey, out var dbSeller))
                 {
-                    dbVariant = new ProductVariant { DigiKalaVariantId = digiVariantId };
-                    dbProduct.Variants.Add(dbVariant);
-                }
-
-                dbVariant.ColorName = firstScraped.ColorName;
-                dbVariant.ColorHex = firstScraped.ColorHex;
-                dbVariant.IsActive = firstScraped.IsMarketable;
-
-                var dbSellersDict = dbVariant.Sellers.ToDictionary(s => s.DigiKalaSellerId);
-                var scrapedSellersDict = scrapedSellersList.ToDictionary(s => s.SellerCode ?? s.SellerId.ToString());
-
-                foreach (var scrapedSeller in scrapedSellersList)
-                {
-                    var sellerKey = scrapedSeller.SellerCode ?? scrapedSeller.SellerId.ToString();
-
-                    if (!dbSellersDict.TryGetValue(sellerKey, out var dbSeller))
+                    // New seller entry
+                    dbSeller = new ProductVariantSeller
                     {
-                        dbSeller = new ProductVariantSeller { DigiKalaSellerId = sellerKey };
-                        dbVariant.Sellers.Add(dbSeller);
+                        DigiKalaVariantId = scrapedSeller.DigiKalaVariantId,
+                        DigiKalaSellerId = sellerKey.Item2,
+                        ColorName = scrapedSeller.ColorName,
+                        ColorHex = scrapedSeller.ColorHex,
+                        CurrentPrice = scrapedSeller.Price,
+                        PreviousPrice = null,
+                        IsBuyBoxWinner = scrapedSeller.IsBuyBoxWinner,
+                        WasBuyBoxWinner = scrapedSeller.IsBuyBoxWinner,
+                        SellerRating = scrapedSeller.SellerRating,
+                        IsActive = scrapedSeller.Status == "marketable",
+                        SellerName = scrapedSeller.SellerName,
+                        PriceHistory = new List<ProductPriceHistory>
+                {
+                    new ProductPriceHistory
+                    {
+                        OldPrice = scrapedSeller.Price,
+                        NewPrice = scrapedSeller.Price,
+                        ChangePercent = 0,
+                        BuyBoxChanged = false,
+                        IsBuyBoxWinner = scrapedSeller.IsBuyBoxWinner
                     }
-
+                }
+                    };
+                    dbProduct.Sellers.Add(dbSeller);
+                }
+                else
+                {
+                    // Existing seller entry - check for changes
                     bool priceChanged = dbSeller.CurrentPrice != scrapedSeller.Price;
                     bool buyBoxChanged = dbSeller.IsBuyBoxWinner != scrapedSeller.IsBuyBoxWinner;
 
                     if (priceChanged || buyBoxChanged)
                     {
-                        dbSeller.PreviousPrice = dbSeller.CurrentPrice;
+                        var oldPrice = dbSeller.CurrentPrice;
+                        var changePercent = oldPrice > 0 ? ((scrapedSeller.Price - oldPrice) / oldPrice) * 100 : 0;
+
+                        dbSeller.PreviousPrice = oldPrice;
                         dbSeller.CurrentPrice = scrapedSeller.Price;
                         dbSeller.WasBuyBoxWinner = dbSeller.IsBuyBoxWinner;
                         dbSeller.IsBuyBoxWinner = scrapedSeller.IsBuyBoxWinner;
 
                         dbSeller.PriceHistory.Add(new ProductPriceHistory
                         {
-                            OldPrice = dbSeller.PreviousPrice ?? 0,
-                            NewPrice = dbSeller.CurrentPrice,
+                            OldPrice = oldPrice,
+                            NewPrice = scrapedSeller.Price,
+                            ChangePercent = changePercent,
                             BuyBoxChanged = buyBoxChanged,
                             IsBuyBoxWinner = dbSeller.IsBuyBoxWinner
                         });
                     }
 
+                    // Update general info
                     dbSeller.SellerName = scrapedSeller.SellerName;
                     dbSeller.SellerRating = scrapedSeller.SellerRating;
-                    dbSeller.IsActive = scrapedSeller.IsMarketable;
-                }
-
-                foreach (var dbSeller in dbVariant.Sellers)
-                {
-                    if (!scrapedSellersDict.ContainsKey(dbSeller.DigiKalaSellerId))
-                    {
-                        dbSeller.IsActive = false;
-                    }
+                    dbSeller.IsActive = scrapedSeller.Status == "marketable";
+                    dbSeller.ColorName = scrapedSeller.ColorName;
+                    dbSeller.ColorHex = scrapedSeller.ColorHex;
                 }
             }
 
-            foreach (var dbVariant in dbProduct.Variants)
+            // Mark missing sellers as inactive
+            foreach (var dbSeller in dbProduct.Sellers)
             {
-                if (!scrapedVariantsGrouped.ContainsKey(dbVariant.DigiKalaVariantId))
+                var sellerKey = (dbSeller.DigiKalaVariantId, dbSeller.DigiKalaSellerId);
+                if (!seenSellerKeys.Contains(sellerKey))
                 {
-                    dbVariant.IsActive = false;
-                    foreach (var seller in dbVariant.Sellers)
-                    {
-                        seller.IsActive = false;
-                    }
+                    dbSeller.IsActive = false;
                 }
             }
 

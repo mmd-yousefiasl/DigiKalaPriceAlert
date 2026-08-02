@@ -2,11 +2,12 @@
 {
     public record ClientSideScrapedProductDto
     {
-        public string DigiKalaId { get; init; } = string.Empty;
-        public string Title { get; init; } = string.Empty;
-        public string Url { get; init; } = string.Empty;
-        public string? ImageUrl { get; init; }
-        public long DefaultVariantId { get; init; }
-        public List<ClientSideScrapedVariantDto> Variants { get; init; } = [];
+        public string DigiKalaId { get; set; }
+        public string Title { get; set; }
+        public string Url { get; set; }
+        public string? ImageUrl { get; set; }
+        public long DefaultVariantId { get; set; }
+
+        public List<ClientSideScrapedSellerDto> Sellers { get; set; } = new();
     }
 }

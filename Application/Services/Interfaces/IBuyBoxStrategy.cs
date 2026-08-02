@@ -4,6 +4,6 @@ namespace Application.Services.Interfaces
 {
     public interface IBuyBoxStrategy
     {
-        void AssignWinners(List<ClientSideScrapedVariantDto> variants);
+        void AssignWinners(List<ClientSideScrapedSellerDto> sellers);
     }
 }
