@@ -293,10 +293,10 @@
                                         <span class="font-size-10 text-muted fw-normal">ت</span>
                                     </span>
 
-                                    @if (item.ChangePercent != 0)
+                                    @if (item.ChangePercent.HasValue)
                                     {
                                         <span class="price-change @(isUp ? "up" : "down")">
-                                            @(isUp ? "▲" : "▼") @Math.Abs(item.ChangePercent).ToString("N1")%
+                                            @(isUp ? "▲" : "▼") @Math.Abs(item.ChangePercent.Value).ToString("N1")%
                                         </span>
                                     }
                                 }

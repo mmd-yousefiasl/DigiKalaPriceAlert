@@ -3,6 +3,7 @@ using Application.Services.Interfaces;
 using Application.Tools;
 using Data.Context;
 using Domain.Enums.Products;
+using Domain.Events.Products;
 using Domain.Models.Products;
 using Domain.Models.Users;
 using Domain.Shared;
@@ -252,55 +253,21 @@ namespace Application.Services.Implementaions
 
         public async Task<Result> ClientSideSetProductAsReadForUser(int id)
         {
-            return Result.Failure("This method is currently disabled for performance reasons. Please contact support for assistance.");
-            /*            if (id < 1)
-                            return Result.Failure(Messages.OperationFailedError);
+            if (id < 1)
+                return Result.Failure(Messages.OperationFailedError);
 
-                        var userId = _httpContextAccessor.HttpContext.User.GetUserId();
-                        if (userId < 1)
-                            return Result.Failure(Messages.OperationFailedError);
+            var userId = _httpContextAccessor.HttpContext.User.GetUserId();
+            if (userId < 1)
+                return Result.Failure(Messages.OperationFailedError);
 
-                        var rowsAffected = await _context.UserProductMappings
-                            .Where(n => n.UserId == userId && n.ProductId == id)
-                            .ExecuteUpdateAsync(s => s.SetProperty(upm => upm.IsRead, true));
+            var rowsAffected = await _context.UserProductMappings
+                .Where(n => n.UserId == userId && n.Id == id)
+                .ExecuteUpdateAsync(s => s.SetProperty(upm => upm.IsRead, true));
 
-                        if (rowsAffected == 0)
-                            return Result.Failure(Messages.OperationFailedError);
+            if (rowsAffected == 0)
+                return Result.Failure(Messages.OperationFailedError);
 
-                        return Result.Success();*/
-        }
-
-        public async Task<List<ProductMonitoringTargetDto>> GetAllProductsForMonitoringAsync(CancellationToken ct)
-        {
-            return new List<ProductMonitoringTargetDto>();
-            /*            var now = DateTime.UtcNow;
-
-                        return await _context.Products
-                            .AsNoTracking()
-                            .AsSplitQuery()
-                            .Where(p => !p.IsDeleted &&
-                                        p.Users.Any(upm =>
-                                            !upm.IsDeleted &&
-                                            !upm.User.IsUserBanned &&
-                                            upm.User.SubscriptionEndDate > now))
-                            .Select(p => new ProductMonitoringTargetDto
-                            {
-                                ProductId = p.Id,
-                                DigiKalaId = p.DigiKalaId,
-                                Watchers = p.Users
-                                    .Where(upm =>
-                                        !upm.IsDeleted &&
-                                        !upm.User.IsUserBanned &&
-                                        upm.User.SubscriptionEndDate > now)
-                                    .Select(upm => new ProductWatcherDto
-                                    {
-                                        UserId = upm.UserId,
-                                        Mobile = upm.User.Mobile,
-                                        FirstName = upm.User.FirstName
-                                    })
-                                    .ToList()
-                            })
-                            .ToListAsync(ct);*/
+            return Result.Success();
         }
 
         public async Task<Result<List<ProductMonitoringTargetDto>>> GetProductBatchForMonitoringAsync(int page, int batchSize, CancellationToken ct)
@@ -733,7 +700,7 @@ namespace Application.Services.Implementaions
             return Result.Success();
         }
 
-        #region Private Helpers
+        #region AddProductToUserTrackingAsync Private Helpers
 
         private async Task<Result<ClientSideProductSearchResultDto>> GetProductModalDataAsync(int productId)
         {
@@ -967,6 +934,297 @@ namespace Application.Services.Implementaions
             return Result.Success();
         }
 
+        #endregion
+
+        public async Task ExecuteUpdateCycleAsync(CancellationToken ct = default)
+        {
+            _logger.LogInformation("Starting product update cycle...");
+
+            // 1. Get active tracked products from DB
+            var trackedProducts = await GetTrackedProductsAsync(ct);
+            if (trackedProducts.Count == 0) return;
+
+            var random = new Random();
+            var notificationsToPublish = new List<ProductPriceChangedEvent>();
+
+            // 2. Scrape list of products sequentially with delay
+            foreach (var trackedProduct in trackedProducts)
+            {
+                var scrapeResult = await _digiKalaService.ScrapeFullProductAsync(trackedProduct.DigiKalaId, ct);
+
+                if (scrapeResult.IsSuccess)
+                {
+                    // 3. Check changes, update entities in memory (EF Core tracks changes)
+                    var events = ProcessChanges(trackedProduct, scrapeResult.Value);
+                    notificationsToPublish.AddRange(events);
+                }
+                else
+                {
+                    _logger.LogWarning("Failed to scrape DKP {Id}: {Error}", trackedProduct.DigiKalaId, scrapeResult.Message);
+                }
+
+                // Random delay 0.8s to 1.5s to prevent rate limiting
+                await Task.Delay(random.Next(800, 1500), ct);
+            }
+
+            // 4. Save all changes to DB in ONE transaction
+            if (notificationsToPublish.Count > 0)
+            {
+                await _context.SaveChangesAsync(ct);
+                _logger.LogInformation("Saved {Count} changes to database.", notificationsToPublish.Count);
+
+                // 5. Dispatch events (Only after DB save is successful!)
+                foreach (var evt in notificationsToPublish)
+                {
+                    //await _mediator.Publish(evt, ct);
+                }
+            }
+            else
+            {
+                _logger.LogInformation("No price changes detected.");
+            }
+        }
+
+        #region ExecuteUpdateCycleAsync Private Helpers
+
+        private async Task<List<Product>> GetTrackedProductsAsync(CancellationToken ct)
+        {
+            return await _context.Products
+                   .Include(p => p.Sellers)
+                   .ToListAsync(ct);
+        }
+
+        private List<ProductPriceChangedEvent> ProcessChanges(Product dbProduct, ClientSideScrapedProductDto scrapedProduct)
+        {
+            var events = new List<ProductPriceChangedEvent>();
+            var foundDbSellerIds = new HashSet<int>();
+
+            dbProduct.LastUpdatedDate = DateTime.UtcNow;
+
+            // ==========================================
+            // 1. PRODUCT LEVEL: Check if the entire product is out of stock
+            // ==========================================
+            if (scrapedProduct.Sellers == null || !scrapedProduct.Sellers.Any())
+            {
+                if (dbProduct.IsActive)
+                {
+                    dbProduct.IsActive = false;
+
+                    foreach (var dbSeller in dbProduct.Sellers.Where(s => s.IsActive))
+                    {
+                        dbSeller.IsActive = false;
+                        bool wasWinner = dbSeller.IsBuyBoxWinner;
+                        dbSeller.WasBuyBoxWinner = wasWinner;
+                        dbSeller.IsBuyBoxWinner = false;
+
+                        // FIX: Use dbSeller.PriceHistory.Add
+                        dbSeller.PriceHistory.Add(new ProductPriceHistory
+                        {
+                            OldPrice = dbSeller.CurrentPrice,
+                            NewPrice = 0,
+                            ChangePercent = null,
+                            BuyBoxChanged = wasWinner,
+                            IsBuyBoxWinner = false,
+                            ChangeDescription = "محصول کاملاً ناموجود شد",
+                            CreatedDate = DateTime.UtcNow
+                        });
+
+                        events.Add(new ProductPriceChangedEvent(
+                            ProductId: dbProduct.Id,
+                            ProductTitle: dbProduct.Title,
+                            SellerId: dbSeller.Id,
+                            DigiKalaVariantId: dbSeller.DigiKalaVariantId,
+                            SellerName: dbSeller.SellerName,
+                            ColorName: dbSeller.ColorName,
+                            PreviousPrice: dbSeller.CurrentPrice,
+                            CurrentPrice: 0,
+                            PriceChanged: true,
+                            BuyBoxWinnerChanged: wasWinner,
+                            IsNowBuyBoxWinner: false
+                        ));
+                    }
+                }
+                return events;
+            }
+
+            // ==========================================
+            // 2. PRODUCT LEVEL: Reactivate product if it was inactive
+            // ==========================================
+            if (!dbProduct.IsActive)
+            {
+                dbProduct.IsActive = true;
+            }
+
+            // ==========================================
+            // 3. SELLER LEVEL: Process scraped sellers
+            // ==========================================
+            foreach (var scrapedSeller in scrapedProduct.Sellers)
+            {
+                var entity = dbProduct.Sellers.FirstOrDefault(s =>
+                    s.DigiKalaVariantId == scrapedSeller.DigiKalaVariantId &&
+                    s.DigiKalaSellerId == scrapedSeller.SellerCode);
+
+                if (entity == null)
+                {
+                    // --- BRAND NEW SELLER ---
+                    var newSeller = new ProductVariantSeller
+                    {
+                        ProductId = dbProduct.Id,
+                        DigiKalaSellerId = scrapedSeller.SellerCode,
+                        SellerName = scrapedSeller.SellerName,
+                        CurrentPrice = scrapedSeller.Price,
+                        PreviousPrice = 0,
+                        IsBuyBoxWinner = scrapedSeller.IsBuyBoxWinner,
+                        WasBuyBoxWinner = false,
+                        IsActive = true,
+                        DigiKalaVariantId = scrapedSeller.DigiKalaVariantId,
+                        ColorName = scrapedSeller.ColorName,
+                        ColorHex = scrapedSeller.ColorHex,
+                        SellerRating = scrapedSeller.SellerRating
+                    };
+
+                    dbProduct.Sellers.Add(newSeller);
+
+                    // FIX: Add history to the new entity's collection
+                    newSeller.PriceHistory.Add(new ProductPriceHistory
+                    {
+                        OldPrice = 0,
+                        NewPrice = scrapedSeller.Price,
+                        ChangePercent = null,
+                        BuyBoxChanged = scrapedSeller.IsBuyBoxWinner,
+                        IsBuyBoxWinner = scrapedSeller.IsBuyBoxWinner,
+                        ChangeDescription = "فروشنده جدید به این محصول اضافه شد",
+                        CreatedDate = DateTime.UtcNow
+                    });
+
+                    events.Add(new ProductPriceChangedEvent(
+                        ProductId: dbProduct.Id,
+                        ProductTitle: dbProduct.Title,
+                        SellerId: 0,
+                        DigiKalaVariantId: scrapedSeller.DigiKalaVariantId,
+                        SellerName: scrapedSeller.SellerName,
+                        ColorName: scrapedSeller.ColorName,
+                        PreviousPrice: 0,
+                        CurrentPrice: scrapedSeller.Price,
+                        PriceChanged: true,
+                        BuyBoxWinnerChanged: scrapedSeller.IsBuyBoxWinner,
+                        IsNowBuyBoxWinner: scrapedSeller.IsBuyBoxWinner
+                    ));
+                    continue;
+                }
+
+                // --- EXISTING SELLER FOUND ---
+                foundDbSellerIds.Add(entity.Id);
+
+                bool wasInactive = !entity.IsActive;
+                bool priceChanged = entity.CurrentPrice != scrapedSeller.Price;
+                bool buyBoxChanged = entity.IsBuyBoxWinner != scrapedSeller.IsBuyBoxWinner;
+
+                if (wasInactive || priceChanged || buyBoxChanged)
+                {
+                    decimal oldPrice = entity.CurrentPrice;
+                    decimal newPrice = scrapedSeller.Price;
+                    decimal? changePercent = oldPrice.CalculateChangePercent(newPrice);
+
+                    var descriptions = new List<string>();
+
+                    if (wasInactive)
+                    {
+                        entity.IsActive = true;
+                        descriptions.Add("فروشنده مجدداً موجود شد");
+                    }
+
+                    if (priceChanged)
+                    {
+                        string direction = newPrice > oldPrice ? "افزایش" : "کاهش";
+                        string percentString = changePercent.HasValue
+                            ? $" ({changePercent.Value:+0.00;-0.00}%)"
+                            : "";
+
+                        descriptions.Add($"قیمت {direction} یافت: از {oldPrice:N0} به {newPrice:N0}{percentString}");
+                    }
+                    if (buyBoxChanged)
+                    {
+                        descriptions.Add(scrapedSeller.IsBuyBoxWinner
+                            ? "برنده باکس خرید (Buy Box) شد"
+                            : "باکس خرید (Buy Box) را از دست داد");
+                    }
+
+                    // FIX: Use entity.PriceHistory.Add
+                    entity.PriceHistory.Add(new ProductPriceHistory
+                    {
+                        OldPrice = oldPrice,
+                        NewPrice = newPrice,
+                        ChangePercent = changePercent,
+                        BuyBoxChanged = buyBoxChanged,
+                        IsBuyBoxWinner = scrapedSeller.IsBuyBoxWinner,
+                        ChangeDescription = string.Join(" | ", descriptions),
+                        CreatedDate = DateTime.UtcNow
+                    });
+
+                    entity.PreviousPrice = oldPrice;
+                    entity.CurrentPrice = newPrice;
+                    entity.WasBuyBoxWinner = entity.IsBuyBoxWinner;
+                    entity.IsBuyBoxWinner = scrapedSeller.IsBuyBoxWinner;
+
+                    events.Add(new ProductPriceChangedEvent(
+                        ProductId: dbProduct.Id,
+                        ProductTitle: dbProduct.Title,
+                        SellerId: entity.Id,
+                        DigiKalaVariantId: scrapedSeller.DigiKalaVariantId,
+                        SellerName: scrapedSeller.SellerName,
+                        ColorName: scrapedSeller.ColorName,
+                        PreviousPrice: oldPrice,
+                        CurrentPrice: newPrice,
+                        PriceChanged: priceChanged || wasInactive,
+                        BuyBoxWinnerChanged: buyBoxChanged,
+                        IsNowBuyBoxWinner: entity.IsBuyBoxWinner
+                    ));
+                }
+            }
+
+            // ==========================================
+            // 4. SELLER LEVEL: Out of stock / Removed sellers
+            // ==========================================
+            var missingSellers = dbProduct.Sellers
+                .Where(s => s.IsActive && !foundDbSellerIds.Contains(s.Id))
+                .ToList();
+
+            foreach (var missingSeller in missingSellers)
+            {
+                missingSeller.IsActive = false;
+                bool wasWinner = missingSeller.IsBuyBoxWinner;
+                missingSeller.WasBuyBoxWinner = wasWinner;
+                missingSeller.IsBuyBoxWinner = false;
+
+                missingSeller.PriceHistory.Add(new ProductPriceHistory
+                {
+                    OldPrice = missingSeller.CurrentPrice,
+                    NewPrice = 0,
+                    ChangePercent = null,
+                    BuyBoxChanged = wasWinner,
+                    IsBuyBoxWinner = false,
+                    ChangeDescription = "فروشنده ناموجود شد یا از لیست فروشندگان حذف شد",
+                    CreatedDate = DateTime.UtcNow
+                });
+
+                events.Add(new ProductPriceChangedEvent(
+                    ProductId: dbProduct.Id,
+                    ProductTitle: dbProduct.Title,
+                    SellerId: missingSeller.Id,
+                    DigiKalaVariantId: missingSeller.DigiKalaVariantId,
+                    SellerName: missingSeller.SellerName,
+                    ColorName: missingSeller.ColorName,
+                    PreviousPrice: missingSeller.CurrentPrice,
+                    CurrentPrice: 0,
+                    PriceChanged: true,
+                    BuyBoxWinnerChanged: wasWinner,
+                    IsNowBuyBoxWinner: false
+                ));
+            }
+
+            return events;
+        }
         #endregion
     }
 }

@@ -20,5 +20,7 @@ namespace Application.Services.Interfaces
         Task<Result<ClientSideProductSearchResultDto>> SearchProductForModalAsync(string url);
 
         Task<Result> AddProductToUserTrackingAsync(int productVariantSellerId);
+
+        Task ExecuteUpdateCycleAsync(CancellationToken ct = default);
     }
 }

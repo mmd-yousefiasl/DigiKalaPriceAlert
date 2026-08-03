@@ -21,7 +21,7 @@ namespace Data.Context.Configurations.Products
                 .HasColumnType("decimal(18,0)");
 
             builder.Property(ph => ph.ChangePercent)
-                .IsRequired()
+                .IsRequired(false)
                 .HasColumnType("decimal(18,4)");
 
             builder.Property(ph => ph.ChangeDescription)
