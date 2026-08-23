@@ -62,6 +62,8 @@ namespace Web
                 // Automatically handle gzip/deflate/brotli so we don't have to manually decode
                 AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate | DecompressionMethods.Brotli
             });
+
+            services.AddHttpClient<ITelegramService, TelegramService>();
             #endregion
 
             #region Scoped Services

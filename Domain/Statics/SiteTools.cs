@@ -66,5 +66,12 @@
         public static string VisitorKeyName { get; set; }
         public static int VisitorExpirationDays { get; set; }
         #endregion
+
+        #region Telegram
+
+        public static string TelegramWorkerKey { get; set; }
+        public static string TelegramWorkerSendUrl { get; set; }
+
+        #endregion
     }
 }
