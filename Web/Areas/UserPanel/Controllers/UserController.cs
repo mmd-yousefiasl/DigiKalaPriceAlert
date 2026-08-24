@@ -1,4 +1,5 @@
 ﻿using Application.Dtos.BalanceTransaction.ClientSide;
+using Application.Dtos.Users.ClientSide;
 using Application.Services.Interfaces;
 using Domain.Shared;
 using Microsoft.AspNetCore.Mvc;
@@ -78,6 +79,50 @@ namespace Web.Areas.UserPanel.Controllers
             }
 
             return RedirectToAction(nameof(UpdateProfile));
+        }
+
+        [HttpGet("/user/my-info")]
+        public async Task<IActionResult> MyInfo()
+        {
+            var result = await _userService.ClientSideGetUserProfileForUpdate();
+            if (result.IsFailure)
+                return View(new ClientSideUpdateProfileDto());
+
+            return View(result.Value);
+        }
+
+        [HttpPost("/user/my-info"), ValidateAntiForgeryToken]
+        public async Task<IActionResult> MyInfo(ClientSideUpdateProfileDto model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var result = await _userService.ClientSideUpdateUserProfile(model);
+            if (result.IsFailure)
+            {
+                TempData[TemporaryErrorMessage] = result.Message;
+                return View(model);
+            }
+            TempData[TemporarySuccessMessage] = result.Message;
+
+            return RedirectToAction(nameof(MyInfo));
+        }
+
+        [HttpPost("/user/my-info/send-telegram-test-message"), ValidateAntiForgeryToken]
+        public async Task<IActionResult> SendTelegramTestMessageFromMyInfo()
+        {
+            var result = await _telegramService.SendTelegramTestMessage();
+
+            if (result.IsFailure)
+            {
+                TempData[TemporaryErrorMessage] = result.Message;
+            }
+            else
+            {
+                TempData[TemporarySuccessMessage] = Messages.TestMessageSentSuccessfully;
+            }
+
+            return RedirectToAction(nameof(MyInfo));
         }
     }
 }

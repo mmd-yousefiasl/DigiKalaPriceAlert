@@ -830,8 +830,7 @@ namespace Application.Services.Implementaions
                 .Select(n => new ClientSideUpdateProfileDto()
                 {
                     FirstName = n.FirstName,
-                    LastName = n.LastName,
-                    IsConnectedToTelegram = n.TelegramChatId != null ? true : false,
+                    LastName = n.LastName
                 }).FirstOrDefaultAsync();
             if (user is null)
                 return Result.Failure<ClientSideUpdateProfileDto>(Messages.OperationFailedError);

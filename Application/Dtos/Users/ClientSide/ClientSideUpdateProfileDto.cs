@@ -14,9 +14,5 @@ namespace Application.Dtos.Users.ClientSide
         [Required(ErrorMessage = Messages.RequiredError)]
         [MaxLength(100, ErrorMessage = Messages.MaxLengthError)]
         public string? LastName { get; set; }
-
-        [Display(Name = "وضعیت اتصال به تلگرام")]
-        [Required(ErrorMessage = Messages.RequiredError)]
-        public bool IsConnectedToTelegram { get; set; }
     }
 }

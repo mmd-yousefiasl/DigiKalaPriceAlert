@@ -1,0 +1,145 @@
+﻿@using Application.Dtos.Users.ClientSide
+@model ClientSideUpdateProfileDto
+
+@{
+    ViewData["Title"] = "ویرایش حساب کاربری";
+}
+
+<div class="container-fluid">
+
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="page-title-box">
+                <h4>پنل کاربری</h4>
+                <ol class="breadcrumb m-0">
+                    <li class="breadcrumb-item">
+                        <a asp-area="UserPanel" asp-controller="Home" asp-action="Index">صفحه نخست</a>
+                    </li>
+                    <li class="breadcrumb-item active">@ViewData["Title"]</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Main Form Column -->
+        <div class="col-12 col-lg-9">
+            <div class="card border border-dark shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title font-size-14 text-dark mb-3">
+                        <i class="mdi mdi-account-edit-outline me-1 text-muted"></i> مشخصات فردی شما
+                    </h5>
+                    <hr class="border-dark-subtle" />
+
+                    <form asp-area="UserPanel" asp-controller="User" asp-action="MyInfo" autocomplete="off" method="post">
+                        <div class="row g-3">
+
+                            <!-- First Name Field -->
+                            <div class="col-12 col-md-6">
+                                <label asp-for="FirstName" class="form-label font-size-12 fw-bold text-dark"></label>
+                                <input class="form-control border-dark-subtle font-size-13" type="text" asp-for="FirstName" autocomplete="off" placeholder="نام خود را وارد کنید...">
+                                <span asp-validation-for="FirstName" class="text-danger font-size-11 mt-1 d-block"></span>
+                            </div>
+
+                            <!-- Last Name Field -->
+                            <div class="col-12 col-md-6">
+                                <label asp-for="LastName" class="form-label font-size-12 fw-bold text-dark"></label>
+                                <input class="form-control border-dark-subtle font-size-13" type="text" asp-for="LastName" autocomplete="off" placeholder="نام خانوادگی خود را وارد کنید...">
+                                <span asp-validation-for="LastName" class="text-danger font-size-11 mt-1 d-block"></span>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <div class="col-12 text-start mt-4">
+                                <button class="btn btn-dark btn-sm px-4 font-size-13 btn-submit" type="submit">
+                                    تایید و ویرایش حساب
+                                </button>
+                            </div>
+
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Telegram Management Column -->
+        <div class="col-12 col-lg-3 d-lg-block">
+            <div class="card border border-dark bg-light shadow-sm">
+                <div class="card-body">
+
+                    <h6 class="font-size-13 text-dark fw-bold mb-1">
+                        <i class="mdi mdi-telegram me-1"></i>
+                        مدیریت تلگرام
+                    </h6>
+
+                    <p class="text-muted font-size-12 lh-base mb-3">
+                        حساب تلگرام متصل خود را مدیریت کنید، در صورت نیاز
+                        مجدداً متصل شوید یا اتصال فعلی را آزمایش کنید.
+                    </p>
+
+                    <!-- Reconnect -->
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+
+                        <div>
+                            <h6 class="font-size-12 fw-bold text-dark mb-1">
+                                اتصال مجدد
+                            </h6>
+
+                            <small class="text-muted font-size-11">
+                                تغییر یا اتصال مجدد حساب تلگرام
+                            </small>
+                        </div>
+
+                        <form asp-area="UserPanel"
+                              asp-controller="User"
+                              asp-action="ConnectTelegram"
+                              method="post"
+                              target="_blank"
+                              class="d-inline-block">
+
+                            <button type="submit"
+                                    class="btn btn-dark btn-sm px-3 font-size-11">
+
+                                <i class="mdi mdi-telegram me-1"></i>
+                                اتصال
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                    <hr class="border-dark-subtle my-3" />
+
+                    <!-- Test Message -->
+                    <div class="d-flex align-items-center justify-content-between">
+
+                        <div>
+                            <h6 class="font-size-12 fw-bold text-dark mb-1">
+                                تست اتصال
+                            </h6>
+
+                            <small class="text-muted font-size-11">
+                                ارسال یک پیام آزمایشی به تلگرام
+                            </small>
+                        </div>
+
+                        <form asp-area="UserPanel"
+                              asp-controller="User"
+                              asp-action="SendTelegramTestMessageFromMyInfo"
+                              method="post">
+
+                            <button type="submit"
+                                    class="btn btn-outline-success btn-sm px-3 font-size-11">
+
+                                <i class="mdi mdi-bell-check-outline me-1"></i>
+                                تست
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
