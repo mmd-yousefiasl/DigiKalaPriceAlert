@@ -41,6 +41,7 @@ namespace Web
             services.AddSingleton<DigiKalaSessionState>();
             services.AddSingleton<IBuyBoxStrategy, HighestRankBuyBoxStrategy>();
             services.AddSingleton<IDigiKalaProductParser, DigiKalaProductParser>();
+            services.AddSingleton<ITelegramUpdateQueue, TelegramUpdateQueue>();
             #endregion
 
             #region HttpClient Services
@@ -98,6 +99,7 @@ namespace Web
             #region Background Services
             services.AddHostedService<PriceMonitorWorker>();
             services.AddHostedService<SmsConsumerWorker>();
+            services.AddHostedService<TelegramUpdateWorker>();
             #endregion
         }
     }

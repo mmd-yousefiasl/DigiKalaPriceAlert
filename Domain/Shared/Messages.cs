@@ -40,6 +40,8 @@
         public const string SellerNotFoundError = "فروشنده محصول پیدا نشد. لطفا مجدد تلاش کنید";
         public const string ProductVariantSellerNotFoundError = "تنوع فروشنده مورد نظر یافت نشد";
         public const string InvalidDataErorr = "اطلاعات ارسالی نامعتبر است. لطفا مجدد تلاش کنید";
+        public const string TelegramBotNotConnectedError = "حساب تلگرام شما متصل نیست. لطفاً ابتدا حساب تلگرام خود را متصل کنید.";
+        public const string TelegramAlreadyConnectedError = "این حساب تلگرام قبلاً به یک حساب کاربری دیگر متصل شده است.";
 
         #endregion
 
@@ -57,6 +59,7 @@
         public const string TicketClosedSuccessfully = "تیکت با موفقیت بسته شد";
         public const string YourProfileUpdatedSuccessfully = "اطلاعات حساب کاربری شما با موفقیت بروزرسانی شد";
         public const string ProductAddedSuccessfully = "محصول با موفقیت به لیست رصد اضافه شد";
+        public const string TestMessageSentSuccessfully = "پیام تست با موفقیت ارسال شد. لطفاً تلگرام خود را بررسی کنید";
 
         #endregion
 

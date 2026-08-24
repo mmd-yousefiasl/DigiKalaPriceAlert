@@ -71,6 +71,7 @@
 
         public static string TelegramWorkerKey { get; set; }
         public static string TelegramWorkerSendUrl { get; set; }
+        public static string TelegramBotUsername { get; set; }
 
         #endregion
     }

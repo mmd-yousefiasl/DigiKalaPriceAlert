@@ -9,13 +9,13 @@ namespace Web.Controllers
     public class TelegramController : BaseController
     {
         #region Fields
-        private readonly ITelegramService _telegramService;
+        private readonly ITelegramUpdateQueue _telegramUpdateQueue;
         #endregion
 
         #region Ctor
-        public TelegramController(ITelegramService telegramService)
+        public TelegramController(ITelegramUpdateQueue telegramUpdateQueue)
         {
-            _telegramService = telegramService;
+            _telegramUpdateQueue = telegramUpdateQueue;
         }
         #endregion
 
@@ -31,8 +31,7 @@ namespace Web.Controllers
             using var reader = new StreamReader(Request.Body);
             var body = await reader.ReadToEndAsync();
 
-            // Return immediately
-            _ = Task.Run(() => _telegramService.ProcessTelegramUpdateAsync(body));
+            await _telegramUpdateQueue.EnqueueAsync(body);
 
             return Ok();
         }

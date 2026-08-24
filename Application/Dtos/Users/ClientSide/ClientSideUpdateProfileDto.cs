@@ -8,11 +8,15 @@ namespace Application.Dtos.Users.ClientSide
         [Display(Name = "نام")]
         [Required(ErrorMessage = Messages.RequiredError)]
         [MaxLength(15, ErrorMessage = Messages.MaxLengthError)]
-        public string FirstName { get; set; }
+        public string? FirstName { get; set; }
 
         [Display(Name = "نام خانوادگی")]
         [Required(ErrorMessage = Messages.RequiredError)]
         [MaxLength(100, ErrorMessage = Messages.MaxLengthError)]
-        public string LastName { get; set; }
+        public string? LastName { get; set; }
+
+        [Display(Name = "وضعیت اتصال به تلگرام")]
+        [Required(ErrorMessage = Messages.RequiredError)]
+        public bool IsConnectedToTelegram { get; set; }
     }
 }

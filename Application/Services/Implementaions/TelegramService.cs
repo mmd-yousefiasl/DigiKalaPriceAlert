@@ -1,5 +1,6 @@
 ﻿using Application.Dtos.Telegram;
 using Application.Services.Interfaces;
+using Domain.Shared;
 using Domain.Statics;
 using System.Net.Http.Json;
 using System.Text.Json;
@@ -10,12 +11,15 @@ namespace Application.Services.Implementaions
     {
         #region Fields
         private readonly HttpClient _httpClient;
+        private readonly IUserService _userService;
         #endregion
 
         #region Ctor
-        public TelegramService(HttpClient httpClient)
+        public TelegramService(HttpClient httpClient,
+            IUserService userService)
         {
             _httpClient = httpClient;
+            _userService = userService;
         }
         #endregion
 
@@ -24,13 +28,14 @@ namespace Application.Services.Implementaions
             try
             {
                 var update = JsonSerializer.Deserialize<TelegramUpdateDto>(
-                body,
-                new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true
-                });
+                    body,
+                    new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    });
 
-                if (update?.Message == null || string.IsNullOrWhiteSpace(update.Message.Text))
+                if (update?.Message == null ||
+                    string.IsNullOrWhiteSpace(update.Message.Text))
                 {
                     return;
                 }
@@ -38,107 +43,22 @@ namespace Application.Services.Implementaions
                 long chatId = update.Message.Chat.Id;
                 string text = update.Message.Text.Trim();
 
-                // ==========================================
-                // /start
-                // ==========================================
-
                 if (text.Equals("/start", StringComparison.OrdinalIgnoreCase))
                 {
-                    await SendTelegramMessage(
-                        chatId,
-                        """
-            👋 سلام!
-
-            به ربات دیجی‌پرایس‌الرت خوش آمدید.
-
-            این ربات برای کاربران وب‌سایت دیجی‌پرایس‌الرت طراحی شده و
-            از طریق آن می‌توانید هشدارهای قیمتی محصولات خود را دریافت کنید.
-
-            🔗 برای استفاده از خدمات و مدیریت هشدارها وارد سایت شوید:
-
-            https://digipricealert.ir
-            """);
-
+                    await HandleStartAsync(chatId);
                     return;
                 }
-
-                // ==========================================
-                // /start AUTH_KEY
-                // ==========================================
 
                 if (text.StartsWith("/start ", StringComparison.OrdinalIgnoreCase))
                 {
-                    var parts = text.Split(
-                        ' ',
-                        StringSplitOptions.RemoveEmptyEntries);
-
-                    string authKey = parts.Length > 1
-                        ? parts[1].Trim()
-                        : string.Empty;
-
-                    if (string.IsNullOrWhiteSpace(authKey))
-                    {
-                        await SendTelegramMessage(
-                            chatId,
-                            "❌ کلید احراز هویت ارسال نشده است.\n\nلطفاً از داخل وب‌سایت دیجی‌پرایس‌الرت اقدام کنید.");
-
-                        return;
-                    }
-
-                    // ==========================================
-                    // TODO:
-                    // Validate authKey against your database
-                    // ==========================================
-
-                    bool authenticated = await AuthenticateTelegramUserAsync(
-                        authKey,
-                        chatId);
-
-                    if (authenticated)
-                    {
-                        await SendTelegramMessage(
-                            chatId,
-                            """
-                ✅ حساب تلگرام شما با موفقیت متصل شد!
-
-                از این پس هشدارهای قیمتی دیجی‌پرایس‌الرت
-                از طریق همین ربات برای شما ارسال خواهد شد.
-                """);
-                    }
-                    else
-                    {
-                        await SendTelegramMessage(
-                            chatId,
-                            """
-                ❌ احراز هویت ناموفق بود.
-
-                کلید اتصال معتبر نیست یا منقضی شده است.
-
-                لطفاً از داخل وب‌سایت دیجی‌پرایس‌الرت
-                دوباره فرآیند اتصال تلگرام را انجام دهید:
-
-                https://digipricealert.ir
-                """);
-                    }
+                    await HandleStartWithAuthKeyAsync(
+                        chatId,
+                        text["/start ".Length..].Trim());
 
                     return;
                 }
 
-                // ==========================================
-                // Everything else
-                // ==========================================
-
-                await SendTelegramMessage(
-                    chatId,
-                    """
-        🤖 متوجه دستور شما نشدم.
-
-        این ربات برای ارسال هشدارهای قیمتی دیجی‌پرایس‌الرت است.
-
-        برای مدیریت حساب و هشدارهای خود وارد سایت شوید:
-
-        https://digipricealert.ir
-        """);
+                await HandleUnknownCommandAsync(chatId);
             }
             catch (Exception ex)
             {
@@ -146,31 +66,81 @@ namespace Application.Services.Implementaions
             }
         }
 
-        #region ProcessTelegramUpdateAsync Private Methods
-        private async Task<bool> AuthenticateTelegramUserAsync(string authKey, long chatId)
+        private async Task HandleStartAsync(long chatId)
         {
-            // TODO:
-            // Check authKey in your database.
-            //
-            // Example:
-            //
-            // var user = await _dbContext.Users
-            //     .FirstOrDefaultAsync(x => x.TelegramAuthKey == authKey);
-            //
-            // if (user == null)
-            //     return false;
-            //
-            // user.TelegramChatId = chatId;
-            // user.TelegramConnected = true;
-            //
-            // await _dbContext.SaveChangesAsync();
-            //
-            // return true;
+            var message = $"""
+        👋 <b>سلام!</b>
 
-            return false;
+        به ربات <b>دیجیتو</b> خوش آمدید. 🎉
+
+        این ربات برای کاربران وب‌سایت دیجیتو طراحی شده است و
+        از طریق آن می‌توانید هشدارهای تغییر قیمت محصولات خود را دریافت کنید.
+
+        🔔 <b>با اتصال به ربات:</b>
+        • هشدارهای قیمت را مستقیماً در تلگرام دریافت می‌کنید.
+        • از تغییرات مهم قیمت محصولات مطلع می‌شوید.
+
+        🔗 <b>برای شروع و مدیریت هشدارها:</b>
+        <a href="{SiteTools.SiteUrl}">ورود به وب‌سایت دیجیتو</a>
+
+        ❤️ از همراهی شما ممنونیم.
+        """;
+
+            await SendTelegramMessage(chatId, message);
         }
 
-        private async Task SendTelegramMessage(long chatId, string messageText)
+        private async Task HandleStartWithAuthKeyAsync(long chatId, string authKey)
+        {
+            var result =
+                await _userService.ClientSideAuthenticateTelegramUserAsync(
+                    authKey,
+                    chatId);
+
+            if (result.IsSuccess)
+            {
+                string authSuccessMessage = $"""
+    ✅ <b>حساب تلگرام شما با موفقیت متصل شد!</b>
+
+    از این پس هشدارهای قیمتی دیجیتو
+    از طریق همین ربات برای شما ارسال خواهد شد.
+
+    🔗 <a href="{SiteTools.SiteUrl}">مدیریت هشدارها در وب‌سایت دیجیتو</a>
+    """;
+                await SendTelegramMessage(chatId, authSuccessMessage);
+
+                return;
+            }
+
+            string authFailedMessage = $"""
+        ❌ <b>احراز هویت ناموفق بود.</b>
+
+        {result.Message}
+
+        لطفاً از داخل وب‌سایت دیجیتو
+        دوباره فرآیند اتصال تلگرام را انجام دهید:
+
+        <a href="{SiteTools.SiteUrl}">ورود به وب‌سایت دیجیتو</a>
+        """;
+            await SendTelegramMessage(chatId, authFailedMessage);
+        }
+
+        private async Task HandleUnknownCommandAsync(long chatId)
+        {
+            string message = $"""
+        🤖 متوجه دستور شما نشدم.
+
+        این ربات برای ارسال هشدارهای قیمتی دیجیتو است.
+
+        برای مدیریت حساب و هشدارهای خود وارد سایت شوید:
+
+        <a href="{SiteTools.SiteUrl}">ورود به وب‌سایت دیجیتو</a>
+        """;
+
+            await SendTelegramMessage(chatId, message);
+        }
+
+
+        public async Task<Result> SendTelegramMessage(long chatId, string messageText)
         {
             var payload = new
             {
@@ -192,12 +162,37 @@ namespace Application.Services.Implementaions
             try
             {
                 await _httpClient.SendAsync(request);
+
+                return Result.Success();
             }
             catch (Exception ex)
             {
-                // TODO: Log exception
+                return Result.Failure(Messages.OperationFailedError);
             }
         }
-        #endregion
+
+        public async Task<Result> SendTelegramTestMessage()
+        {
+            var chatIdResult = await _userService.ClientSideGetCurrentUserChatId();
+
+            if (chatIdResult.IsFailure)
+                return Result.Failure(chatIdResult.Message!);
+
+            string message = $"""
+    <b>🎉 اتصال تلگرام با موفقیت انجام شد!</b>
+
+    ✅ حساب تلگرام شما با موفقیت به حساب کاربری‌تان متصل شد.
+
+    🔔 <b>از این پس چه اتفاقی می‌افتد؟</b>
+    • هشدارهای تغییر قیمت را دریافت می‌کنید.
+    • اعلان‌های مهم مستقیماً در تلگرام برای شما ارسال می‌شوند.
+
+    💡 <i>این پیام فقط برای تست اتصال ارسال شده است.</i>
+
+    ❤️ ممنون که از <a href="{SiteTools.SiteUrl}">دیجیتو</a> استفاده می‌کنید.
+    """;
+
+            return await SendTelegramMessage(chatIdResult.Value, message);
+        }
     }
 }

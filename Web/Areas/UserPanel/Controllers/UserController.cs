@@ -1,6 +1,6 @@
 ﻿using Application.Dtos.BalanceTransaction.ClientSide;
-using Application.Dtos.Users.ClientSide;
 using Application.Services.Interfaces;
+using Domain.Shared;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Web.Areas.UserPanel.Controllers
@@ -9,12 +9,15 @@ namespace Web.Areas.UserPanel.Controllers
     {
         #region Fields
         private readonly IUserService _userService;
+        private readonly ITelegramService _telegramService;
         #endregion
 
         #region Ctor
-        public UserController(IUserService userService)
+        public UserController(IUserService userService,
+            ITelegramService telegramService)
         {
             _userService = userService;
+            _telegramService = telegramService;
         }
         #endregion
 
@@ -34,21 +37,47 @@ namespace Web.Areas.UserPanel.Controllers
             return View();
         }
 
-        [HttpPost("/user/profile/edit"), ValidateAntiForgeryToken]
-        public async Task<IActionResult> UpdateProfile(ClientSideUpdateProfileDto dto)
+        [HttpPost("/user/profile/check"), ValidateAntiForgeryToken]
+        public async Task<IActionResult> CheckProfile()
         {
-            if (!ModelState.IsValid)
-                return View(dto);
-
-            var result = await _userService.ClientSideUpdateUserProfile(dto);
+            var result = await _userService.ClientSideIsUserProfileCompleted();
             if (result.IsFailure)
             {
                 TempData[TemporaryErrorMessage] = result.Message;
-                return View(dto);
+                return RedirectToAction(nameof(UpdateProfile));
             }
             TempData[TemporarySuccessMessage] = result.Message;
 
             return RedirectToAction("AddNewProduct", "Product", new { area = "UserPanel" });
+        }
+
+        [HttpPost("/user/profile/connect-telegram"), ValidateAntiForgeryToken]
+        public async Task<IActionResult> ConnectTelegram()
+        {
+            var result = await _userService.ClientSideConnectUserToTelegram();
+            if (result.IsFailure)
+            {
+                TempData[TemporaryErrorMessage] = result.Message;
+                return RedirectToAction(nameof(UpdateProfile));
+            }
+
+            return Redirect(result.Value);
+        }
+
+        [HttpPost("/user/profile/send-telegram-test-message"), ValidateAntiForgeryToken]
+        public async Task<IActionResult> SendTelegramTestMessage()
+        {
+            var result = await _telegramService.SendTelegramTestMessage();
+            if (result.IsFailure)
+            {
+                TempData[TemporaryErrorMessage] = result.Message;
+            }
+            else
+            {
+                TempData[TemporarySuccessMessage] = Messages.TestMessageSentSuccessfully;
+            }
+
+            return RedirectToAction(nameof(UpdateProfile));
         }
     }
 }

@@ -16,6 +16,7 @@ using Domain.Shared;
 using Domain.Statics;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Cryptography;
 
 namespace Application.Services.Implementaions
 {
@@ -752,8 +753,25 @@ namespace Application.Services.Implementaions
             if (user is null)
                 return Result.Failure(Messages.OperationFailedError);
 
-            if (string.IsNullOrWhiteSpace(user.FirstName) || string.IsNullOrWhiteSpace(user.LastName))
+            if (user.TelegramChatId is null)
+                return Result.Failure(Messages.TelegramBotNotConnectedError);
+
+            return Result.Success();
+        }
+
+        public async Task<Result> ClientSideIsUserProfileCompleted()
+        {
+            var userId = _httpContextAccessor.HttpContext.User.GetUserId();
+
+            if (userId < 1)
                 return Result.Failure(Messages.OperationFailedError);
+
+            var user = await _context.Users.FindAsync(userId);
+            if (user is null)
+                return Result.Failure(Messages.OperationFailedError);
+
+            if (user.TelegramChatId is null)
+                return Result.Failure(Messages.TelegramBotNotConnectedError);
 
             return Result.Success();
         }
@@ -770,6 +788,9 @@ namespace Application.Services.Implementaions
             var user = await _context.Users.FindAsync(userId);
             if (user is null)
                 return Result.Failure(Messages.OperationFailedError);
+
+            if (user.TelegramChatId is null)
+                return Result.Failure(Messages.TelegramBotNotConnectedError);
 
             user.FirstName = dto.FirstName;
             user.LastName = dto.LastName;
@@ -795,6 +816,115 @@ namespace Application.Services.Implementaions
                     FirstName = u.FirstName ?? "کاربر"
                 })
                 .ToListAsync(ct);
+        }
+
+        public async Task<Result<ClientSideUpdateProfileDto>> ClientSideGetUserProfileForUpdate()
+        {
+            var userId = _httpContextAccessor.HttpContext.User.GetUserId();
+            if (userId < 1)
+                return Result.Failure<ClientSideUpdateProfileDto>(Messages.OperationFailedError);
+
+            var user = await _context.Users
+                .AsNoTracking()
+                .Where(n => n.Id == userId)
+                .Select(n => new ClientSideUpdateProfileDto()
+                {
+                    FirstName = n.FirstName,
+                    LastName = n.LastName,
+                    IsConnectedToTelegram = n.TelegramChatId != null ? true : false,
+                }).FirstOrDefaultAsync();
+            if (user is null)
+                return Result.Failure<ClientSideUpdateProfileDto>(Messages.OperationFailedError);
+
+            return user;
+        }
+
+        public async Task<Result<string>> ClientSideConnectUserToTelegram()
+        {
+            var userId = _httpContextAccessor.HttpContext.User.GetUserId();
+
+            if (userId < 1)
+                return Result.Failure<string>(Messages.OperationFailedError);
+
+            // Remove existing validation code for this user
+            var existingValidations = await _context.TelegramValidation
+                .Where(n => n.UserId == userId)
+                .ToListAsync();
+
+            if (existingValidations.Any())
+            {
+                _context.TelegramValidation.RemoveRange(existingValidations);
+            }
+
+            // Generate a secure random code
+            var randomBytes = RandomNumberGenerator.GetBytes(32);
+
+            var code = Convert.ToBase64String(randomBytes)
+                .Replace("+", "-")
+                .Replace("/", "_")
+                .TrimEnd('=');
+
+            var validation = new TelegramValidation
+            {
+                UserId = userId,
+                Code = code
+            };
+
+            await _context.TelegramValidation.AddAsync(validation);
+            await _context.SaveChangesAsync();
+
+            var telegramUrl =
+                $"https://t.me/{SiteTools.TelegramBotUsername}?start={code}";
+
+            return telegramUrl;
+        }
+
+        public async Task<Result> ClientSideAuthenticateTelegramUserAsync(string authKey, long chatId)
+        {
+            if (string.IsNullOrWhiteSpace(authKey) || chatId <= 0)
+                return Result.Failure(Messages.InvalidDataErorr);
+
+            var minimumCreatedDate = DateTime.UtcNow.AddMinutes(-20);
+
+            var authResult = await _context.TelegramValidation
+                .FirstOrDefaultAsync(n =>
+                    n.Code == authKey &&
+                    n.CreatedDate >= minimumCreatedDate);
+
+            if (authResult is null)
+                return Result.Failure(Messages.OperationFailedError);
+
+            var user = await _context.Users.FindAsync(authResult.UserId);
+
+            if (user is null)
+                return Result.Failure(Messages.OperationFailedError);
+
+            user.TelegramChatId = chatId;
+            user.LastUpdatedDate = DateTime.UtcNow;
+
+            _context.TelegramValidation.Remove(authResult);
+
+            await _context.SaveChangesAsync();
+
+            return Result.Success();
+        }
+
+        public async Task<Result<long>> ClientSideGetCurrentUserChatId()
+        {
+            var userId = _httpContextAccessor.HttpContext.User.GetUserId();
+            if (userId < 1)
+                return Result.Failure<long>(Messages.OperationFailedError);
+
+            var chatId = await _context.Users
+                .AsNoTracking()
+                .Where(n => n.Id == userId)
+                .Select(n => n.TelegramChatId)
+                .FirstOrDefaultAsync();
+
+            if (chatId is null || chatId < 1)
+                return Result.Failure<long>(Messages.TelegramBotNotConnectedError);
+
+            return chatId;
         }
     }
 }

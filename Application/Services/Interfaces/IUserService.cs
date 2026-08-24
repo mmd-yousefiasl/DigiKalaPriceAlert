@@ -57,8 +57,18 @@ namespace Application.Services.Interfaces
 
         Task<Result> ClientSideIsUserProfileCompleted(int userId);
 
+        Task<Result> ClientSideIsUserProfileCompleted();
+
         Task<Result> ClientSideUpdateUserProfile(ClientSideUpdateProfileDto dto);
 
         Task<List<ClientSideUserToNotifyDto>> GetUserContactsAsync(List<int> userIds, CancellationToken ct);
+
+        Task<Result<ClientSideUpdateProfileDto>> ClientSideGetUserProfileForUpdate();
+
+        Task<Result<string>> ClientSideConnectUserToTelegram();
+
+        Task<Result> ClientSideAuthenticateTelegramUserAsync(string authKey, long chatId);
+
+        Task<Result<long>> ClientSideGetCurrentUserChatId();
     }
 }
