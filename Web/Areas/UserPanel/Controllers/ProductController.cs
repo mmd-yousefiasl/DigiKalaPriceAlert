@@ -66,7 +66,7 @@ namespace Web.Areas.UserPanel.Controllers
                 return Json(new { success = false, message = firstError });
             }
 
-            var result = await _productService.AddProductToUserTrackingAsync(dto.SellerId);
+            var result = await _productService.AddProductToUserTrackingAsync(dto);
 
             if (result.IsFailure)
                 return Json(new { success = false, message = result.Message });

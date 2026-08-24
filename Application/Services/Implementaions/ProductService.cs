@@ -1,4 +1,5 @@
 ﻿using Application.Dtos.Products.ClientSide;
+using Application.Mediator;
 using Application.Services.Interfaces;
 using Application.Tools;
 using Data.Context;
@@ -22,6 +23,7 @@ namespace Application.Services.Implementaions
         private readonly IDigiKalaService _digiKalaService;
         private readonly IUserService _userService;
         private readonly ILogger<IProductService> _logger;
+        private readonly IMediatorHandler _mediator;
         #endregion
 
         #region Ctor
@@ -29,13 +31,15 @@ namespace Application.Services.Implementaions
             IHttpContextAccessor httpContextAccessor,
             IDigiKalaService digiKalaService,
             IUserService userService,
-            ILogger<IProductService> logger)
+            ILogger<IProductService> logger,
+            IMediatorHandler mediator)
         {
             _context = context;
             _httpContextAccessor = httpContextAccessor;
             _digiKalaService = digiKalaService;
             _userService = userService;
             _logger = logger;
+            _mediator = mediator;
         }
         #endregion
 
@@ -664,7 +668,7 @@ namespace Application.Services.Implementaions
             return await GetProductModalDataAsync(existingProduct.Id);
         }
 
-        public async Task<Result> AddProductToUserTrackingAsync(int productVariantSellerId)
+        public async Task<Result> AddProductToUserTrackingAsync(ClientSideAddTrackingDto dto)
         {
             var userResult = await _userService.ClientSideCanUserAddProduct();
 
@@ -676,13 +680,13 @@ namespace Application.Services.Implementaions
                 return Result.Failure(Messages.OperationFailedError);
 
             var sellerExists = await _context.ProductVariantSellers
-                .AnyAsync(s => s.Id == productVariantSellerId);
+                .AnyAsync(s => s.Id == dto.SellerId);
 
             if (!sellerExists)
                 return Result.Failure(Messages.ProductVariantSellerNotFoundError);
 
             var alreadyTracking = await _context.UserProductMappings
-                .AnyAsync(m => m.UserId == userId && m.VariantSellerId == productVariantSellerId);
+                .AnyAsync(m => m.UserId == userId && m.VariantSellerId == dto.SellerId);
 
             if (alreadyTracking)
                 return Result.Failure(Messages.ThisProductAlreadyInYourWatchListError);
@@ -690,7 +694,8 @@ namespace Application.Services.Implementaions
             var mapping = new UserProductMapping
             {
                 UserId = userId,
-                VariantSellerId = productVariantSellerId,
+                VariantSellerId = dto.SellerId,
+                DigiKalaVariantId = dto.DigiKalaVariantId,
                 IsRead = true
             };
 
@@ -744,6 +749,7 @@ namespace Application.Services.Implementaions
                         {
                             SellerId = s.Id,
                             SellerName = s.SellerName,
+                            DigiKalaVariantId = s.DigiKalaVariantId,
                             Price = s.CurrentPrice,
                             IsBuyBoxWinner = s.IsBuyBoxWinner
                         }).ToList()
@@ -976,7 +982,7 @@ namespace Application.Services.Implementaions
                 // 5. Dispatch events (Only after DB save is successful!)
                 foreach (var evt in notificationsToPublish)
                 {
-                    //await _mediator.Publish(evt, ct);
+                    await _mediator.PublishEvent(evt);
                 }
             }
             else
@@ -1028,7 +1034,6 @@ namespace Application.Services.Implementaions
                             ChangeDescription = "محصول کاملاً ناموجود شد",
                             CreatedDate = DateTime.UtcNow
                         });
-
                         events.Add(new ProductPriceChangedEvent(
                             ProductId: dbProduct.Id,
                             ProductTitle: dbProduct.Title,

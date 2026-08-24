@@ -181,7 +181,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 if (isTracked) {
                     buttonHtml = `<button type="button" class="btn btn-sm btn-light font-size-11 btn-tracked" disabled style="border-radius: 8px; min-width: 130px;"><i class="mdi mdi-check-circle text-success"></i> در حال رصد</button>`;
                 } else {
-                    buttonHtml = `<button type="button" class="btn btn-sm btn-dark font-size-11 btn-add-tracking" data-seller-id="${seller.sellerId}" style="border-radius: 8px; min-width: 130px;"><i class="mdi mdi-radar"></i> افزودن به رصد</button>`;
+                    buttonHtml = `<button type="button" class="btn btn-sm btn-dark font-size-11 btn-add-tracking" data-seller-id="${seller.sellerId}" data-digikala-variant-Id="${seller.digiKalaVariantId}" style="border-radius: 8px; min-width: 130px;"><i class="mdi mdi-radar"></i> افزودن به رصد</button>`;
                 }
 
                 html += `
@@ -212,6 +212,7 @@ document.addEventListener("DOMContentLoaded", function () {
     async function handleAddTrackingClick() {
         const btn = this;
         const sellerId = btn.getAttribute('data-seller-id');
+        const digiKalaVariantId = btn.getAttribute('data-digikala-variant-id');
 
         setButtonLoading(btn);
 
@@ -222,7 +223,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     'Content-Type': 'application/json',
                     'RequestVerificationToken': antiForgeryToken || ''
                 },
-                body: JSON.stringify({ sellerId: parseInt(sellerId) })
+                body: JSON.stringify({ sellerId: parseInt(sellerId), digiKalaVariantId: parseInt(digiKalaVariantId) })
             });
 
             const result = await response.json();
