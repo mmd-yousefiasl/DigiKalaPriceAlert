@@ -188,44 +188,48 @@ namespace Application.Services.Implementaions
 
         public async Task<Result> AdminSideUpdateRole(AdminSideUpdateRoleDto model)
         {
-            var role = await _context.Roles.Include(n => n.RolePermissionMapping).FirstOrDefaultAsync(n => n.Id == model.Id);
+            var role = await _context.Roles
+                .Include(r => r.RolePermissionMapping)
+                .FirstOrDefaultAsync(r => r.Id == model.Id);
 
-            if (role is null) return Result.Failure(Messages.OperationFailedError);
+            if (role is null)
+                return Result.Failure(Messages.OperationFailedError);
 
-
-            if (await _context.Roles.AnyAsync(n => n.UniqueName == model.UniqueName && n.Id != model.Id))
-                return Result.Failure(Messages.DuplicateUniqueNameForRoleError);
-
-            foreach (var permission in role.RolePermissionMapping)
-            {
-                role.RolePermissionMapping.Remove(permission);
-            }
-
+            // Admin role is protected and cannot be modified.
             if (role.UniqueName == "Admin")
                 return Result.Failure(Messages.OperationFailedError);
+
+            if (await _context.Roles.AnyAsync(r =>
+                r.UniqueName == model.UniqueName &&
+                r.Id != model.Id))
+            {
+                return Result.Failure(Messages.DuplicateUniqueNameForRoleError);
+            }
+
+            _context.RolePermissionMapping.RemoveRange(
+                role.RolePermissionMapping);
+
+            foreach (var permissionId in model.PermissionIds ?? new List<int>())
+            {
+                role.RolePermissionMapping.Add(new RolePermissionMapping
+                {
+                    RoleId = role.Id,
+                    PermissionId = permissionId
+                });
+            }
 
             role.Title = model.Title;
             role.UniqueName = model.UniqueName;
             role.LastUpdatedDate = DateTime.UtcNow;
 
-            foreach (var item in model.PermissionIds ?? new List<int>())
-            {
-                role.RolePermissionMapping.Add(new RolePermissionMapping
-                {
-                    RoleId = role.Id,
-                    PermissionId = item
-                });
-            }
-
-            _context.Roles.Update(role);
             await _context.SaveChangesAsync();
 
-            RoleUpdatedEvent RoleUpdatedEvent = new RoleUpdatedEvent(
-            role.Id,
-            role.Title,
-            role.UniqueName);
+            var roleUpdatedEvent = new RoleUpdatedEvent(
+                role.Id,
+                role.Title,
+                role.UniqueName);
 
-            await _mediator.PublishEvent(RoleUpdatedEvent);
+            await _mediator.PublishEvent(roleUpdatedEvent);
 
             return Result.Success(Messages.SuccessfullyDone);
         }

@@ -6,12 +6,12 @@ namespace Application.Dtos.Role.AdminSide
     public class AdminSideUpdateRoleDto : CommonDto
     {
         [Display(Name = "عنوان")]
-        [Required]
+        [Required(ErrorMessage = Messages.RequiredError)]
         [MaxLength(100)]
         public string Title { get; set; }
 
         [Display(Name = "نام یکتا")]
-        [Required]
+        [Required(ErrorMessage = Messages.RequiredError)]
         [MaxLength(100)]
         public string UniqueName { get; set; }
 
