@@ -15,14 +15,17 @@ namespace Application.Services.Implementaions
         #region Fields
         private readonly DigiKalaPriceAlertDbContext _context;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly ITelegramService _telegramService;
         #endregion
 
         #region Ctor
         public SiteNotificationService(DigiKalaPriceAlertDbContext context,
-            IHttpContextAccessor httpContextAccessor)
+            IHttpContextAccessor httpContextAccessor,
+            ITelegramService telegramService)
         {
             _context = context;
             _httpContextAccessor = httpContextAccessor;
+            _telegramService = telegramService;
         }
         #endregion
 
@@ -106,6 +109,10 @@ namespace Application.Services.Implementaions
 
             _context.SiteNotifications.Add(notification);
             await _context.SaveChangesAsync();
+
+            // Best-effort mirror to the Telegram channel — never blocks or fails
+            // the admin request if the worker is down.
+            _ = Task.Run(() => _telegramService.SendSiteNotificationToChannelAsync(notification.Content));
 
             return Result.Success();
         }

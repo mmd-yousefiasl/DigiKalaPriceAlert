@@ -73,6 +73,15 @@
         public static string TelegramWorkerSendUrl { get; set; }
         public static string TelegramBotUsername { get; set; }
 
+        public static string AdminTelegramWorkerKey { get; set; }
+        public static string AdminTelegramWorkerSendUrl { get; set; }
+
+        // Private channels (ids are negative, e.g. -100xxxxxxxxxx; bot must be admin).
+        public static long TelegramNotificationChannelId { get; set; }
+        public static long TelegramErrorChannelId { get; set; }
+
+        public static bool TelegramErrorAlertingEnabled { get; set; }
+
         #endregion
     }
 }

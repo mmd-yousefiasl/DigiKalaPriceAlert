@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Diagnostics;
 using Serilog;
 using Web;
 using Web.Configuration;
+using Web.Logging;
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Information()
@@ -55,7 +56,9 @@ try
 
     #region Logging
     builder.Logging.ClearProviders();
-    builder.Host.UseSerilog((ctx, lc) => lc.ReadFrom.Configuration(ctx.Configuration));
+    builder.Host.UseSerilog((ctx, lc) => lc
+        .ReadFrom.Configuration(ctx.Configuration)
+        .WriteTo.Sink(new TelegramErrorSink()));
     #endregion
 
     #region Compression
