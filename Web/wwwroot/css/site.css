@@ -228,33 +228,11 @@
     gap: 6px;
 }
 
-:root {
-    --dk-red: #ef4056;
-    --dk-red-hover: #c82a3c;
-    --bg-white: #ffffff;
-    --bg-light: #f0f0f2;
-    --text-dark: #23254e;
-    --text-muted: #62666d;
-    --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05);
-    --shadow-md: 0 8px 24px rgba(239, 64, 86, 0.08);
-}
-
 .seller-main-container {
     font-family: Vazir;
     background-color: var(--bg-white);
     color: var(--text-dark);
     line-height: 1.7;
-}
-
-.section-wrapper {
-    padding: 80px 0;
-}
-
-.container {
-    width: 100%;
-    max-width: 1140px;
-    margin: 0 auto;
-    padding: 0 20px;
 }
 
 .row-layout {
@@ -1010,12 +988,6 @@
 /* ══════════════════════════════════════
                            CALCULATOR SECTION
                         ══════════════════════════════════════ */
-.bg-alt-section {
-    background-color: rgba(239, 64, 86, 0.01);
-    border-top: 1px solid var(--bg-light);
-    border-bottom: 1px solid var(--bg-light);
-}
-
 .calc-flex {
     display: flex;
     flex-wrap: wrap;
@@ -1560,11 +1532,6 @@
 /* ══════════════════════════════════════
                            FAQ
                         ══════════════════════════════════════ */
-.faq-block {
-    max-width: 800px;
-    margin: 0 auto;
-}
-
 .faq-row {
     border-bottom: 1px solid var(--bg-light);
     padding: 22px 8px;
@@ -1886,48 +1853,26 @@
     padding: 0;
 }
 
-/* بخش معرفی هدر */
-.digito-hero {
-    text-align: center;
+/* بخش معرفی هدر — نسخه‌ی صفحه تعرفه‌ها؛ مقادیر متفاوت با نسخه‌ی عمومی ابتدای فایل، به همین دلیل اسکوپ شده است */
+.digito-wrapper .digito-hero {
     max-width: 800px;
     margin: 0 auto 60px auto;
     padding: 30px;
 }
 
-.digito-badge {
-    display: inline-flex;
-    align-items: center;
+.digito-wrapper .digito-badge {
     gap: 8px;
-    background-color: #fef2f2;
-    color: #ed1945;
     padding: 8px 16px;
-    border-radius: 50px;
     font-size: 13px;
-    font-weight: 700;
-    margin-bottom: 24px;
 }
 
-.digito-badge-dot {
-    width: 8px;
-    height: 8px;
-    background-color: #ed1945;
-    border-radius: 50%;
-    display: inline-block;
-}
-
-.digito-hero-title {
+.digito-wrapper .digito-hero-title {
     color: #18181b;
     font-size: 32px;
-    font-weight: 800;
     margin-bottom: 20px;
-    line-height: 1.4;
 }
 
-    .digito-hero-title .highlight {
-        color: #ed1945;
-    }
-
-.digito-hero-desc {
+.digito-wrapper .digito-hero-desc {
     color: #52525b;
     font-size: 15px;
     line-height: 1.8;
@@ -2071,24 +2016,13 @@
     transition: all 0.2s ease;
 }
 
-.digito-btn-primary {
-    background-color: #ed1945;
-    color: #ffffff;
+.digito-wrapper .digito-btn-primary {
     box-shadow: 0 4px 12px rgba(237, 25, 69, 0.25);
 }
 
-    .digito-btn-primary:hover {
-        background-color: #d1123a;
-    }
-
-.digito-btn-secondary {
-    background-color: #f4f4f5;
+.digito-wrapper .digito-btn-secondary {
     color: #27272a;
 }
-
-    .digito-btn-secondary:hover {
-        background-color: #e4e4e7;
-    }
 
 .digito-btn-outline {
     background-color: transparent;
@@ -2449,117 +2383,6 @@
     }
 }
 
-.legal-page {
-    max-width: 1100px;
-    margin: 40px auto;
-    padding: 0 16px;
-    direction: rtl;
-    font-family: Vazir;
-    color: #27272a;
-}
-
-.legal-hero {
-    background: #fff;
-    border: 1px solid #e4e4e7;
-    border-radius: 16px;
-    padding: 40px 32px;
-    margin-bottom: 24px;
-    text-align: center;
-    box-shadow: 0 1px 3px rgba(0,0,0,.05);
-}
-
-.legal-badge {
-    display: inline-block;
-    background: #fef2f2;
-    color: #ed1945;
-    padding: 6px 14px;
-    border-radius: 999px;
-    font-size: 12px;
-    font-weight: bold;
-    margin-bottom: 16px;
-}
-
-.legal-title {
-    font-size: 32px;
-    font-weight: 800;
-    color: #09090b;
-    margin-bottom: 12px;
-}
-
-.legal-desc {
-    color: #71717a;
-    font-size: 14px;
-    line-height: 1.9;
-    max-width: 700px;
-    margin: 0 auto;
-}
-
-.legal-content {
-    background: #fff;
-    border: 1px solid #e4e4e7;
-    border-radius: 16px;
-    padding: 32px;
-    box-shadow: 0 1px 3px rgba(0,0,0,.05);
-}
-
-.legal-section {
-    margin-bottom: 32px;
-}
-
-    .legal-section:last-child {
-        margin-bottom: 0;
-    }
-
-    .legal-section h2 {
-        color: #ed1945;
-        font-size: 20px;
-        font-weight: 700;
-        margin-bottom: 16px;
-        padding-bottom: 10px;
-        border-bottom: 1px solid #f4f4f5;
-    }
-
-    .legal-section p {
-        line-height: 2;
-        color: #52525b;
-        margin-bottom: 12px;
-        font-size: 14px;
-    }
-
-    .legal-section ul {
-        margin: 0;
-        padding-right: 20px;
-    }
-
-    .legal-section li {
-        color: #52525b;
-        line-height: 2;
-        margin-bottom: 8px;
-        font-size: 14px;
-    }
-
-.legal-update {
-    background: #fef2f2;
-    color: #ed1945;
-    border: 1px solid #fecdd3;
-    border-radius: 12px;
-    padding: 12px 16px;
-    margin-bottom: 24px;
-    font-size: 13px;
-    font-weight: 600;
-}
-
-@media(max-width:768px) {
-    .legal-content,
-    .legal-hero {
-        padding: 24px;
-    }
-
-    .legal-title {
-        font-size: 24px;
-    }
-}
-
 /* تنظیمات پایه سازگار با پوسته دیجیتو */
 .digito-checkout-wrapper {
     color: #27272a;
@@ -2664,27 +2487,6 @@
     100% {
         transform: scale(1);
     }
-}
-
-/* تنظیمات پایه مخصوص صفحه چک‌اوت دیجیتو */
-.digito-checkout-wrapper {
-    color: #27272a;
-    direction: rtl;
-    font-family: 'Vazir';
-    padding: 60px 16px;
-    box-sizing: border-box;
-    line-height: 1.6;
-    background-color: #fafafa;
-    min-height: 80vh;
-    margin: 0px;
-}
-
-.digito-checkout-wrapper *,
-.digito-checkout-wrapper *::before,
-.digito-checkout-wrapper *::after {
-    box-sizing: inherit;
-    margin: 0;
-    padding: 0;
 }
 
 .digito-checkout-container {
@@ -2988,39 +2790,7 @@
         color: #27272a;
     }
 
-.digito-payment-wrapper {
-    color: #27272a;
-    direction: rtl;
-    font-family: 'Vazir';
-    padding: 80px 16px;
-    box-sizing: border-box;
-    line-height: 1.6;
-    background-color: #fafafa;
-    min-height: 85vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.digito-payment-wrapper *,
-.digito-payment-wrapper *::before,
-.digito-payment-wrapper *::after {
-    box-sizing: inherit;
-    margin: 0;
-    padding: 0;
-}
-
-.payment-status-card {
-    background-color: #ffffff;
-    border: 1px solid #e4e4e7;
-    border-radius: 20px;
-    padding: 45px 30px;
-    max-width: 500px;
-    width: 100%;
-    text-align: center;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.03);
-}
-
+/* استایل پایه صفحه موفقیت (سبز) — نسخه قرمز «failed» با کلاس‌های اختصاصی بازنویسی می‌شود */
 .status-icon-box {
     width: 80px;
     height: 80px;
@@ -3040,12 +2810,6 @@
     font-size: 22px;
     font-weight: 800;
     margin-bottom: 12px;
-}
-
-.payment-status-card p {
-    color: #71717a;
-    font-size: 14px;
-    margin-bottom: 24px;
 }
 
 .payment-details-list {

@@ -28,7 +28,7 @@ namespace Data.Context
             {
                 Id = 2,
                 Name = "اشتراک ۳۰ روزه (ماهانه)",
-                Price = 990000,
+                Price = 460000,
                 DurationInDays = 30,
                 IsPopular = false,
                 ShortDescription = "ویژه فروشندگانی که می‌خواهند بای‌باکس را تصاحب کنند.",
@@ -38,7 +38,7 @@ namespace Data.Context
             {
                 Id = 3,
                 Name = "اشتراک ۹۰ روزه (۳ ماهه)",
-                Price = 2675000,
+                Price = 990000,
                 DurationInDays = 90,
                 IsPopular = true,
                 ShortDescription = "بهترین انتخاب برای کاهش هزینه‌ها و تمرکز کامل بر فروش.",
@@ -75,7 +75,7 @@ namespace Data.Context
                         Priority = 10,
                         SubscriptionPlanId = 1,
                         IsDeleted =false,
-                        Title = " ارسال هشدار سریع پیامکی به محض تغییر قیمت"
+                        Title = " ارسال هشدار فوری تلگرامی به محض تغییر قیمت "
                     },
                     new SubscriptionPlanFeature()
                     {
@@ -120,7 +120,7 @@ namespace Data.Context
                         Priority = 10,
                         SubscriptionPlanId = 2,
                         IsDeleted =false,
-                        Title = "ارسال فوری پیامک در صورت تغییر قیمت"
+                        Title = "ارسال فوری گزارش تلگرامی در صورت تغییر قیمت رقیب "
                     },
                     new SubscriptionPlanFeature()
                     {
@@ -174,7 +174,7 @@ namespace Data.Context
                         Priority = 10,
                         SubscriptionPlanId = 3,
                         IsDeleted =false,
-                        Title = " ارسال آنی پیامک هشدار تغییر قیمت کالا"
+                        Title = "ارسال آنی گزارش تلگرامی تغییر قیمت کالا "
                     },
                     new SubscriptionPlanFeature()
                     {
