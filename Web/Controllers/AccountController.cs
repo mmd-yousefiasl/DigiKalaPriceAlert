@@ -146,8 +146,7 @@ namespace Web.Controllers
             var principal = new ClaimsPrincipal(identity);
             var properties = new AuthenticationProperties
             {
-                IsPersistent = rememberMe,
-                ExpiresUtc = DateTime.Now.AddDays(1)
+                IsPersistent = rememberMe
             };
 
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, properties);
