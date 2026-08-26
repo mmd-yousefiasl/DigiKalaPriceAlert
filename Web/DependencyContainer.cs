@@ -94,6 +94,7 @@ namespace Web
             services.AddScoped<IVisitorService, VisitorService>();
             services.AddScoped<ISiteNotificationService, SiteNotificationService>();
             services.AddScoped<IDigiKalaService, DigiKalaService>();
+            services.AddScoped<IMarketAlertService, MarketAlertService>();
             #endregion
 
             #region Background Services

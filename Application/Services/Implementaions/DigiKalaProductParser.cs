@@ -26,11 +26,12 @@ namespace Application.Services.Implementaions
                     return Result.Failure<ClientSideScrapedProductDto>(DigiKalaErrors.MalformedResponse);
 
                 var sellers = MapSellers(product.Variants).ToList();
+
+                // An empty list from a successful fetch is the stockout signal,
+                // NOT an error. Transport-level problems still surface as failures
+                // from the API client (RateLimited / HttpFetchFailed).
                 if (sellers.Count == 0)
-                {
-                    _logger.LogWarning("No valid sellers for DKP {Id}", digiKalaId);
-                    return Result.Failure<ClientSideScrapedProductDto>(DigiKalaErrors.NoVariants);
-                }
+                    _logger.LogWarning("No marketable sellers for DKP {Id} (likely out of stock)", digiKalaId);
 
                 // Assign buy box winners based on color groups
                 _buyBox.AssignWinners(sellers);
@@ -77,7 +78,7 @@ namespace Application.Services.Implementaions
 
                     SellerId = v.Seller.Id,
                     SellerName = v.Seller.Title ?? DigiKalaDefaults.UnknownSeller,
-                    SellerCode = v.Seller.Code ?? string.Empty,
+                    SellerCode = v.Seller.Code ?? v.Seller.Id.ToString(),
                     SellerRating = v.Seller.Rating?.TotalRate,
 
                     Price = price,

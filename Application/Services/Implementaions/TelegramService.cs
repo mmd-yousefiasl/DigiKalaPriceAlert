@@ -146,7 +146,11 @@ namespace Application.Services.Implementaions
             {
                 chat_id = chatId,
                 text = messageText,
-                parse_mode = "HTML"
+                parse_mode = "HTML",
+
+                // Telegram expands the product URL into a huge photo preview —
+                // keep alert messages compact.
+                link_preview_options = new { is_disabled = true }
             };
 
             using var request = new HttpRequestMessage(

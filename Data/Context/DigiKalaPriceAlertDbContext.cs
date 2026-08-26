@@ -36,7 +36,7 @@ namespace Data.Context
 
         public DbSet<Product> Products => Set<Product>();
         public DbSet<ProductVariantSeller> ProductVariantSellers => Set<ProductVariantSeller>();
-        public DbSet<ProductPriceHistory> ProductPriceHistory => Set<ProductPriceHistory>();
+        public DbSet<ProductVariantChange> ProductVariantChanges => Set<ProductVariantChange>();
 
 
         public DbSet<SubscriptionPlan> SubscriptionPlans => Set<SubscriptionPlan>();

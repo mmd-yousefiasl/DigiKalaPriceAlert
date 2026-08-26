@@ -26,16 +26,10 @@ namespace Data.Context.Configurations.Products
                 .IsRequired()
                 .HasColumnType("decimal(18,0)");
 
-            builder.Property(s => s.PreviousPrice)
-                .HasColumnType("decimal(18,0)");
-
             builder.Property(s => s.SellerRating)
                 .HasColumnType("decimal(5,2)");
 
             builder.Property(s => s.IsBuyBoxWinner)
-                .HasDefaultValue(false);
-
-            builder.Property(s => s.WasBuyBoxWinner)
                 .HasDefaultValue(false);
 
             builder.Property(s => s.IsActive)

@@ -20,6 +20,6 @@
         public ClientSideVariantSellerDto? WinnerSeller { get; set; }
         public List<ClientSideVariantSellerDto> Opponents { get; set; } = [];
 
-        public List<ClientSideSellerPriceHistoryDto> RecentHistory { get; set; } = [];
+        public List<ClientSideVariantChangeDto> RecentHistory { get; set; } = [];
     }
 }

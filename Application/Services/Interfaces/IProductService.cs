@@ -11,11 +11,7 @@ namespace Application.Services.Interfaces
 
         Task<Result> ClientSideDeleteUserProduct(int id);
 
-        Task<Result<List<ProductMonitoringTargetDto>>> GetProductBatchForMonitoringAsync(int page, int batchSize, CancellationToken ct);
-
         Task<Result> ClientSideSetProductAsReadForUser(int id);
-
-        Task<Result<List<ClientSideUserChangeNotification>>> SyncProductAndDetectChangesAsync(ProductMonitoringTargetDto target, ClientSideScrapedProductDto scraped, CancellationToken ct);
 
         Task<Result<ClientSideProductSearchResultDto>> SearchProductForModalAsync(string url);
 

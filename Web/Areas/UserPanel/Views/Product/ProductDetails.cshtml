@@ -205,21 +205,19 @@
         </div>
     </div>
 
-    @* ── Price History (Strictly for this variant) ────── *@
+    @* ── Change History (grouped records for this variant) ────── *@
     @{
-        var allHistory = Model.RecentHistory
-            .OrderByDescending(h => h.CreatedDate)
-            .Take(100)
-            .ToList();
+        var allChanges = Model.RecentHistory;
 
-        var uniqueSellers = allHistory
-            .Where(h => !string.IsNullOrEmpty(h.SellerName))
-            .Select(h => h.SellerName)
+        var uniqueSellers = allChanges
+            .SelectMany(c => c.Items)
+            .Where(i => !string.IsNullOrEmpty(i.SellerName))
+            .Select(i => i.SellerName)
             .Distinct()
             .ToList();
     }
 
-    @if (allHistory.Any())
+    @if (allChanges.Any())
     {
         <div class="pd-card mb-4">
             <div class="section-header">
@@ -227,10 +225,10 @@
                     <i class="mdi mdi-history"></i>
                     تاریخچه تغییرات
                 </div>
-                <span class="section-count" id="history-count">@allHistory.Count تغییر</span>
+                <span class="section-count" id="history-count">@allChanges.Sum(c => c.Items.Count) تغییر</span>
             </div>
 
-            @* ── Seller Filters (No color filters needed anymore) ── *@
+            @* ── Seller Filters ── *@
             @if (uniqueSellers.Count > 1)
             {
                 <div class="history-filters p-3 border-bottom">
@@ -249,85 +247,129 @@
                 </div>
             }
 
-            @* ── History Items ── *@
+            @* ── Change Records ── *@
             <div id="history-container" class="p-3">
-                @foreach (var item in allHistory)
+                @foreach (var change in allChanges)
                 {
-                    var isUp = item.NewPrice > item.OldPrice;
-                    var dotClass = item.ChangePercent != 0 ? (isUp ? "up" : "down") : "neutral";
-                    var isYou = item.SellerName == Model.TrackedSeller?.SellerName;
-
-                    <div class="history-item" data-seller="@item.SellerName" style="@(isYou ? "background-color: #eff6ff; border-radius: 8px; padding: 8px;" : "")">
-
-                        <span class="hi-dot @dotClass"></span>
-
-                        <div class="hi-body">
-                            <div class="hi-header">
-                                <div class="d-flex align-items-center gap-2">
-                                    <span class="hi-seller @(isYou ? "fw-bold text-primary" : "")">@item.SellerName</span>
-                                    @if (isYou)
-                                    {
-                                        <span class="badge bg-primary font-size-9">شما</span>
-                                    }
-                                </div>
-                                <span class="hi-time">@item.CreatedDate.ToPersianRelativeTime()</span>
-                            </div>
-
-                            <div class="hi-prices">
-                                @if (item.OldPrice == item.NewPrice)
-                                {
-                                    <span class="hi-price-stable">
-                                        @item.NewPrice.ToTomanFormat()
-                                        <span class="font-size-10 text-muted fw-normal">ت</span>
-                                    </span>
-                                }
-                                else
-                                {
-                                    @if (item.OldPrice > 0)
-                                    {
-                                        <span class="hi-old">@item.OldPrice.ToTomanFormat()</span>
-                                        <span class="hi-arrow">←</span>
-                                    }
-                                    <span class="hi-new">
-                                        @item.NewPrice.ToTomanFormat()
-                                        <span class="font-size-10 text-muted fw-normal">ت</span>
-                                    </span>
-
-                                    @if (item.ChangePercent.HasValue)
-                                    {
-                                        <span class="price-change @(isUp ? "up" : "down")">
-                                            @(isUp ? "▲" : "▼") @Math.Abs(item.ChangePercent.Value).ToString("N1")%
-                                        </span>
-                                    }
-                                }
-
-                                @if (item.BuyBoxChanged)
-                                {
-                                    @if (item.IsBuyBoxWinner)
-                                    {
-                                        <span class="buybox-badge win" title="این فروشنده بای‌باکس را فتح کرد">
-                                            <i class="mdi mdi-trophy font-size-11"></i>
-                                            فتح بای‌باکس
-                                        </span>
-                                    }
-                                    else
-                                    {
-                                        <span class="buybox-badge loss" title="این فروشنده بای‌باکس را از دست داد">
-                                            <i class="mdi mdi-close-circle-outline font-size-11"></i>
-                                            خروج از بای‌باکس
-                                        </span>
-                                    }
-                                }
-                            </div>
-
-                            @if (!string.IsNullOrWhiteSpace(item.ChangeDescription))
+                    <div class="change-record mb-3">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <span class="hi-time"><i class="mdi mdi-clock-outline font-size-11"></i> @change.CreatedDate.ToPersianRelativeTime()</span>
+                            @if (change.IsStockOut)
                             {
-                                <div class="hi-description">
-                                    <i class="mdi mdi-information-outline"></i>
-                                    <span>@item.ChangeDescription</span>
-                                </div>
+                                <span class="badge bg-danger font-size-9">ناموجود شد</span>
                             }
                         </div>
+
+                        @foreach (var item in change.Items)
+                        {
+                            var isUp = item.NewPrice > item.OldPrice;
+                            var isYou = item.SellerName == Model.TrackedSeller?.SellerName;
+                            string dotClass = item.Type switch
+                            {
+                                Domain.Enums.Products.ChangeItemType.PriceChanged => isUp ? "up" : "down",
+                                Domain.Enums.Products.ChangeItemType.BuyBoxGained => "up",
+                                Domain.Enums.Products.ChangeItemType.BuyBoxLost => "down",
+                                _ => "neutral"
+                            };
+
+                            <div class="history-item" data-seller="@item.SellerName" style="@(isYou ? "background-color: #eff6ff; border-radius: 8px; padding: 8px;" : "")">
+
+                                <span class="hi-dot @dotClass"></span>
+
+                                <div class="hi-body">
+                                    <div class="hi-header">
+                                        <div class="d-flex align-items-center gap-2">
+                                            @if (!string.IsNullOrEmpty(item.SellerName))
+                                            {
+                                                <span class="hi-seller @(isYou ? "fw-bold text-primary" : "")">@item.SellerName</span>
+                                                @if (isYou)
+                                                {
+                                                    <span class="badge bg-primary font-size-9">شما</span>
+                                                }
+                                            }
+                                        </div>
+                                    </div>
+
+                                    <div class="hi-prices">
+                                        @switch (item.Type)
+                                        {
+                                            case Domain.Enums.Products.ChangeItemType.PriceChanged:
+                                                @if (item.OldPrice > 0)
+                                                {
+                                                    <span class="hi-old">@item.OldPrice.ToTomanFormat()</span>
+                                                    <span class="hi-arrow">←</span>
+                                                }
+                                                <span class="hi-new">
+                                                    @item.NewPrice.ToTomanFormat()
+                                                    <span class="font-size-10 text-muted fw-normal">ت</span>
+                                                </span>
+
+                                                @if (item.ChangePercent.HasValue)
+                                                {
+                                                    <span class="price-change @(isUp ? "up" : "down")">
+                                                        @(isUp ? "▲" : "▼") @Math.Abs(item.ChangePercent.Value).ToString("N1")%
+                                                    </span>
+                                                }
+                                                break;
+
+                                            case Domain.Enums.Products.ChangeItemType.BuyBoxGained:
+                                                <span class="buybox-badge win" title="این فروشنده بای‌باکس را فتح کرد">
+                                                    <i class="mdi mdi-trophy font-size-11"></i>
+                                                    فتح بای‌باکس
+                                                </span>
+                                                break;
+
+                                            case Domain.Enums.Products.ChangeItemType.BuyBoxLost:
+                                                <span class="buybox-badge loss" title="این فروشنده بای‌باکس را از دست داد">
+                                                    <i class="mdi mdi-close-circle-outline font-size-11"></i>
+                                                    خروج از بای‌باکس
+                                                </span>
+                                                break;
+
+                                            case Domain.Enums.Products.ChangeItemType.SellerAdded:
+                                                <span class="seller-chip" title="فروشنده جدید به این تنوع اضافه شد">
+                                                    <i class="mdi mdi-plus-circle-outline font-size-11"></i>
+                                                    فروشنده جدید
+                                                    @if (item.NewPrice > 0)
+                                                    {
+                                                        <span class="fw-bold">@item.NewPrice.ToTomanFormat() ت</span>
+                                                    }
+                                                </span>
+                                                break;
+
+                                            case Domain.Enums.Products.ChangeItemType.SellerRemoved:
+                                                <span class="seller-chip" title="این فروشنده ناموجود شد یا حذف شد">
+                                                    <i class="mdi mdi-minus-circle-outline font-size-11"></i>
+                                                    فروشنده ناموجود شد
+                                                    @if (item.OldPrice > 0)
+                                                    {
+                                                        <span>@item.OldPrice.ToTomanFormat() ت</span>
+                                                    }
+                                                </span>
+                                                break;
+
+                                            case Domain.Enums.Products.ChangeItemType.SellerBackInStock:
+                                                <span class="seller-chip" title="این فروشنده مجدداً موجود شد">
+                                                    <i class="mdi mdi-check-circle-outline font-size-11"></i>
+                                                    مجدداً موجود شد
+                                                    @if (item.NewPrice > 0)
+                                                    {
+                                                        <span class="fw-bold">@item.NewPrice.ToTomanFormat() ت</span>
+                                                    }
+                                                </span>
+                                                break;
+
+                                            case Domain.Enums.Products.ChangeItemType.StockOut:
+                                                <span class="badge bg-danger-subtle text-danger font-size-10">
+                                                    <i class="mdi mdi-package-variant-closed font-size-11"></i>
+                                                    محصول در این رنگ کاملاً ناموجود شد
+                                                </span>
+                                                break;
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        }
                     </div>
                 }
             </div>
