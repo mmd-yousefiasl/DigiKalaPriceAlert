@@ -370,3 +370,4 @@ FodyWeavers.xsd
 /Web/KeyDirectory
 /Web/appsettings.Production.json
 /Web/appsettings.Development.json
+/Web/DigiAPIDocs/
