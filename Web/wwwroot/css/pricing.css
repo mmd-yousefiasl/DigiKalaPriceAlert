@@ -1,0 +1,622 @@
+﻿:root {
+    --digito-red-50: #fef2f2;
+    --digito-red-100: #fee2e2;
+    --digito-red-200: #fecaca;
+    --digito-red-400: #f87171;
+    --digito-red-500: #ef4444;
+    --digito-red-600: #dc2626;
+    --digito-red-700: #b91c1c;
+    --digito-ink: #1f2937;
+    --digito-muted: #6b7280;
+    --digito-line: #e5e7eb;
+}
+
+/* Add this to .digito-pricing-grid so hidden sections fade cleanly */
+.digito-pricing-grid[hidden] {
+    display: none;
+}
+/* ============ HERO ============ */
+.digito-hero {
+    text-align: center;
+    padding: 48px 20px 24px;
+    max-width: 760px;
+    margin: 0 auto;
+}
+
+.digito-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--digito-red-50);
+    color: var(--digito-red-700);
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 18px;
+}
+
+.digito-badge-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--digito-red-500);
+    animation: pulse 1.8s infinite;
+}
+
+@@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: .5;
+        transform: scale(1.3);
+    }
+}
+
+.digito-hero-title {
+    font-size: clamp(24px, 4vw, 38px);
+    font-weight: 800;
+    line-height: 1.4;
+    color: var(--digito-ink);
+    margin: 0 0 16px;
+}
+
+    .digito-hero-title .highlight {
+        background: linear-gradient(120deg, var(--digito-red-600) 0%, var(--digito-red-400) 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
+
+.digito-hero-desc {
+    font-size: 16px;
+    line-height: 1.9;
+    color: #4b5563;
+    margin: 0 auto;
+    max-width: 620px;
+}
+
+/* ============ TOGGLE ============ */
+.digito-toggle {
+    display: inline-flex;
+    gap: 4px;
+    margin-top: 28px;
+    background: #f3f4f6;
+    padding: 5px;
+    border-radius: 14px;
+    border: 1px solid var(--digito-line);
+}
+
+.digito-toggle-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: 10px;
+    border: none;
+    background: transparent;
+    color: var(--digito-muted);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all .25s cubic-bezier(.4,0,.2,1);
+}
+
+    .digito-toggle-btn:hover {
+        color: #374151;
+    }
+
+    .digito-toggle-btn.active {
+        background: #fff;
+        color: var(--digito-red-600);
+        box-shadow: 0 2px 8px rgba(220, 38, 38, .15), 0 1px 2px rgba(0,0,0,.04);
+    }
+
+.digito-toggle-tag {
+    background: linear-gradient(120deg, var(--digito-red-600), var(--digito-red-400));
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 999px;
+}
+
+/* ============ PRICING CARD ============ */
+.digito-pricing-card {
+    background: #fff;
+    border: 1px solid var(--digito-line);
+    border-radius: 18px;
+    padding: 28px 24px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity .5s ease, transform .5s cubic-bezier(.2,.8,.2,1), box-shadow .3s, border-color .3s;
+}
+
+    .digito-pricing-card.in-view {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .digito-pricing-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 20px 40px -18px rgba(0,0,0,.18);
+        border-color: #d1d5db;
+    }
+
+    /* Best choice — red gradient border + red glow */
+    .digito-pricing-card.popular {
+        border: 2px solid transparent;
+        background: linear-gradient(#fff, #fff) padding-box, linear-gradient(135deg, var(--digito-red-600), var(--digito-red-400)) border-box;
+        box-shadow: 0 20px 50px -20px rgba(220, 38, 38, .35);
+        transform: translateY(-8px) scale(1.02);
+    }
+
+        .digito-pricing-card.popular.in-view {
+            transform: translateY(-8px) scale(1.02);
+        }
+
+        .digito-pricing-card.popular:hover {
+            transform: translateY(-14px) scale(1.03);
+        }
+
+.digito-popular-badge {
+    position: absolute;
+    top: -14px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: linear-gradient(120deg, var(--digito-red-600), var(--digito-red-400));
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 6px 14px;
+    border-radius: 999px;
+    box-shadow: 0 6px 16px -6px rgba(220,38,38,.6);
+    white-space: nowrap;
+    animation: float 3s ease-in-out infinite;
+}
+
+@@keyframes float {
+    0%, 100% {
+        transform: translateX(-50%) translateY(0);
+    }
+
+    50% {
+        transform: translateX(-50%) translateY(-4px);
+    }
+}
+
+.digito-plan-name {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--digito-ink);
+    margin: 0 0 6px;
+}
+
+.digito-plan-desc {
+    font-size: 13px;
+    color: var(--digito-muted);
+    margin: 0 0 20px;
+    line-height: 1.7;
+}
+
+/* ============ PRICE ============ */
+.digito-plan-price {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+    border-bottom: 1px dashed var(--digito-line);
+}
+
+.digito-price-amount {
+    font-size: 30px;
+    font-weight: 900;
+    color: var(--digito-ink);
+    line-height: 1.1;
+    letter-spacing: -.5px;
+    font-variant-numeric: tabular-nums;
+}
+
+.digito-price-currency {
+    font-size: 12.5px;
+    color: var(--digito-muted);
+}
+
+.digito-price-save {
+    display: inline-block;
+    align-self: flex-start;
+    background: var(--digito-red-50);
+    color: var(--digito-red-700);
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 999px;
+    margin-top: 6px;
+}
+
+/* ============ FEATURES ============ */
+.digito-features-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    flex-grow: 1;
+}
+
+    .digito-features-list li {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        font-size: 13.5px;
+        color: #374151;
+        line-height: 1.7;
+    }
+
+.digito-icon-check {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--digito-red-50);
+    color: var(--digito-red-600);
+    border-radius: 50%;
+    font-size: 11px;
+    font-weight: 900;
+    margin-top: 2px;
+}
+
+.digito-icon-cross {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #f3f4f6;
+    color: #9ca3af;
+    border-radius: 50%;
+    font-size: 10px;
+    font-weight: 900;
+    margin-top: 2px;
+}
+
+.digito-feature-disabled {
+    opacity: .55;
+}
+
+/* ============ BUTTONS ============ */
+.digito-btn {
+    display: block;
+    width: 100%;
+    text-align: center;
+    padding: 13px 20px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform .2s, box-shadow .2s, background .2s, color .2s;
+    border: 1.5px solid transparent;
+}
+
+    .digito-btn:active {
+        transform: scale(.98);
+    }
+
+.digito-btn-primary {
+    background: linear-gradient(120deg, var(--digito-red-600), var(--digito-red-400));
+    color: #fff;
+    box-shadow: 0 8px 20px -8px rgba(220,38,38,.6);
+}
+
+    .digito-btn-primary:hover {
+        box-shadow: 0 12px 28px -8px rgba(220,38,38,.75);
+        transform: translateY(-2px);
+    }
+
+.digito-btn-secondary {
+    background: #f3f4f6;
+    color: #374151;
+    border-color: var(--digito-line);
+}
+
+    .digito-btn-secondary:hover {
+        background: #e5e7eb;
+    }
+
+.digito-btn-outline {
+    background: transparent;
+    color: var(--digito-red-600);
+    border-color: var(--digito-red-200);
+}
+
+    .digito-btn-outline:hover {
+        background: var(--digito-red-50);
+        border-color: var(--digito-red-400);
+    }
+
+.digito-btn-lg {
+    padding: 16px 28px;
+    font-size: 15px;
+}
+
+/* ============ NOTIFY STRIP ============ */
+.digito-notify-strip {
+    max-width: 1080px;
+    margin: 40px auto 0;
+    padding: 24px;
+    background: #fafafa;
+    border: 1px solid var(--digito-line);
+    border-radius: 18px;
+    transition: opacity .25s ease, transform .25s ease;
+}
+
+.digito-notify-head {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 20px;
+}
+
+.digito-notify-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: var(--digito-red-50);
+    color: var(--digito-red-600);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.digito-notify-head h3 {
+    font-size: 17px;
+    font-weight: 800;
+    color: var(--digito-ink);
+    margin: 0;
+}
+
+.digito-notify-head p {
+    font-size: 13px;
+    color: var(--digito-muted);
+    margin: 2px 0 0;
+}
+
+.digito-notify-plans {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+
+.digito-notify-plan {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    background: #fff;
+    border: 1px solid var(--digito-line);
+    border-radius: 12px;
+    padding: 14px 16px;
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity .4s ease, transform .4s ease, border-color .25s, box-shadow .25s;
+}
+
+    .digito-notify-plan.in-view {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .digito-notify-plan:hover {
+        border-color: var(--digito-red-200);
+        box-shadow: 0 6px 16px -6px rgba(0,0,0,.08);
+    }
+
+.digito-notify-plan--best {
+    border-color: var(--digito-red-200);
+    background: var(--digito-red-50);
+}
+
+.digito-notify-days {
+    font-size: 13px;
+    font-weight: 700;
+    color: #374151;
+}
+
+.digito-notify-price {
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--digito-ink);
+    font-variant-numeric: tabular-nums;
+}
+
+.digito-notify-btn {
+    font-size: 12.5px;
+    font-weight: 700;
+    padding: 7px 14px;
+    border-radius: 8px;
+    background: #fff;
+    color: var(--digito-red-600);
+    border: 1px solid var(--digito-red-200);
+    text-decoration: none;
+    transition: all .2s;
+}
+
+    .digito-notify-btn:hover {
+        background: var(--digito-red-50);
+    }
+
+.digito-notify-btn--primary {
+    background: linear-gradient(120deg, var(--digito-red-600), var(--digito-red-400));
+    color: #fff;
+    border-color: transparent;
+}
+
+/* ============ ROI BANNER ============ */
+.digito-roi-banner {
+    max-width: 1080px;
+    margin: 56px auto 0;
+    padding: 32px;
+    background: linear-gradient(135deg, var(--digito-red-50) 0%, #fff5f5 100%);
+    border: 1px solid var(--digito-red-100);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    flex-wrap: wrap;
+}
+
+.digito-roi-content {
+    flex: 1;
+    min-width: 280px;
+}
+
+.digito-roi-title {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--digito-ink);
+    margin: 0 0 10px;
+    line-height: 1.6;
+}
+
+.digito-roi-desc {
+    font-size: 14px;
+    line-height: 2;
+    color: #4b5563;
+    margin: 0;
+}
+
+.digito-roi-cta {
+    flex-shrink: 0;
+}
+
+/* ============ RESPONSIVE ============ */
+@@media (max-width: 900px) {
+    .digito-pricing-grid {
+        grid-template-columns: 1fr;
+        max-width: 460px;
+    }
+
+    .digito-pricing-card.popular,
+    .digito-pricing-card.popular.in-view {
+        transform: none;
+    }
+
+        .digito-pricing-card.popular:hover {
+            transform: translateY(-6px);
+        }
+
+    .digito-notify-plans {
+        grid-template-columns: 1fr;
+    }
+}
+
+@@media (max-width: 640px) {
+    .digito-toggle {
+        flex-direction: column;
+        width: 100%;
+        max-width: 320px;
+    }
+
+    .digito-toggle-btn {
+        justify-content: center;
+    }
+
+    .digito-roi-banner {
+        padding: 24px;
+        text-align: center;
+        justify-content: center;
+    }
+
+    .digito-price-amount {
+        font-size: 26px;
+    }
+}
+/* ============ PRICING GRID — auto responsive ============ */
+.digito-pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+    max-width: 1080px;
+    margin: 40px auto 0;
+    padding: 0 20px;
+    box-sizing: border-box;
+    transition: opacity .25s ease, transform .25s ease;
+}
+
+    .digito-pricing-grid[hidden] {
+        display: none;
+    }
+
+/* On wide screens, cap to 3 columns so cards don't get huge */
+@media (min-width: 1024px) {
+    .digito-pricing-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+/* Medium: 2 columns */
+@media (min-width: 640px) and (max-width: 1023px) {
+    .digito-pricing-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        max-width: 720px;
+    }
+        /* 3rd card spans full width on 2-col layout */
+        .digito-pricing-grid > .digito-pricing-card:nth-child(3) {
+            grid-column: 1 / -1;
+            max-width: 460px;
+            margin-inline: auto;
+            width: 100%;
+        }
+}
+
+/* Small: 1 column */
+@media (max-width: 639px) {
+    .digito-pricing-grid {
+        grid-template-columns: 1fr;
+        max-width: 460px;
+        padding: 0 16px;
+        gap: 20px;
+    }
+
+    /* Reset popular card transforms on mobile */
+    .digito-pricing-card.popular,
+    .digito-pricing-card.popular.in-view {
+        transform: none;
+    }
+
+        .digito-pricing-card.popular:hover {
+            transform: translateY(-4px);
+        }
+}
+
+/* Make sure cards can actually shrink */
+.digito-pricing-card {
+    min-width: 0; /* critical for grid children */
+    box-sizing: border-box;
+    word-wrap: break-word;
+    overflow-wrap: anywhere;
+}
+
+/* Prevent long price numbers from overflowing on tiny screens */
+.digito-price-amount {
+    word-break: keep-all;
+    white-space: nowrap;
+    font-size: clamp(22px, 5vw, 30px);
+}
