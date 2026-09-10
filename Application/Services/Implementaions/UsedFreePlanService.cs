@@ -1,6 +1,7 @@
 ﻿using Application.Services.Interfaces;
 using Application.Tools;
 using Data.Context;
+using Domain.Enums.SubscriptionPlans;
 using Domain.Models.SubscriptionPlans;
 using Domain.Shared;
 using Microsoft.AspNetCore.Http;
@@ -24,7 +25,7 @@ namespace Application.Services.Implementaions
         }
         #endregion
 
-        public async Task<Result> ClientSideCanUserGetFreePlan()
+        public async Task<Result> ClientSideCanUserGetFreePlan(UsedFreePlanTypeEnum type)
         {
             var userId = _httpContextAccessor.HttpContext.User.GetUserId();
             if (userId < 1)
@@ -37,13 +38,13 @@ namespace Application.Services.Implementaions
             if (string.IsNullOrWhiteSpace(mobile))
                 return Result.Failure(Messages.OperationFailedError);
 
-            if (await _context.UsedFreePlans.AnyAsync(n => n.Mobile == mobile))
+            if (await _context.UsedFreePlans.AnyAsync(n => n.Mobile == mobile && n.Type == type))
                 return Result.Failure(Messages.YouAlreadyUsedFreePlanError);
 
             return Result.Success(Messages.FreePlanActivatedSuccessfully);
         }
 
-        public async Task<Result> ClientSideCreateNewUsedFreePlan()
+        public async Task<Result> ClientSideCreateNewUsedFreePlan(UsedFreePlanTypeEnum type)
         {
             var userId = _httpContextAccessor.HttpContext.User.GetUserId();
             if (userId < 1)
@@ -56,13 +57,14 @@ namespace Application.Services.Implementaions
             if (string.IsNullOrWhiteSpace(mobile))
                 return Result.Failure(Messages.OperationFailedError);
 
-            if (await _context.UsedFreePlans.AnyAsync(n => n.Mobile == mobile))
+            if (await _context.UsedFreePlans.AnyAsync(n => n.Mobile == mobile && n.Type == type))
                 return Result.Failure(Messages.OperationFailedError);
 
             var usedFreePlan = new UsedFreePlan()
             {
                 Mobile = mobile,
                 UserId = userId,
+                Type = type
             };
 
             _context.UsedFreePlans.Add(usedFreePlan);

@@ -3,6 +3,7 @@ using Application.Dtos.BalanceTransaction.ClientSide;
 using Application.Dtos.Users.AdminSide;
 using Application.Dtos.Users.ClientSide;
 using Application.Dtos.UserValidation;
+using Domain.Enums.SubscriptionPlans;
 using Domain.Shared;
 
 namespace Application.Services.Interfaces
@@ -35,7 +36,7 @@ namespace Application.Services.Interfaces
 
         Task<Result> ClientSideWithdrawUserOrder(ClientSideWithdrawUserOrderDto dto);
 
-        Task<Result> ClientSideAddToUserSubscription(int durationInDays);
+        Task<Result> ClientSideAddToUserSubscription(int durationInDays, UsedFreePlanTypeEnum type);
 
         Task<Result> ClientSideCanUserAddProduct();
 

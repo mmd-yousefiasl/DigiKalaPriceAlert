@@ -16,7 +16,7 @@ namespace Data.Context.Configurations.SubscriptionPlans
                 .HasMaxLength(11)
                 .IsRequired();
 
-            builder.HasIndex(ufp => ufp.Mobile)
+            builder.HasIndex(ufp => new { ufp.Mobile, ufp.Type })
                 .IsUnique();
         }
     }

@@ -7,7 +7,8 @@ namespace Domain.Models.Users
         public string Mobile { get; set; }
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
-        public DateTime? SubscriptionEndDate { get; set; }
+        public DateTime? NotificationSubscriptionEndDate { get; set; }
+        public DateTime? AutoPriceSubscriptionEndDate { get; set; }
         public bool IsUserBanned { get; set; } = false;
         public decimal Balance { get; set; }
         public int AccessFailedCount { get; set; } = 0;

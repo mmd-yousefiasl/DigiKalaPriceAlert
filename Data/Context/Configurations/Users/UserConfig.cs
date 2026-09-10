@@ -13,8 +13,11 @@ namespace Data.Context.Configurations.Users
 
             builder.HasQueryFilter(u => !u.IsDeleted);
 
-            builder.HasIndex(u => u.SubscriptionEndDate)
-                .HasFilter("\"IsDeleted\" = 'false' AND \"SubscriptionEndDate\" IS NOT NULL");
+            builder.HasIndex(u => u.NotificationSubscriptionEndDate)
+                .HasFilter("\"IsDeleted\" = 'false' AND \"NotificationSubscriptionEndDate\" IS NOT NULL");
+
+            builder.HasIndex(u => u.AutoPriceSubscriptionEndDate)
+                .HasFilter("\"IsDeleted\" = 'false' AND \"AutoPriceSubscriptionEndDate\" IS NOT NULL");
 
             builder.Property(u => u.Mobile)
                 .HasMaxLength(11)

@@ -9,6 +9,7 @@ using Application.Mediator;
 using Application.Services.Interfaces;
 using Application.Tools;
 using Data.Context;
+using Domain.Enums.SubscriptionPlans;
 using Domain.Enums.Users;
 using Domain.Events.Users;
 using Domain.Models.Users;
@@ -337,7 +338,7 @@ namespace Application.Services.Implementaions
                     LastName = u.LastName,
                     IsUserBanned = u.IsUserBanned,
                     Mobile = u.Mobile,
-                    SubscriptionEndDate = u.SubscriptionEndDate,
+                    SubscriptionEndDate = u.NotificationSubscriptionEndDate,
                     Balance = u.Balance,
                     UserRoles = u.UserRoleMapping.Where(urm => urm.UserId == u.Id)
                     .Select(urm => new AdminSideRoleDto()
@@ -368,7 +369,7 @@ namespace Application.Services.Implementaions
                     LastName = u.LastName,
                     IsUserBanned = u.IsUserBanned,
                     Mobile = u.Mobile,
-                    SubscriptionEndDate = u.SubscriptionEndDate,
+                    SubscriptionEndDate = u.NotificationSubscriptionEndDate,
                     Balance = u.Balance,
                     UserRoles = u.UserRoleMapping.Where(urm => urm.UserId == u.Id)
                     .Select(urm => new AdminSideRoleDto()
@@ -427,7 +428,7 @@ namespace Application.Services.Implementaions
             return Result.Success();
         }
 
-        public async Task<Result> ClientSideAddToUserSubscription(int durationInDays)
+        public async Task<Result> ClientSideAddToUserSubscription(int durationInDays, UsedFreePlanTypeEnum type)
         {
             if (durationInDays < 1)
                 return Result.Failure(Messages.OperationFailedError);
@@ -440,13 +441,27 @@ namespace Application.Services.Implementaions
             if (user is null)
                 return Result.Failure(Messages.OperationFailedError);
 
-            if (user.SubscriptionEndDate == null || user.SubscriptionEndDate <= DateTime.UtcNow)
+            if (type == UsedFreePlanTypeEnum.Notification)
             {
-                user.SubscriptionEndDate = DateTime.UtcNow.AddDays(durationInDays);
+                if (user.NotificationSubscriptionEndDate == null || user.NotificationSubscriptionEndDate <= DateTime.UtcNow)
+                {
+                    user.NotificationSubscriptionEndDate = DateTime.UtcNow.AddDays(durationInDays);
+                }
+                else
+                {
+                    user.NotificationSubscriptionEndDate = user.NotificationSubscriptionEndDate.Value.AddDays(durationInDays);
+                }
             }
             else
             {
-                user.SubscriptionEndDate = user.SubscriptionEndDate.Value.AddDays(durationInDays);
+                if (user.AutoPriceSubscriptionEndDate == null || user.AutoPriceSubscriptionEndDate <= DateTime.UtcNow)
+                {
+                    user.AutoPriceSubscriptionEndDate = DateTime.UtcNow.AddDays(durationInDays);
+                }
+                else
+                {
+                    user.AutoPriceSubscriptionEndDate = user.AutoPriceSubscriptionEndDate.Value.AddDays(durationInDays);
+                }
             }
 
             _context.Users.Update(user);
@@ -474,7 +489,7 @@ namespace Application.Services.Implementaions
 
             var currentDate = DateTime.UtcNow;
 
-            if (await _context.Users.AnyAsync(n => n.Id == userId && n.SubscriptionEndDate > currentDate))
+            if (await _context.Users.AnyAsync(n => n.Id == userId && n.NotificationSubscriptionEndDate > currentDate))
                 return Result.Success();
 
             return Result.Failure(Messages.OperationFailedError);

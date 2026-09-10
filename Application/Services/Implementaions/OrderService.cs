@@ -9,6 +9,7 @@ using Application.Tools;
 using Data.Context;
 using Domain.Enums.Orders;
 using Domain.Enums.Payment;
+using Domain.Enums.SubscriptionPlans;
 using Domain.Enums.Users;
 using Domain.Events.Orders;
 using Domain.Models.Orders;
@@ -180,7 +181,18 @@ namespace Application.Services.Implementaions
 
             if (order.SubscriptionPlanId == 1)
             {
-                var userResult = await _usedFreePlanService.ClientSideCanUserGetFreePlan();
+                var userResult = await _usedFreePlanService.ClientSideCanUserGetFreePlan(UsedFreePlanTypeEnum.Notification);
+                if (userResult.IsFailure)
+                    return Result.Failure<ClientSideProceedToCheckoutDto>(userResult.Message!);
+
+                return new ClientSideProceedToCheckoutDto()
+                {
+                    IsDone = true
+                };
+            }
+            else if (order.SubscriptionPlanId == 6)
+            {
+                var userResult = await _usedFreePlanService.ClientSideCanUserGetFreePlan(UsedFreePlanTypeEnum.AutoPricing);
                 if (userResult.IsFailure)
                     return Result.Failure<ClientSideProceedToCheckoutDto>(userResult.Message!);
 
@@ -276,9 +288,23 @@ namespace Application.Services.Implementaions
             if (order is null)
                 return Result.Failure<string>(Messages.OperationFailedError);
 
-            if (order.SubscriptionPlanId == 1)
+            var planId = order.SubscriptionPlanId;
+            var isNotificationPlan = planId is 1 or 2 or 3;
+            var isAutoPricingPlan = planId is 4 or 5 or 6;
+
+            if (!isNotificationPlan && !isAutoPricingPlan)
+                return Result.Failure<string>(Messages.OperationFailedError);
+
+            // ─────────── Free-plan guard (runs before the transaction) ───────────
+            if (planId == 1) // notification trial
             {
-                var userResult = await _usedFreePlanService.ClientSideCanUserGetFreePlan();
+                var userResult = await _usedFreePlanService.ClientSideCanUserGetFreePlan(UsedFreePlanTypeEnum.Notification);
+                if (userResult.IsFailure)
+                    return Result.Failure<string>(userResult.Message!);
+            }
+            else if (planId == 6) // auto-pricing trial
+            {
+                var userResult = await _usedFreePlanService.ClientSideCanUserGetFreePlan(UsedFreePlanTypeEnum.AutoPricing);
                 if (userResult.IsFailure)
                     return Result.Failure<string>(userResult.Message!);
             }
@@ -289,9 +315,19 @@ namespace Application.Services.Implementaions
                 using var dbTx = await _context.Database.BeginTransactionAsync();
                 try
                 {
-                    if (order.SubscriptionPlanId == 1)
+                    // ─────────── Record free-plan usage ───────────
+                    if (planId == 1)
                     {
-                        var userUsedResult = await _usedFreePlanService.ClientSideCreateNewUsedFreePlan();
+                        var userUsedResult = await _usedFreePlanService.ClientSideCreateNewUsedFreePlan(UsedFreePlanTypeEnum.Notification);
+                        if (userUsedResult.IsFailure)
+                        {
+                            await dbTx.RollbackAsync();
+                            return Result.Failure<string>(userUsedResult.Message!);
+                        }
+                    }
+                    else if (planId == 6)
+                    {
+                        var userUsedResult = await _usedFreePlanService.ClientSideCreateNewUsedFreePlan(UsedFreePlanTypeEnum.AutoPricing);
                         if (userUsedResult.IsFailure)
                         {
                             await dbTx.RollbackAsync();
@@ -299,6 +335,7 @@ namespace Application.Services.Implementaions
                         }
                     }
 
+                    // ─────────── Withdraw balance ───────────
                     var withdrawRes = await _userService.ClientSideWithdrawUserOrder(new ClientSideWithdrawUserOrderDto()
                     {
                         Amount = order.SubscriptionPlan.Price,
@@ -311,13 +348,26 @@ namespace Application.Services.Implementaions
                         return Result.Failure<string>(withdrawRes.Message!);
                     }
 
+                    // ─────────── Finalize order ───────────
                     order.PaidDate = DateTime.UtcNow;
                     order.PlanPrice = order.SubscriptionPlan.Price;
                     order.PlanTitle = order.SubscriptionPlan.Name;
                     order.Status = OrderStatusEnum.Success;
                     _context.Orders.Update(order);
 
-                    var userSubResult = await _userService.ClientSideAddToUserSubscription(order.SubscriptionPlan.DurationInDays);
+                    // ─────────── Activate the matching subscription ───────────
+                    Result userSubResult;
+                    if (isNotificationPlan)
+                    {
+                        userSubResult = await _userService
+                            .ClientSideAddToUserSubscription(order.SubscriptionPlan.DurationInDays, UsedFreePlanTypeEnum.Notification);
+                    }
+                    else // auto-pricing
+                    {
+                        userSubResult = await _userService
+                            .ClientSideAddToUserSubscription(order.SubscriptionPlan.DurationInDays, UsedFreePlanTypeEnum.AutoPricing);
+                    }
+
                     if (userSubResult.IsFailure)
                     {
                         await dbTx.RollbackAsync();
@@ -328,16 +378,16 @@ namespace Application.Services.Implementaions
                     await dbTx.CommitAsync();
 
                     OrderUpdatedEvent OrderUpdatedEvent = new OrderUpdatedEvent(
-                    order.Id,
-                    order.CreatedDate,
-                    order.LastUpdatedDate,
-                    order.Status,
-                    order.PlanPrice,
-                    order.PlanTitle,
-                    order.PaidDate,
-                    order.InvoiceId,
-                    order.SubscriptionPlanId,
-                    order.UserId);
+                        order.Id,
+                        order.CreatedDate,
+                        order.LastUpdatedDate,
+                        order.Status,
+                        order.PlanPrice,
+                        order.PlanTitle,
+                        order.PaidDate,
+                        order.InvoiceId,
+                        order.SubscriptionPlanId,
+                        order.UserId);
 
                     await _mediator.PublishEvent(OrderUpdatedEvent);
 

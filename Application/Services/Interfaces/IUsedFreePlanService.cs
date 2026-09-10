@@ -1,11 +1,12 @@
-﻿using Domain.Shared;
+﻿using Domain.Enums.SubscriptionPlans;
+using Domain.Shared;
 
 namespace Application.Services.Interfaces
 {
     public interface IUsedFreePlanService
     {
-        Task<Result> ClientSideCanUserGetFreePlan();
+        Task<Result> ClientSideCanUserGetFreePlan(UsedFreePlanTypeEnum type);
 
-        Task<Result> ClientSideCreateNewUsedFreePlan();
+        Task<Result> ClientSideCreateNewUsedFreePlan(UsedFreePlanTypeEnum typeEnum);
     }
 }
