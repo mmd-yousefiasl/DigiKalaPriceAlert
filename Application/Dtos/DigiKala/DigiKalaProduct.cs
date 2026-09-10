@@ -17,7 +17,8 @@ namespace Application.Dtos.DigiKala
         public DigiKalaImages? Images { get; init; }
 
         [JsonPropertyName("default_variant")]
-        public DigiKalaVariant? DefaultVariant { get; init; }
+        [JsonConverter(typeof(DefaultVariantIdConverter))]
+        public long? DefaultVariantId { get; init; }
 
         [JsonPropertyName("variants")]
         public List<DigiKalaVariant>? Variants { get; init; }

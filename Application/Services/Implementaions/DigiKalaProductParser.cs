@@ -42,7 +42,7 @@ namespace Application.Services.Implementaions
                     Title = product.Title ?? DigiKalaDefaults.NoTitle,
                     Url = $"https://www.digikala.com/product/dkp-{digiKalaId}/",
                     ImageUrl = product.Images?.Main?.Urls?.FirstOrDefault(),
-                    DefaultVariantId = product.DefaultVariant?.Id ?? 0,
+                    DefaultVariantId = product.DefaultVariantId ?? 0,
                     Sellers = sellers
                 });
             }
