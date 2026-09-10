@@ -65,6 +65,27 @@ namespace Web
             });
 
             services.AddHttpClient<ITelegramService, TelegramService>();
+
+            services.AddHttpClient<IDkHealthApiService, DkHealthApiService>((sp, client) =>
+            {
+                var config = sp.GetRequiredService<IConfiguration>();
+                client.BaseAddress = new Uri(config["DkMarketplace:BaseUrl"]!);
+                client.DefaultRequestHeaders.Add("Accept", "application/json");
+            });
+
+            services.AddHttpClient<IDkAuthApiService, DkAuthApiService>((sp, client) =>
+            {
+                var config = sp.GetRequiredService<IConfiguration>();
+                client.BaseAddress = new Uri(config["DkMarketplace:BaseUrl"]!);
+                client.DefaultRequestHeaders.Add("Accept", "application/json");
+            });
+
+            services.AddHttpClient<IDkMarketplaceApiService, DkMarketplaceApiService>((sp, client) =>
+            {
+                var config = sp.GetRequiredService<IConfiguration>();
+                client.BaseAddress = new Uri(config["DkMarketplace:BaseUrl"]!);
+                client.DefaultRequestHeaders.Add("Accept", "application/json");
+            });
             #endregion
 
             #region Scoped Services

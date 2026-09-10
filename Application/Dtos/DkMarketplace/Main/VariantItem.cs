@@ -1,0 +1,69 @@
+﻿namespace Application.Dtos.DkMarketplace.Main
+{
+    public sealed class VariantItem
+    {
+        public int? Id { get; init; }
+        public string? ImageSrc { get; init; }
+        public int? SellerId { get; init; }
+        public string? MainCategoryTitle { get; init; }
+        public int? CategoryId { get; init; }
+        public int? ProductId { get; init; }
+        public string? ProductUrl { get; init; }
+        public int? ProductVariantId { get; init; }
+        public string? SupplierCode { get; init; }
+        public string? ProductModerationStatus { get; init; }
+        public string? Title { get; init; }
+        public string? ProductTitle { get; init; }
+        public bool? Active { get; init; }
+        public int? LeadTime { get; init; }
+        public int? PriceList { get; init; }
+        public string? MarketPriceLastUpdate { get; init; }
+        public string? PriceType { get; init; }
+        public string? SellingChannelSite { get; init; }
+        public int? PriceSale { get; init; }
+        public int? CashSellingPrice { get; init; }
+        public int? CreditSellingPrice { get; init; }
+        public int? PriceLimit { get; init; }
+        public int? InitialLimit { get; init; }
+        public double? CreditIncreasePercentage { get; init; }
+        public double? MaximumCreditIncreasePercentage { get; init; }
+        public int? MarketplaceSellerStock { get; init; }
+        public int? WarehouseStock { get; init; }
+        public int? OnTheWayStock { get; init; }
+        public int? Reservation { get; init; }
+        public int? LeftConsumer { get; init; }
+        public int? MaximumPerOrder { get; init; }
+        public int? AllowedCount { get; init; }
+        public bool? OvlSellingActive { get; init; }
+        public string? CreatedAt { get; init; }
+        public bool? PolActive { get; init; }
+        public VariantB2bParams? B2bParams { get; init; }
+        public int? MaxLeadTime { get; init; }
+        public int? BuyBoxPrice { get; init; }
+        public string? BuyBoxBadgeLabel { get; init; }
+        public bool? IsBuyBoxWinner { get; init; }
+        public bool? IsSkuWinner { get; init; }
+        public VariantSkuConfig? SkuConfig { get; init; }
+        public bool? IsSellerBuyBoxWinner { get; init; }
+        public bool? IsInBuyBoxChallenge { get; init; }
+        public string? SuppressedUntil { get; init; }
+        public string? SuppressionReason { get; init; }
+        public VariantSellingChannel? ProductSellingChanel { get; init; }
+        public VariantSellingChannel? VariantSellingChanel { get; init; }
+        public bool? IsInIncrediblePromotion { get; init; }
+        public bool? IsInPeriodicPromotion { get; init; }
+        public bool? IsInPromotion { get; init; }
+        public int? PromotionPrice { get; init; }
+        public int? ShippingNatureId { get; init; }
+        public int? DefaultSellingChanelCode { get; init; }
+        public double? Rating { get; init; }
+        public bool? IsPromotionManagementVisibleForSeller { get; init; }
+        public bool? IsArchived { get; init; }
+        public int? FulfilmentAndDeliveryCost { get; init; }
+        public int? SellerReservation { get; init; }
+        public int? DigikalaReservation { get; init; }
+        public int? SellerShippingLeadTime { get; init; }
+        public List<VariantThemeValue>? ThemeValues { get; init; }
+        public VariantShippingOptions? ShippingOptions { get; init; }
+    }
+}

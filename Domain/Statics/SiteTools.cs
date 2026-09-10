@@ -83,5 +83,11 @@
         public static bool TelegramErrorAlertingEnabled { get; set; }
 
         #endregion
+
+        #region DkApiServiceBase
+
+        public static string DkApiServiceBase { get; set; }
+
+        #endregion
     }
 }
