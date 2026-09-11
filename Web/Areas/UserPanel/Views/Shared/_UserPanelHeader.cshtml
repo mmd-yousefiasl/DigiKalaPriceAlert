@@ -18,17 +18,70 @@
         </div>
 
         <div class="d-flex">
+
+            <!-- ============ QUICK ACCESS ============ -->
+            <a asp-area="UserPanel" asp-controller="Product" asp-action="ProductsList"
+               class="btn header-item waves-effect qa-link"
+               title="اعلان تغییر قیمت" aria-label="اعلان تغییر قیمت">
+                <i class="mdi mdi-bell-outline align-middle fs-22"></i>
+                <span class="qa-label">اعلان قیمت</span>
+            </a>
+
+            <a asp-area="UserPanel" asp-controller="AutoPricing" asp-action="Index"
+               class="btn header-item waves-effect qa-link"
+               title="قیمت‌گذاری خودکار" aria-label="قیمت‌گذاری خودکار">
+                <i class="mdi mdi-robot-outline align-middle fs-22"></i>
+                <span class="qa-label">قیمت‌گذاری خودکار</span>
+            </a>
+            <!-- ============ /QUICK ACCESS ============ -->
+
             <div class="dropdown d-inline-block">
-                <button type="button" class="btn header-item waves-effect" id="page-header-user-dropdown"
+
+                <button type="button" class="btn header-item waves-effect user-trigger"
+                        id="page-header-user-dropdown"
                         data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <i class="mdi mdi-account-circle text-muted align-middle mex-1 fs-30"></i>
+
+                    <span class="user-avatar" aria-hidden="true">
+                        <i class="mdi mdi-account"></i>
+                    </span>
+
+                    <span class="user-meta">
+                        <span class="user-name">@User.Identity?.Name</span>
+                        <span class="user-role">فروشنده</span>
+                    </span>
+
+                    <i class="mdi mdi-chevron-down user-caret"></i>
                 </button>
-                <div class="dropdown-menu dropdown-menu-end">
-                    <a class="dropdown-item" asp-area="UserPanel" asp-controller="User" asp-action="MyInfo">
-                        <i class="mdi mdi-account-circle font-size-17 text-muted align-middle mex-1"></i> مشخصات
-                    </a>
-                    <div class="dropdown-divider"></div>
-                    <a class="dropdown-item text-danger" asp-area="" asp-controller="Account" asp-action="Logout"><i class="mdi mdi-power font-size-17 text-muted align-middle mex-1 text-danger"></i> خروج</a>
+
+                <div class="dropdown-menu dropdown-menu-end user-menu">
+
+                    <!-- NEW wrapper — animation lives here, not on .dropdown-menu -->
+                    <div class="user-menu-inner">
+
+                        <div class="user-menu-head">
+                            <span class="user-avatar user-avatar--lg" aria-hidden="true">
+                                <i class="mdi mdi-account"></i>
+                            </span>
+                            <div class="user-menu-head-text">
+                                <span class="user-menu-name">@User.Identity?.Name</span>
+                                <span class="user-menu-sub">پنل کاربری</span>
+                            </div>
+                        </div>
+
+                        <div class="user-menu-body">
+                            <a class="user-menu-item" asp-area="UserPanel" asp-controller="User" asp-action="MyInfo">
+                                <i class="mdi mdi-account-circle-outline"></i>
+                                <span>مشخصات</span>
+                            </a>
+
+                            <a class="user-menu-item user-menu-item--danger" asp-area="" asp-controller="Account" asp-action="Logout">
+                                <i class="mdi mdi-power"></i>
+                                <span>خروج</span>
+                            </a>
+                        </div>
+
+                    </div>
+
                 </div>
             </div>
         </div>

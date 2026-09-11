@@ -2,209 +2,198 @@
     ViewData["Title"] = "تکمیل حساب کاربری";
 }
 
-<div class="container-fluid">
+<div class="dp-complete-profile">
+    <div class="container-fluid">
 
-    <!-- Page Header -->
-    <div class="row">
-        <div class="col-12">
-            <div class="page-title-box">
-                <h4>پنل کاربری</h4>
+        <!-- Page Header -->
+        <div class="row">
+            <div class="col-12">
+                <div class="page-title-box">
+                    <h4>پنل کاربری</h4>
 
-                <ol class="breadcrumb m-0">
-                    <li class="breadcrumb-item">
-                        <a asp-area="UserPanel"
-                           asp-controller="Home"
-                           asp-action="Index">
-                            صفحه نخست
-                        </a>
-                    </li>
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item">
+                            <a asp-area="UserPanel"
+                               asp-controller="Home"
+                               asp-action="Index">
+                                صفحه نخست
+                            </a>
+                        </li>
 
-                    <li class="breadcrumb-item active">
-                        @ViewData["Title"]
-                    </li>
-                </ol>
+                        <li class="breadcrumb-item active">
+                            @ViewData["Title"]
+                        </li>
+                    </ol>
+                </div>
             </div>
         </div>
-    </div>
 
 
-    <div class="row">
+        <div class="row">
 
-        <!-- Main Content -->
-        <div class="col-12 col-lg-9">
+            <!-- Main Content -->
+            <div class="col-12 col-lg-9">
 
-            <div class="card border border-dark shadow-sm">
-                <div class="card-body">
+                <div class="card shadow-sm">
+                    <div class="card-body">
 
-                    <!-- Header -->
-                    <div class="d-flex align-items-center mb-3">
+                        <!-- Header -->
+                        <div class="d-flex align-items-center mb-3">
 
-                        <div class="rounded-circle bg-dark text-white d-flex align-items-center justify-content-center me-2"
-                             style="width:36px;height:36px;">
-                            <i class="mdi mdi-telegram font-size-18"></i>
-                        </div>
+                            <div class="cp-icon-tile cp-icon-tile--sm">
+                                <i class="mdi mdi-telegram"></i>
+                            </div>
 
-                        <div>
-                            <h5 class="font-size-13 fw-bold text-dark mb-0">
-                                اتصال به تلگرام
-                            </h5>
+                            <div class="cp-header-text">
+                                <h5 class="cp-title">
+                                    اتصال به تلگرام
+                                </h5>
 
-                            <small class="text-muted font-size-11">
-                                حساب تلگرام خود را متصل کنید تا هشدارهای قیمتی را دریافت کنید.
-                            </small>
-                        </div>
-
-                    </div>
-
-                    <hr class="border-dark-subtle mb-4" />
-
-
-                    <!-- Telegram Connection -->
-                    <div class="text-center py-4">
-
-                        <div class="rounded-circle bg-light border d-flex align-items-center justify-content-center mx-auto mb-3"
-                             style="width:70px;height:70px;">
-
-                            <i class="mdi mdi-telegram text-dark"
-                               style="font-size:36px;"></i>
+                                <small class="cp-sub">
+                                    حساب تلگرام خود را متصل کنید تا هشدارهای قیمتی را دریافت کنید.
+                                </small>
+                            </div>
 
                         </div>
 
-                        <h6 class="font-size-14 fw-bold text-dark mb-2">
-                            اتصال حساب تلگرام
-                        </h6>
-
-                        <p class="text-muted font-size-11 mb-4">
-                            برای ادامه، ابتدا حساب تلگرام خود را از طریق ربات ما متصل کنید.
-                        </p>
+                        <hr class="card-divider mb-4" />
 
 
-                        <!-- Connect -->
-                        <form asp-area="UserPanel"
-                              asp-controller="User"
-                              asp-action="ConnectTelegram"
-                              method="post"
-                              target="_blank"
-                              class="d-inline-block">
+                        <!-- Telegram Connection -->
+                        <div class="text-center py-4">
 
-                            <button type="submit"
-                                    class="btn btn-dark btn-sm px-4 font-size-12">
+                            <div class="cp-hero-avatar">
+                                <i class="mdi mdi-telegram"></i>
+                            </div>
 
-                                <i class="mdi mdi-telegram me-1"></i>
-                                اتصال به تلگرام
-
-                            </button>
-
-                        </form>
-
-                    </div>
-
-
-                    <hr class="border-dark-subtle my-4" />
-
-
-                    <!-- Test Message -->
-                    <div class="d-flex align-items-center justify-content-between">
-
-                        <div>
-                            <h6 class="font-size-13 fw-bold text-dark mb-1">
-                                تست اتصال
+                            <h6 class="cp-hero-title">
+                                اتصال حساب تلگرام
                             </h6>
 
-                            <small class="text-muted font-size-11">
-                                پس از اتصال، یک پیام آزمایشی برای شما ارسال کنید.
-                            </small>
+                            <p class="cp-hero-desc">
+                                برای ادامه، ابتدا حساب تلگرام خود را از طریق ربات ما متصل کنید.
+                            </p>
+
+
+                            <!-- Connect -->
+                            <form asp-area="UserPanel"
+                                  asp-controller="User"
+                                  asp-action="ConnectTelegram"
+                                  method="post"
+                                  target="_blank"
+                                  class="d-inline-block">
+
+                                <button type="submit"
+                                        class="btn btn-dark px-4">
+
+                                    <i class="mdi mdi-telegram me-1"></i>
+                                    اتصال به تلگرام
+
+                                </button>
+
+                            </form>
+
                         </div>
 
-                        <form asp-area="UserPanel"
-                              asp-controller="User"
-                              asp-action="SendTelegramTestMessage"
-                              method="post">
 
-                            <button type="submit"
-                                    class="btn btn-outline-success btn-sm px-3 font-size-11">
+                        <hr class="card-divider my-4" />
 
-                                <i class="mdi mdi-bell-check-outline me-1"></i>
-                                پیام آزمایشی
 
-                            </button>
+                        <!-- Test Message -->
+                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
 
-                        </form>
+                            <div>
+                                <h6 class="cp-item-title">
+                                    تست اتصال
+                                </h6>
+
+                                <small class="cp-item-sub">
+                                    پس از اتصال، یک پیام آزمایشی برای شما ارسال کنید.
+                                </small>
+                            </div>
+
+                            <form asp-area="UserPanel"
+                                  asp-controller="User"
+                                  asp-action="SendTelegramTestMessage"
+                                  method="post">
+
+                                <button type="submit"
+                                        class="btn btn-outline-success btn-sm px-3">
+
+                                    <i class="mdi mdi-bell-check-outline me-1"></i>
+                                    پیام آزمایشی
+
+                                </button>
+
+                            </form>
+
+                        </div>
+
+
+                        <!-- Proceed -->
+                        <div class="cp-proceed">
+
+                            <form asp-area="UserPanel"
+                                  asp-controller="User"
+                                  asp-action="CheckProfile"
+                                  method="post">
+
+                                <button type="submit"
+                                        class="btn btn-dark px-4">
+
+                                    <i class="mdi mdi-check me-1"></i>
+                                    ادامه
+
+                                </button>
+
+                            </form>
+
+                        </div>
 
                     </div>
-
-
-                    <!-- Proceed -->
-                    <div class="mt-4 pt-3 border-top border-dark-subtle text-start">
-
-                        <form asp-area="UserPanel"
-                              asp-controller="User"
-                              asp-action="CheckProfile"
-                              method="post">
-
-                            <button type="submit"
-                                    class="btn btn-dark btn-sm px-4 font-size-13">
-
-                                <i class="mdi mdi-check me-1"></i>
-                                ادامه
-
-                            </button>
-
-                        </form>
-
-                    </div>
-
                 </div>
+
             </div>
 
-        </div>
 
+            <!-- ===================================== -->
+            <!-- Sidebar                               -->
+            <!-- ===================================== -->
 
-        <!-- ===================================== -->
-        <!-- Sidebar -->
-        <!-- ===================================== -->
+            <div class="col-12 col-lg-3">
 
-        <div class="col-12 col-lg-3">
+                <div class="card bg-light shadow-sm">
 
-            <div class="card border border-dark bg-light shadow-sm">
+                    <div class="card-body">
 
-                <div class="card-body">
-
-                    <div class="d-flex align-items-center mb-3">
-
-                        <i class="mdi mdi-information-outline text-dark font-size-18 me-2"></i>
-
-                        <h6 class="font-size-13 text-dark fw-bold mb-0">
-                            تکمیل حساب
-                        </h6>
-
-                    </div>
-
-                    <p class="text-muted font-size-12 lh-base mb-3">
-                        برای استفاده از خدمات دیجیتو
-                        اطلاعات شخصی خود را تکمیل کرده و حساب تلگرام
-                        خود را متصل کنید.
-                    </p>
-
-                    <div class="border-top pt-3">
-
-                        <div class="d-flex align-items-start mb-2">
-
-                            <i class="mdi mdi-check-circle-outline text-success m-3"></i>
-
-                            <small class="text-muted font-size-11 my-auto">
-                                دریافت هشدارهای تغییر قیمت
-                            </small>
-
+                        <div class="d-flex align-items-center mb-3">
+                            <i class="mdi mdi-information-outline cp-info-icon"></i>
+                            <h6 class="cp-sidebar-title">
+                                تکمیل حساب
+                            </h6>
                         </div>
 
-                        <div class="d-flex align-items-start">
+                        <p class="cp-sidebar-text">
+                            برای استفاده از خدمات دیجیتو
+                            اطلاعات شخصی خود را تکمیل کرده و حساب تلگرام
+                            خود را متصل کنید.
+                        </p>
 
-                            <i class="mdi mdi-telegram text-dark m-3"></i>
+                        <div class="cp-benefits">
 
-                            <small class="text-muted font-size-11 my-auto">
-                                ارسال مستقیم اعلان‌ها در تلگرام
-                            </small>
+                            <div class="cp-benefit">
+                                <i class="mdi mdi-check-circle-outline cp-benefit-icon cp-benefit-icon--success"></i>
+                                <small class="cp-benefit-text">
+                                    دریافت هشدارهای تغییر قیمت
+                                </small>
+                            </div>
+
+                            <div class="cp-benefit">
+                                <i class="mdi mdi-telegram cp-benefit-icon"></i>
+                                <small class="cp-benefit-text">
+                                    ارسال مستقیم اعلان‌ها در تلگرام
+                                </small>
+                            </div>
 
                         </div>
 
@@ -217,5 +206,4 @@
         </div>
 
     </div>
-
 </div>
