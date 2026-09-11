@@ -1,6 +1,5 @@
 ﻿using Application.Dtos.BalanceTransaction.AdminSide;
 using Application.Dtos.BalanceTransaction.ClientSide;
-using Application.Dtos.Role.AdminSide;
 using Application.Dtos.SendSms.ClientSide;
 using Application.Dtos.Users.AdminSide;
 using Application.Dtos.Users.ClientSide;
@@ -334,19 +333,10 @@ namespace Application.Services.Implementaions
                 .Select(u => new AdminSideUserDetailsDto()
                 {
                     Id = u.Id,
-                    FirstName = u.FirstName,
-                    LastName = u.LastName,
                     IsUserBanned = u.IsUserBanned,
-                    Mobile = u.Mobile,
-                    SubscriptionEndDate = u.NotificationSubscriptionEndDate,
+                    DaysToNotificationSubscriptionEnd = u.NotificationSubscriptionEndDate.DaysRemaining(),
+                    DaysToAutoPriceSubscriptionEnd = u.AutoPriceSubscriptionEndDate.DaysRemaining(),
                     Balance = u.Balance,
-                    UserRoles = u.UserRoleMapping.Where(urm => urm.UserId == u.Id)
-                    .Select(urm => new AdminSideRoleDto()
-                    {
-                        Id = urm.RoleId,
-                        Title = urm.Role.Title,
-                        UniqueName = urm.Role.UniqueName
-                    }).ToList()
                 }).FirstOrDefaultAsync();
             if (user is null)
                 return Result.Failure<AdminSideUserDetailsDto>(Messages.OperationFailedError);

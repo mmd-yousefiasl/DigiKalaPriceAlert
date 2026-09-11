@@ -26,147 +26,81 @@
     </div>
 
     <div class="row">
-        <div class="col-xl-4 col-lg-5">
-
-            <div class="card text-center" style="border-top: 4px solid #000000;">
-                <div class="card-body">
-                    <div class="mb-3">
-                        <div class="avatar-sm mx-auto bg-dark rounded-circle d-flex align-items-center justify-content-center" style="width: 72px; height: 72px;">
-                            @if (!string.IsNullOrEmpty(Model.FirstName))
+        <div class="card border border-dark" style="border-top: 4px solid #000000 !important;">
+            <div class="card-body">
+                <h4 class="card-title mb-4 pb-2 border-bottom text-dark font-size-14 d-flex justify-content-between align-items-center">
+                    <span><i class="mdi mdi-star-outline me-1 text-muted"></i> وضعیت اشتراک فعلی</span>
+                </h4>
+                <div class="row align-items-center mb-3">
+                    <div class="col-md-4 mb-3 mb-md-0">
+                        <span class="text-muted font-size-13 d-block mb-1">اشتراک:</span>
+                        <h5 class="font-size-15 fw-bold text-dark mb-0">
+                            <span>اعلان تغییر قیمت</span>
+                        </h5>
+                    </div>
+                    <div class="col-md-4 mb-3 mb-md-0">
+                        <span class="text-muted font-size-13 d-block mb-1">وضعیت:</span>
+                        <h5 class="font-size-15 fw-bold text-dark mb-0">
+                            @if (Model.DaysToNotificationSubscriptionEnd <= 0)
                             {
-                                <span class="text-white font-size-24 fw-bold">@Model.FirstName.FirstOrDefault()</span>
+                                <span class="text-muted font-size-14">غیر فعال</span>
                             }
                             else
                             {
-                                <i class="mdi mdi-account text-white font-size-24"></i>
+                                @Model.DaysToNotificationSubscriptionEnd
+                                @: روز
                             }
-                        </div>
-                    </div>
-
-                    @if (string.IsNullOrEmpty(Model.FirstName) && string.IsNullOrEmpty(Model.LastName))
-                    {
-                        <h5 class="font-size-16 mb-1 text-dark fw-bold">کاربر بدون نام</h5>
-                    }
-                    else
-                    {
-                        <h5 class="font-size-16 mb-1 text-dark fw-bold">
-                            @(Model.FirstName ?? "") @(Model.LastName ?? "")
                         </h5>
-                    }
-
-                    <div>
-                        <span class="badge bg-dark px-3 py-2 font-size-12">
-                            حساب کاربری @(Model.IsUserBanned ? "غیرفعال" : "فعال")
-                        </span>
                     </div>
                 </div>
-            </div>
-
-            <div class="card">
-                <div class="card-body">
-                    <h4 class="card-title mb-4 pb-2 border-bottom text-dark font-size-14">اطلاعات ارتباطی و سیستم</h4>
-
-                    <div class="table-responsive">
-                        <table class="table table-borderless mb-0 font-size-13">
-                            <tbody>
-                                <tr>
-                                    <th scope="row" class="text-muted ps-0" style="width: 40%;">شماره موبایل:</th>
-                                    <td class="text-end fw-bold text-dark" dir="ltr">@Model.Mobile</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row" class="text-muted ps-0">نقش‌های کاربری:</th>
-                                    <td class="text-end">
-                                        @if (Model.UserRoles?.Any() ?? false)
-                                        {
-                                            foreach (var item in Model.UserRoles)
-                                            {
-                                                <span class="badge border border-dark text-dark bg-transparent me-1">@item.Title</span>
-                                            }
-                                        }
-                                        else
-                                        {
-                                            <span class="badge bg-light text-muted border">کاربر عادی</span>
-                                        }
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                <div class="row align-items-center">
+                    <div class="col-md-4 mb-3 mb-md-0">
+                        <span class="text-muted font-size-13 d-block mb-1">اشتراک:</span>
+                        <h5 class="font-size-15 fw-bold text-dark mb-0">
+                            <span>قیمت گذاری خودکار</span>
+                        </h5>
+                    </div>
+                    <div class="col-md-4 mb-3 mb-md-0">
+                        <span class="text-muted font-size-13 d-block mb-1">وضعیت:</span>
+                        <h5 class="font-size-15 fw-bold text-dark mb-0">
+                            @if (Model.DaysToAutoPriceSubscriptionEnd <= 0)
+                            {
+                                <span class="text-muted font-size-14">غیر فعال</span>
+                            }
+                            else
+                            {
+                                @Model.DaysToAutoPriceSubscriptionEnd
+                                @: روز
+                            }
+                        </h5>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="col-xl-8 col-lg-7">
-            <div class="card border border-dark" style="border-top: 4px solid #000000 !important;">
-                <div class="card-body">
-                    <h4 class="card-title mb-4 pb-2 border-bottom text-dark font-size-14 d-flex justify-content-between align-items-center">
-                        <span><i class="mdi mdi-star-outline me-1 text-muted"></i> وضعیت اشتراک فعلی</span>
-                        @if (Model.SubscriptionEndDate is null || Model.SubscriptionEndDate.Value < DateTime.Now)
-                        {
-                            <span class="badge bg-danger font-size-11">غیر فعال</span>
-                        }
-                        else
-                        {
-                            <span class="badge bg-success font-size-11">فعال</span>
-                        }
-                    </h4>
-                    <div class="row align-items-center">
-                        <div class="col-md-4 mb-3 mb-md-0">
-                            <span class="text-muted font-size-13 d-block mb-1">وضعیت حساب:</span>
-                            <h5 class="font-size-15 fw-bold text-dark mb-0">
-                                @if (Model.SubscriptionEndDate is null || Model.SubscriptionEndDate.Value < DateTime.Now)
-                                {
-                                    <span class="text-danger">بدون اشتراک فعال</span>
-                                }
-                                else
-                                {
-                                    <span class="text-success">دارای اشتراک ویژه پایش</span>
-                                }
-                            </h5>
-                        </div>
-                        <div class="col-md-4 mb-3 mb-md-0">
-                            <span class="text-muted font-size-13 d-block mb-1">تاریخ پایان اعتبار پایش و پیامک:</span>
-                            <h5 class="font-size-15 fw-bold text-dark mb-0">
-                                @if (Model.SubscriptionEndDate is null)
-                                {
-                                    <span class="text-muted font-size-14">—</span>
-                                }
-                                else
-                                {
-                                    @Model.SubscriptionEndDate?.GetEndDateInDays()
-                                    @: تا
-                                    @Model.SubscriptionEndDate?.GetDateTime()
-                                }
-                            </h5>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card border border-dark">
-                <div class="card-body">
-                    <div class="row align-items-center">
-                        <div class="col-sm-7 mb-3 mb-sm-0">
-                            <div class="d-flex align-items-center">
-                                <div class="avatar-xs me-3 bg-dark text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                                    <i class="mdi mdi-wallet font-size-20"></i>
-                                </div>
-                                <div>
-                                    <span class="text-muted font-size-13 d-block mb-1">موجودی فعلی کیف پول:</span>
-                                    <h4 class="font-size-20 fw-bold text-dark mb-0">@Model.Balance.ToTomanFormat() <span class="font-size-13 fw-normal text-muted">تومان</span></h4>
-                                </div>
+        <div class="card border border-dark">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-sm-7 mb-3 mb-sm-0">
+                        <div class="d-flex align-items-center">
+                            <div class="avatar-xs me-3 bg-dark text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                <i class="mdi mdi-wallet font-size-20"></i>
+                            </div>
+                            <div>
+                                <span class="text-muted font-size-13 d-block mb-1">موجودی فعلی کیف پول:</span>
+                                <h4 class="font-size-20 fw-bold text-dark mb-0">@Model.Balance.ToTomanFormat() <span class="font-size-13 fw-normal text-muted">تومان</span></h4>
                             </div>
                         </div>
-                        <div class="col-sm-5 text-sm-end">
-                            <a permission="ManageBalanceTransaction" asp-area="Admin" asp-controller="BalanceTransaction" asp-action="CreateNewBalanceTransaction" asp-route-userId="@Model.Id" class="btn btn-dark waves-effect waves-light">
-                                <i class="mdi mdi-plus-circle me-1"></i> ثبت تراکنش جدید
-                            </a>
-                        </div>
+                    </div>
+                    <div class="col-sm-5 text-sm-end">
+                        <a permission="ManageBalanceTransaction" asp-area="Admin" asp-controller="BalanceTransaction" asp-action="CreateNewBalanceTransaction" asp-route-userId="@Model.Id" class="btn btn-dark waves-effect waves-light">
+                            <i class="mdi mdi-plus-circle me-1"></i> ثبت تراکنش جدید
+                        </a>
                     </div>
                 </div>
             </div>
-
-            @await Component.InvokeAsync("AdminSideLatestBalanceTransactions", Model.Id)
         </div>
+
+        @await Component.InvokeAsync("AdminSideLatestBalanceTransactions", Model.Id)
     </div>
 </div>
