@@ -30,8 +30,6 @@ namespace Application.Services.Interfaces
 
         Task<Result<AdminSideUserDetailsDto>> AdminSideGetUserDetails(int id);
 
-        Task<Result<ClientSideUserDetailsDto>> ClientSideGetUserDetails();
-
         Task<decimal> ClientSideGetCurrentUserBalance();
 
         Task<Result> ClientSideWithdrawUserOrder(ClientSideWithdrawUserOrderDto dto);

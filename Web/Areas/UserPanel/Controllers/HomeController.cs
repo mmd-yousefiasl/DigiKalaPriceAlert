@@ -1,5 +1,4 @@
-﻿using Application.Dtos.Users.ClientSide;
-using Application.Services.Interfaces;
+﻿using Application.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Web.Areas.UserPanel.Controllers
@@ -20,11 +19,7 @@ namespace Web.Areas.UserPanel.Controllers
         [HttpGet("/user")]
         public async Task<IActionResult> Index()
         {
-            var result = await _userService.ClientSideGetUserDetails();
-            if (result.IsFailure)
-                return View(new ClientSideUserDetailsDto());
-
-            return View(result.Value);
+            return View();
         }
 
         [HttpGet("/user/subscription-expired")]

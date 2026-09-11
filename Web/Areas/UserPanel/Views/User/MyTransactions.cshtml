@@ -55,6 +55,10 @@
             </div>
         </div>
 
+        <div class="dp-panel-index">
+            @await Component.InvokeAsync("ClientSideUserBalance", new { showLink = false })
+        </div>
+
         @if (Model?.Entities?.Any() ?? false)
         {
             int counter = 0;

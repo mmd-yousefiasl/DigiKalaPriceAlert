@@ -897,12 +897,10 @@ body.dark-mode .dp-panel-index,
 
 /* ============ VALUE WRAPPER ============ */
 .dp-panel-index .dp-balance-value {
-    position: relative;
     display: inline-flex;
     align-items: center;
     gap: 10px;
     min-height: 42px;
-    flex: 1;
 }
 
 .dp-panel-index .dp-balance-input {
@@ -922,7 +920,6 @@ body.dark-mode .dp-panel-index,
     line-height: 1;
     font-variant-numeric: tabular-nums;
     letter-spacing: -.3px;
-    transition: opacity .45s cubic-bezier(.2,.8,.2,1), filter .45s cubic-bezier(.2,.8,.2,1), transform .45s cubic-bezier(.2,.8,.2,1);
 }
 
     .dp-panel-index .dp-balance-real small {
@@ -933,55 +930,20 @@ body.dark-mode .dp-panel-index,
     }
 
 .dp-panel-index .dp-balance-masked {
-    opacity: 1;
-    filter: blur(0);
-    transform: translateY(0);
     letter-spacing: 3px;
 }
 
+/* Hide whichever one isn't active */
 .dp-panel-index .dp-balance-real {
-    position: absolute;
-    inset-block-start: 0;
-    inset-inline-start: 0;
-    opacity: 0;
-    filter: blur(8px);
-    transform: translateY(8px);
-    pointer-events: none;
+    display: none;
 }
 
 .dp-panel-index .dp-balance-input:checked ~ .dp-balance-masked {
-    opacity: 0;
-    filter: blur(6px);
-    transform: translateY(-6px);
-    pointer-events: none;
+    display: none;
 }
 
 .dp-panel-index .dp-balance-input:checked ~ .dp-balance-real {
-    opacity: 1;
-    filter: blur(0);
-    transform: translateY(0);
-    pointer-events: auto;
-    animation: dpBalanceReveal .5s cubic-bezier(.2,.8,.2,1);
-}
-
-@keyframes dpBalanceReveal {
-    0% {
-        opacity: 0;
-        filter: blur(8px);
-        transform: translateY(8px);
-    }
-
-    60% {
-        opacity: 1;
-        filter: blur(1px);
-        transform: translateY(-2px);
-    }
-
-    100% {
-        opacity: 1;
-        filter: blur(0);
-        transform: translateY(0);
-    }
+    display: inline-flex;
 }
 
 /* ============ EYE BUTTON ============ */
