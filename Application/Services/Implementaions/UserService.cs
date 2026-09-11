@@ -909,5 +909,22 @@ namespace Application.Services.Implementaions
 
             return chatId;
         }
+
+        public async Task<Result<ClientSideUserSubscriptionsDto>> ClientSideCurrentUserSubscriptions()
+        {
+            var userId = _httpContextAccessor.HttpContext.User.GetUserId();
+            if (userId < 1)
+                return Result.Failure<ClientSideUserSubscriptionsDto>(Messages.OperationFailedError);
+
+            var user = await _context.Users.FindAsync(userId);
+            if (user is null)
+                return Result.Failure<ClientSideUserSubscriptionsDto>(Messages.OperationFailedError);
+
+            return new ClientSideUserSubscriptionsDto()
+            {
+                DaysToAutoPriceSubscriptionEnd = user.AutoPriceSubscriptionEndDate.DaysRemaining(),
+                DaysToNotificationSubscriptionEnd = user.NotificationSubscriptionEndDate.DaysRemaining()
+            };
+        }
     }
 }

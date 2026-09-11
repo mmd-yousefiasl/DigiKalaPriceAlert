@@ -69,5 +69,7 @@ namespace Application.Services.Interfaces
         Task<Result> ClientSideAuthenticateTelegramUserAsync(string authKey, long chatId);
 
         Task<Result<long>> ClientSideGetCurrentUserChatId();
+
+        Task<Result<ClientSideUserSubscriptionsDto>> ClientSideCurrentUserSubscriptions();
     }
 }

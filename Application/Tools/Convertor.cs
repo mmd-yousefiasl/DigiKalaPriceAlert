@@ -185,5 +185,14 @@ namespace Application.Tools
                 ? trimmed[..maxLength]
                 : trimmed;
         }
+
+        public static int DaysRemaining(this DateTime? value)
+        {
+            if (value is not { } date)
+                return 0;
+
+            var days = (date.Date - DateTime.Today).Days;
+            return days > 0 ? days : 0;
+        }
     }
 }
