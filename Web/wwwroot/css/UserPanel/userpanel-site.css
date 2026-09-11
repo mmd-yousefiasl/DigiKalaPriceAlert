@@ -83,10 +83,11 @@ input, select, textarea, button {
     overflow: hidden;
     transition: max-height 0.25s ease-out;
 }
+
 /* استایل اختصاصی کارت‌های موبایل برای تم مونوکروم */
 .tr-card {
     border: 1px solid #e9ecef;
-    border-right: 4px solid #000000;
+    border-right: 4px solid #e9ecef; /* ← was #000000 */
     border-radius: 4px;
     background: #ffffff;
 }
@@ -137,7 +138,7 @@ input, select, textarea, button {
     overflow-x: hidden;
     /* Firefox */
     scrollbar-width: thin;
-    scrollbar-color: #000 transparent;
+    scrollbar-color: #cfd4da transparent; /* ← was #000 transparent */
 }
 
     /* Chrome / Edge / Safari */
@@ -150,12 +151,12 @@ input, select, textarea, button {
     }
 
     .admin-vertical-menu::-webkit-scrollbar-thumb {
-        background: #000;
+        background: #cfd4da; /* ← was #000 */
         border-radius: 10px;
     }
 
         .admin-vertical-menu::-webkit-scrollbar-thumb:hover {
-            background: #111;
+            background: #b8bec5; /* ← was #111 */
         }
 
     /* Hide up/down buttons */
@@ -176,4 +177,1555 @@ input, select, textarea, button {
 
 .fs-small {
     font-size: small !important;
+}
+
+
+/* ============================================================
+                           TRANSACTIONS PAGE — scoped styles
+============================================================ */
+.dp-tx {
+    --tx-ink: #0a0a0a;
+    --tx-ink-soft: #374151;
+    --tx-muted: #6b7280;
+    --tx-line: #e5e7eb;
+    --tx-line-soft: #f1f2f4;
+    --tx-bg: #ffffff;
+    --tx-bg-soft: #f9fafb;
+    --tx-bg-softer: #f3f4f6;
+    --tx-accent: #dc2626;
+    --tx-accent-soft: rgba(220, 38, 38, .08);
+    --tx-radius: 14px;
+    --tx-radius-sm: 9px;
+    --tx-shadow-sm: 0 1px 2px rgba(0, 0, 0, .04);
+    --tx-shadow-md: 0 10px 24px -16px rgba(0, 0, 0, .18);
+}
+
+
+/* ---- Cards (filter + table + empty) ---- */
+.dp-tx .card {
+    background: var(--tx-bg);
+    border: 1px solid var(--tx-line);
+    border-radius: var(--tx-radius);
+    box-shadow: var(--tx-shadow-sm);
+    overflow: hidden;
+}
+
+.dp-tx .card-body {
+    padding: 1.4rem 1.4rem;
+}
+
+/* ---- Filter form ---- */
+.dp-tx .form-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--tx-ink-soft);
+    margin-bottom: 6px;
+}
+
+.dp-tx .form-control,
+.dp-tx .form-select {
+    background: var(--tx-bg);
+    border: 1px solid var(--tx-line);
+    border-radius: var(--tx-radius-sm);
+    color: var(--tx-ink);
+    font-size: 13px;
+    min-height: 42px;
+    padding: 9px 14px;
+    box-shadow: none;
+    transition: border-color .18s ease, box-shadow .18s ease;
+}
+
+    .dp-tx .form-control::placeholder {
+        color: #9ca3af;
+    }
+
+    .dp-tx .form-control:focus,
+    .dp-tx .form-select:focus {
+        border-color: var(--tx-ink);
+        box-shadow: 0 0 0 3px rgba(0, 0, 0, .05);
+        outline: none;
+    }
+
+/* ---- Buttons ---- */
+.dp-tx .btn {
+    border-radius: var(--tx-radius-sm);
+    font-size: 13px;
+    font-weight: 700;
+    padding: 9px 20px;
+    transition: transform .15s ease, box-shadow .2s ease, background .2s ease, border-color .2s ease;
+}
+
+    .dp-tx .btn:hover {
+        transform: translateY(-1px);
+    }
+
+    .dp-tx .btn:active {
+        transform: translateY(0);
+    }
+
+.dp-tx .btn-dark {
+    background: var(--tx-ink);
+    border-color: var(--tx-ink);
+    color: #fff;
+}
+
+    .dp-tx .btn-dark:hover,
+    .dp-tx .btn-dark:focus {
+        background: #000;
+        border-color: #000;
+        color: #fff;
+        box-shadow: 0 10px 22px -14px rgba(0, 0, 0, .5);
+    }
+
+/* ---- Table ---- */
+.dp-tx .table {
+    margin: 0;
+    color: var(--tx-ink-soft);
+    font-size: 13px;
+}
+
+    .dp-tx .table > thead > tr > th {
+        background: var(--tx-bg-soft);
+        border-bottom: 1px solid var(--tx-line);
+        color: var(--tx-muted);
+        font-weight: 700;
+        font-size: 12px;
+        letter-spacing: .2px;
+        padding: 12px 14px;
+        white-space: nowrap;
+    }
+
+    .dp-tx .table > tbody > tr > td {
+        border-top: 1px solid var(--tx-line-soft);
+        padding: 14px;
+        vertical-align: middle;
+    }
+
+.dp-tx .table-hover > tbody > tr {
+    transition: background .18s ease;
+}
+
+    .dp-tx .table-hover > tbody > tr:hover {
+        background: var(--tx-bg-soft);
+    }
+
+/* ---- Badges ---- */
+.dp-tx .badge {
+    font-weight: 700;
+    font-size: 11.5px;
+    padding: .45em .7em;
+    border-radius: 999px;
+    line-height: 1;
+}
+
+    /* Status: success = soft success (not black) */
+    .dp-tx .badge.bg-dark {
+        background: rgba(22, 163, 74, .12) !important;
+        color: #15803d !important;
+        border: 1px solid rgba(22, 163, 74, .22) !important;
+    }
+
+    /* Type badge: soft neutral */
+    .dp-tx .badge.bg-light {
+        background: var(--tx-bg-soft) !important;
+        color: var(--tx-ink-soft) !important;
+        border: 1px solid var(--tx-line) !important;
+    }
+
+/* ---- Description collapse ---- */
+.dp-tx .desc-collapse {
+    background: var(--tx-bg-soft) !important;
+}
+
+    .dp-tx .desc-collapse > .p-3 {
+        border-top: 1px solid var(--tx-line-soft) !important;
+        border-bottom: 1px solid var(--tx-line-soft) !important;
+        color: var(--tx-ink-soft);
+        font-size: 13px;
+        line-height: 1.9;
+    }
+
+/* ---- Mobile card ---- */
+.dp-tx .tr-card {
+    border: 1px solid var(--tx-line);
+    border-right: 4px solid var(--tx-line); /* replaced black inline */
+    border-radius: var(--tx-radius);
+    background: var(--tx-bg);
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    box-shadow: var(--tx-shadow-sm);
+    cursor: pointer;
+    transition: box-shadow .2s ease, transform .2s ease, border-color .2s ease;
+}
+
+    .dp-tx .tr-card:hover {
+        box-shadow: var(--tx-shadow-md);
+        transform: translateY(-1px);
+        border-color: var(--tx-line);
+    }
+
+    .dp-tx .tr-card.failed {
+        border-right-color: var(--tx-line-soft);
+    }
+
+/* ---- Responsive ---- */
+@media (max-width: 768px) {
+    .dp-tx .card-body {
+        padding: 1.1rem 1rem;
+    }
+
+    .dp-tx .table > tbody > tr > td {
+        padding: 12px 10px;
+    }
+}
+
+/* ============================================================
+   PAGE: ORDERS LIST (.dp-orders)
+   ============================================================ */
+.dp-orders {
+    --or-ink: #0a0a0a;
+    --or-ink-soft: #374151;
+    --or-muted: #6b7280;
+    --or-line: #e5e7eb;
+    --or-line-soft: #f1f2f4;
+    --or-bg: #ffffff;
+    --or-bg-soft: #f9fafb;
+    --or-bg-softer: #f3f4f6;
+    --or-radius: 14px;
+    --or-radius-sm: 9px;
+    --or-shadow-sm: 0 1px 2px rgba(0, 0, 0, .04);
+    --or-shadow-md: 0 10px 24px -16px rgba(0, 0, 0, .18);
+}
+
+
+    /* ---- Cards ---- */
+    .dp-orders .card {
+        background: var(--or-bg);
+        border: 1px solid var(--or-line);
+        border-radius: var(--or-radius);
+        box-shadow: var(--or-shadow-sm);
+        overflow: hidden;
+    }
+
+    .dp-orders .card-body {
+        padding: 1.4rem 1.4rem;
+    }
+
+    /* ---- Filter form ---- */
+    .dp-orders .form-label {
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--or-ink-soft);
+        margin-bottom: 6px;
+    }
+
+    .dp-orders .form-control,
+    .dp-orders .form-select {
+        background: var(--or-bg);
+        border: 1px solid var(--or-line);
+        border-radius: var(--or-radius-sm);
+        color: var(--or-ink);
+        font-size: 13px;
+        min-height: 42px;
+        padding: 9px 14px;
+        box-shadow: none;
+        transition: border-color .18s ease, box-shadow .18s ease;
+    }
+
+        .dp-orders .form-control::placeholder {
+            color: #9ca3af;
+        }
+
+        .dp-orders .form-control:focus,
+        .dp-orders .form-select:focus {
+            border-color: var(--or-ink);
+            box-shadow: 0 0 0 3px rgba(0, 0, 0, .05);
+            outline: none;
+        }
+
+    /* ---- Buttons ---- */
+    .dp-orders .btn {
+        border-radius: var(--or-radius-sm);
+        font-size: 13px;
+        font-weight: 700;
+        padding: 9px 20px;
+        transition: transform .15s ease, box-shadow .2s ease, background .2s ease, border-color .2s ease;
+    }
+
+        .dp-orders .btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .dp-orders .btn:active {
+            transform: translateY(0);
+        }
+
+    .dp-orders .btn-dark {
+        background: var(--or-ink);
+        border-color: var(--or-ink);
+        color: #fff;
+    }
+
+        .dp-orders .btn-dark:hover,
+        .dp-orders .btn-dark:focus {
+            background: #000;
+            border-color: #000;
+            color: #fff;
+            box-shadow: 0 10px 22px -14px rgba(0, 0, 0, .5);
+        }
+
+    /* ---- Table ---- */
+    .dp-orders .table {
+        margin: 0;
+        color: var(--or-ink-soft);
+        font-size: 13px;
+    }
+
+        .dp-orders .table > thead > tr > th {
+            background: var(--or-bg-soft);
+            border-bottom: 1px solid var(--or-line);
+            color: var(--or-muted);
+            font-weight: 700;
+            font-size: 12px;
+            letter-spacing: .2px;
+            padding: 12px 14px;
+            white-space: nowrap;
+        }
+
+        .dp-orders .table > tbody > tr > td {
+            border-top: 1px solid var(--or-line-soft);
+            padding: 14px;
+            vertical-align: middle;
+        }
+
+    .dp-orders .table-hover > tbody > tr {
+        transition: background .18s ease;
+    }
+
+        .dp-orders .table-hover > tbody > tr:hover {
+            background: var(--or-bg-soft);
+        }
+
+    /* ---- Badges ---- */
+    .dp-orders .badge {
+        font-weight: 700;
+        font-size: 11.5px;
+        padding: .45em .7em;
+        border-radius: 999px;
+        line-height: 1;
+    }
+
+        .dp-orders .badge.bg-light {
+            background: var(--or-bg-softer) !important;
+            color: var(--or-ink-soft) !important;
+            border: 1px solid var(--or-line) !important;
+        }
+
+    /* ---- Mobile card (reuses .tr-card shared style, but ensures no black) ---- */
+    .dp-orders .tr-card {
+        border: 1px solid var(--or-line);
+        border-right: 4px solid var(--or-line); /* neutral, no black */
+        border-radius: var(--or-radius);
+        background: var(--or-bg);
+        padding: 14px 16px;
+        margin-bottom: 10px;
+        box-shadow: var(--or-shadow-sm);
+        transition: box-shadow .2s ease, transform .2s ease;
+    }
+
+        .dp-orders .tr-card:hover {
+            box-shadow: var(--or-shadow-md);
+            transform: translateY(-1px);
+        }
+
+/* ---- Responsive ---- */
+@media (max-width: 768px) {
+    .dp-orders .card-body {
+        padding: 1.1rem 1rem;
+    }
+
+    .dp-orders .table > tbody > tr > td {
+        padding: 12px 10px;
+    }
+}
+
+/* ============================================================
+   PAGE: PANEL INDEX (.dp-panel-index)
+   ============================================================ */
+
+/* ============ LIGHT MODE TOKENS ============ */
+.dp-panel-index {
+    --dp-black: #0a0a0a; /* highest contrast text / primary */
+    --dp-ink: #171717;
+    --dp-gray-900: #1f2937;
+    --dp-gray-700: #374151;
+    --dp-gray-500: #6b7280;
+    --dp-gray-400: #9ca3af;
+    --dp-gray-300: #d1d5db;
+    --dp-line: #e5e7eb;
+    --dp-gray-100: #f3f4f6;
+    --dp-gray-50: #f9fafb;
+    --dp-white: #ffffff; /* card background */
+    --dp-on-solid: #ffffff; /* text on colored tiles — stays white in BOTH modes */
+
+    --dp-green-50: #f0fdf4;
+    --dp-green-100: #dcfce7;
+    --dp-green-200: #bbf7d0;
+    --dp-green-600: #16a34a;
+    --dp-green-700: #15803d;
+    --dp-red-50: #fef2f2;
+    --dp-red-100: #fee2e2;
+    --dp-red-200: #fecaca;
+    --dp-red-600: #dc2626;
+    --dp-red-700: #b91c1c;
+    --dp-amber-50: #fffbeb;
+    --dp-amber-100: #fef3c7;
+    --dp-amber-200: #fde68a;
+    --dp-amber-600: #d97706;
+    --dp-amber-700: #b45309;
+}
+
+/* ============ DARK MODE TOKENS ============ */
+/* Supports the common theme-selector patterns. Keep only
+                                                   the one your site actually uses; the rest are harmless. */
+html[data-theme="dark"] .dp-panel-index,
+html.dark .dp-panel-index,
+html.dark-mode .dp-panel-index,
+html[data-bs-theme="dark"] .dp-panel-index,
+body[data-theme="dark"] .dp-panel-index,
+body.dark .dp-panel-index,
+body.dark-mode .dp-panel-index,
+.dark .dp-panel-index,
+.dark-mode .dp-panel-index {
+    --dp-black: #f5f5f5;
+    --dp-ink: #e5e5e5;
+    --dp-gray-900: #e5e7eb;
+    --dp-gray-700: #d1d5db;
+    --dp-gray-500: #9ca3af;
+    --dp-gray-400: #6b7280;
+    --dp-gray-300: #4b5563;
+    --dp-line: #2a2a2a;
+    --dp-gray-100: #1f1f1f;
+    --dp-gray-50: #171717;
+    --dp-white: #131313;
+    /* --dp-on-solid intentionally NOT overridden */
+
+    --dp-green-50: rgba(34, 197, 94, .08);
+    --dp-green-100: rgba(34, 197, 94, .16);
+    --dp-green-200: rgba(34, 197, 94, .32);
+    --dp-green-600: #22c55e;
+    --dp-green-700: #4ade80;
+    --dp-red-50: rgba(239, 68, 68, .08);
+    --dp-red-100: rgba(239, 68, 68, .16);
+    --dp-red-200: rgba(239, 68, 68, .32);
+    --dp-red-600: #ef4444;
+    --dp-red-700: #f87171;
+    --dp-amber-50: rgba(245, 158, 11, .08);
+    --dp-amber-100: rgba(245, 158, 11, .16);
+    --dp-amber-200: rgba(245, 158, 11, .32);
+    --dp-amber-600: #f59e0b;
+    --dp-amber-700: #fbbf24;
+}
+
+/* ============ LAYOUT ============ */
+.dp-panel-index .container-fluid {
+    max-width: 1320px;
+}
+
+/* ============================================================
+                                                   ACTION CARDS
+                                                   ============================================================ */
+.dp-panel-index .dp-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    background: var(--dp-white);
+    border: 1px solid var(--dp-line);
+    border-radius: 20px;
+    padding: 26px 24px 20px;
+    margin-bottom: 24px;
+    text-decoration: none;
+    color: inherit;
+    overflow: hidden;
+    transition: transform .25s cubic-bezier(.2,.8,.2,1), box-shadow .25s ease, border-color .25s ease, background .3s ease;
+    min-height: 210px;
+}
+
+    .dp-panel-index .dp-card:hover {
+        transform: translateY(-4px);
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .dp-panel-index .dp-card::before {
+        content: '';
+        position: absolute;
+        top: -80px;
+        right: -80px;
+        width: 200px;
+        height: 200px;
+        border-radius: 50%;
+        opacity: .45;
+        pointer-events: none;
+        transition: opacity .3s ease;
+    }
+
+    .dp-panel-index .dp-card:hover::before {
+        opacity: .7;
+    }
+
+/* ---- ACTIVE (green) ---- */
+.dp-panel-index .dp-card--active {
+    background: linear-gradient(180deg, var(--dp-green-50) 0%, var(--dp-white) 55%);
+    border-color: var(--dp-green-200);
+}
+
+    .dp-panel-index .dp-card--active::before {
+        background: radial-gradient(circle, var(--dp-green-100), transparent 70%);
+    }
+
+    .dp-panel-index .dp-card--active:hover {
+        border-color: var(--dp-green-600);
+        box-shadow: 0 18px 40px -22px rgba(22,163,74,.35);
+    }
+
+    .dp-panel-index .dp-card--active .dp-card-icon {
+        background: var(--dp-green-600);
+        color: var(--dp-on-solid);
+    }
+
+    .dp-panel-index .dp-card--active .dp-card-foot {
+        color: var(--dp-green-700);
+    }
+
+/* ---- INACTIVE (red) ---- */
+.dp-panel-index .dp-card--inactive {
+    background: linear-gradient(180deg, var(--dp-red-50) 0%, var(--dp-white) 55%);
+    border-color: var(--dp-red-200);
+}
+
+    .dp-panel-index .dp-card--inactive::before {
+        background: radial-gradient(circle, var(--dp-red-100), transparent 70%);
+    }
+
+    .dp-panel-index .dp-card--inactive:hover {
+        border-color: var(--dp-red-600);
+        box-shadow: 0 18px 40px -22px rgba(220,38,38,.35);
+    }
+
+    .dp-panel-index .dp-card--inactive .dp-card-icon {
+        background: var(--dp-red-600);
+        color: var(--dp-on-solid);
+    }
+
+    .dp-panel-index .dp-card--inactive .dp-card-foot {
+        color: var(--dp-red-700);
+    }
+
+/* ---- EXPIRING SOON (amber) ---- */
+.dp-panel-index .dp-card--expiring {
+    background: linear-gradient(180deg, var(--dp-amber-50) 0%, var(--dp-white) 55%);
+    border-color: var(--dp-amber-200);
+}
+
+    .dp-panel-index .dp-card--expiring::before {
+        background: radial-gradient(circle, var(--dp-amber-100), transparent 70%);
+    }
+
+    .dp-panel-index .dp-card--expiring .dp-card-icon {
+        background: var(--dp-amber-600);
+        color: var(--dp-on-solid);
+    }
+
+    .dp-panel-index .dp-card--expiring .dp-card-foot {
+        color: var(--dp-amber-700);
+    }
+
+    .dp-panel-index .dp-card--expiring .dp-card-days {
+        border-color: var(--dp-amber-200);
+        color: var(--dp-amber-700);
+        box-shadow: 0 2px 8px -4px rgba(217,119,6,.3);
+    }
+
+/* ============ BADGES ============ */
+.dp-panel-index .dp-card-days {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    display: inline-flex;
+    align-items: baseline;
+    gap: 3px;
+    background: var(--dp-white);
+    border: 1px solid var(--dp-green-200);
+    color: var(--dp-green-700);
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    box-shadow: 0 2px 8px -4px rgba(22,163,74,.25);
+    z-index: 1;
+}
+
+    .dp-panel-index .dp-card-days b {
+        font-size: 14px;
+        font-weight: 900;
+        font-variant-numeric: tabular-nums;
+        line-height: 1;
+    }
+
+    .dp-panel-index .dp-card-days span {
+        line-height: 1;
+    }
+
+.dp-panel-index .dp-card-badge {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    display: inline-flex;
+    align-items: center;
+    background: var(--dp-white);
+    border: 1px solid var(--dp-red-200);
+    color: var(--dp-red-700);
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    box-shadow: 0 2px 8px -4px rgba(220,38,38,.25);
+    z-index: 1;
+}
+
+/* ============ ICON ============ */
+.dp-panel-index .dp-card-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    margin-bottom: 18px;
+    color: var(--dp-on-solid);
+    transition: transform .3s cubic-bezier(.2,.8,.2,1);
+    box-shadow: 0 8px 18px -10px rgba(0,0,0,.25);
+}
+
+.dp-panel-index .dp-card:hover .dp-card-icon {
+    transform: scale(1.05) rotate(-3deg);
+}
+
+/* ============ TITLE & DESCRIPTION ============ */
+.dp-panel-index .dp-card-title {
+    font-size: 17px;
+    font-weight: 800;
+    color: var(--dp-black);
+    margin: 0 0 8px;
+    line-height: 1.4;
+}
+
+.dp-panel-index .dp-card-desc {
+    font-size: 13.5px;
+    color: var(--dp-gray-500);
+    line-height: 1.95;
+    margin: 0 0 18px;
+    flex: 1;
+}
+
+/* ============ FOOTER ============ */
+.dp-panel-index .dp-card-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 16px;
+    border-top: 1px dashed var(--dp-line);
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.dp-panel-index .dp-card-arrow {
+    font-size: 16px;
+    transition: transform .25s cubic-bezier(.2,.8,.2,1);
+}
+
+.dp-panel-index .dp-card:hover .dp-card-arrow {
+    transform: translateX(-5px);
+}
+
+/* ============================================================
+                                                   BALANCE CARD
+                                                   ============================================================ */
+.dp-panel-index .dp-balance {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    background: var(--dp-white);
+    border: 1px solid var(--dp-line);
+    border-radius: 20px;
+    padding: 20px 24px;
+    margin-bottom: 24px;
+    transition: border-color .2s, box-shadow .2s, background .3s;
+}
+
+    .dp-panel-index .dp-balance:hover {
+        border-color: var(--dp-gray-300);
+        box-shadow: 0 8px 24px -18px rgba(0,0,0,.2);
+    }
+
+.dp-panel-index .dp-balance-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+.dp-panel-index .dp-balance-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 11px;
+    background: var(--dp-gray-100);
+    color: var(--dp-black);
+}
+
+.dp-panel-index .dp-balance-label {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--dp-gray-500);
+    letter-spacing: .2px;
+}
+
+/* ============ VALUE WRAPPER ============ */
+.dp-panel-index .dp-balance-value {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 42px;
+    flex: 1;
+}
+
+.dp-panel-index .dp-balance-input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.dp-panel-index .dp-balance-masked,
+.dp-panel-index .dp-balance-real {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 6px;
+    font-size: 26px;
+    font-weight: 900;
+    color: var(--dp-black);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -.3px;
+    transition: opacity .45s cubic-bezier(.2,.8,.2,1), filter .45s cubic-bezier(.2,.8,.2,1), transform .45s cubic-bezier(.2,.8,.2,1);
+}
+
+    .dp-panel-index .dp-balance-real small {
+        font-size: 12.5px;
+        font-weight: 700;
+        color: var(--dp-gray-500);
+        letter-spacing: 0;
+    }
+
+.dp-panel-index .dp-balance-masked {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0);
+    letter-spacing: 3px;
+}
+
+.dp-panel-index .dp-balance-real {
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline-start: 0;
+    opacity: 0;
+    filter: blur(8px);
+    transform: translateY(8px);
+    pointer-events: none;
+}
+
+.dp-panel-index .dp-balance-input:checked ~ .dp-balance-masked {
+    opacity: 0;
+    filter: blur(6px);
+    transform: translateY(-6px);
+    pointer-events: none;
+}
+
+.dp-panel-index .dp-balance-input:checked ~ .dp-balance-real {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0);
+    pointer-events: auto;
+    animation: dpBalanceReveal .5s cubic-bezier(.2,.8,.2,1);
+}
+@keyframes dpBalanceReveal {
+    0% {
+        opacity: 0;
+        filter: blur(8px);
+        transform: translateY(8px);
+    }
+
+    60% {
+        opacity: 1;
+        filter: blur(1px);
+        transform: translateY(-2px);
+    }
+
+    100% {
+        opacity: 1;
+        filter: blur(0);
+        transform: translateY(0);
+    }
+}
+
+/* ============ EYE BUTTON ============ */
+.dp-panel-index .dp-balance-eye {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    background: var(--dp-gray-100);
+    color: var(--dp-gray-700);
+    cursor: pointer;
+    margin-inline-start: 4px;
+    transition: background .2s, color .2s, transform .2s;
+    flex-shrink: 0;
+    user-select: none;
+}
+
+    .dp-panel-index .dp-balance-eye:hover {
+        background: var(--dp-black);
+        color: var(--dp-white);
+    }
+
+    .dp-panel-index .dp-balance-eye:active {
+        transform: scale(.94);
+    }
+
+    .dp-panel-index .dp-balance-eye .dp-eye-open,
+    .dp-panel-index .dp-balance-eye .dp-eye-closed {
+        position: absolute;
+        transition: opacity .25s ease, transform .25s ease;
+    }
+
+    .dp-panel-index .dp-balance-eye .dp-eye-closed {
+        opacity: 0;
+        transform: scale(.7);
+    }
+
+    .dp-panel-index .dp-balance-eye .dp-eye-open {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+.dp-panel-index .dp-balance-input:checked ~ .dp-balance-eye .dp-eye-open {
+    opacity: 0;
+    transform: scale(.7);
+}
+
+.dp-panel-index .dp-balance-input:checked ~ .dp-balance-eye .dp-eye-closed {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* ============ ACTION BUTTON ============ */
+.dp-panel-index .dp-balance-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-inline-start: auto;
+    padding: 10px 18px;
+    border-radius: 11px;
+    background: var(--dp-black);
+    color: var(--dp-white);
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: background .2s, transform .2s, color .2s;
+    flex-shrink: 0;
+}
+
+    .dp-panel-index .dp-balance-action:hover {
+        background: var(--dp-gray-900);
+        color: var(--dp-white);
+        text-decoration: none;
+        transform: translateY(-1px);
+    }
+
+.dp-panel-index .dp-balance-action-arrow {
+    font-size: 15px;
+    transition: transform .25s cubic-bezier(.2,.8,.2,1);
+}
+
+.dp-panel-index .dp-balance-action:hover .dp-balance-action-arrow {
+    transform: translateX(-4px);
+}
+
+/* ============================================================
+                                                   RESPONSIVE
+============================================================ */
+@media (max-width: 768px) {
+    .dp-panel-index .dp-card {
+        padding: 22px 20px 16px;
+        min-height: auto;
+    }
+
+    .dp-panel-index .dp-card-title {
+        font-size: 16px;
+    }
+
+    .dp-panel-index .dp-card-days,
+    .dp-panel-index .dp-card-badge {
+        top: 14px;
+        left: 14px;
+        padding: 5px 10px;
+        font-size: 10.5px;
+    }
+
+        .dp-panel-index .dp-card-days b {
+            font-size: 13px;
+        }
+
+    .dp-panel-index .dp-balance {
+        padding: 18px 20px;
+        gap: 14px;
+    }
+
+    .dp-panel-index .dp-balance-masked,
+    .dp-panel-index .dp-balance-real {
+        font-size: 22px;
+    }
+
+    .dp-panel-index .dp-balance-action {
+        margin-inline-start: 0;
+        width: 100%;
+        justify-content: center;
+    }
+
+    .dp-panel-index .dp-balance-value {
+        width: 100%;
+        order: 3;
+    }
+}
+
+/* ============================================================
+   PAGE: TICKETS LIST (.dp-tickets)
+   ============================================================ */
+.dp-tickets {
+    --tk-ink: #0a0a0a;
+    --tk-ink-soft: #374151;
+    --tk-muted: #6b7280;
+    --tk-line: #e5e7eb;
+    --tk-line-soft: #f1f2f4;
+    --tk-bg: #ffffff;
+    --tk-bg-soft: #f9fafb;
+    --tk-bg-softer: #f3f4f6;
+    --tk-radius: 14px;
+    --tk-radius-sm: 9px;
+    --tk-shadow-sm: 0 1px 2px rgba(0, 0, 0, .04);
+    --tk-shadow-md: 0 10px 24px -16px rgba(0, 0, 0, .18);
+}
+
+    /* ---- Cards ---- */
+    .dp-tickets .card {
+        background: var(--tk-bg);
+        border: 1px solid var(--tk-line);
+        border-radius: var(--tk-radius);
+        box-shadow: var(--tk-shadow-sm);
+        overflow: hidden;
+    }
+
+    .dp-tickets .card-body {
+        padding: 1.4rem 1.4rem;
+    }
+
+    /* ---- Filter form ---- */
+    .dp-tickets .form-label {
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--tk-ink-soft);
+        margin-bottom: 6px;
+    }
+
+    .dp-tickets .form-control,
+    .dp-tickets .form-select {
+        background: var(--tk-bg);
+        border: 1px solid var(--tk-line);
+        border-radius: var(--tk-radius-sm);
+        color: var(--tk-ink);
+        font-size: 13px;
+        min-height: 42px;
+        padding: 9px 14px;
+        box-shadow: none;
+        transition: border-color .18s ease, box-shadow .18s ease;
+    }
+
+        .dp-tickets .form-control::placeholder {
+            color: #9ca3af;
+        }
+
+        .dp-tickets .form-control:focus,
+        .dp-tickets .form-select:focus {
+            border-color: var(--tk-ink);
+            box-shadow: 0 0 0 3px rgba(0, 0, 0, .05);
+            outline: none;
+        }
+
+    /* ---- Buttons ---- */
+    .dp-tickets .btn {
+        border-radius: var(--tk-radius-sm);
+        font-size: 13px;
+        font-weight: 700;
+        padding: 9px 20px;
+        transition: transform .15s ease, box-shadow .2s ease, background .2s ease, border-color .2s ease;
+    }
+
+        .dp-tickets .btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .dp-tickets .btn:active {
+            transform: translateY(0);
+        }
+
+    .dp-tickets .btn-dark {
+        background: var(--tk-ink);
+        border-color: var(--tk-ink);
+        color: #fff;
+    }
+
+        .dp-tickets .btn-dark:hover,
+        .dp-tickets .btn-dark:focus {
+            background: #000;
+            border-color: #000;
+            color: #fff;
+            box-shadow: 0 10px 22px -14px rgba(0, 0, 0, .5);
+        }
+
+    .dp-tickets .btn-outline-dark {
+        background: transparent;
+        color: var(--tk-ink);
+        border: 1px solid var(--tk-line);
+    }
+
+        .dp-tickets .btn-outline-dark:hover {
+            background: var(--tk-bg-soft);
+            border-color: var(--tk-ink);
+            color: var(--tk-ink);
+        }
+
+    .dp-tickets .btn-sm {
+        padding: 6px 12px;
+        font-size: 12px;
+        border-radius: 7px;
+    }
+
+    /* ---- Table ---- */
+    .dp-tickets .table {
+        margin: 0;
+        color: var(--tk-ink-soft);
+        font-size: 13px;
+    }
+
+        .dp-tickets .table > thead > tr > th {
+            background: var(--tk-bg-soft);
+            border-bottom: 1px solid var(--tk-line);
+            color: var(--tk-muted);
+            font-weight: 700;
+            font-size: 12px;
+            letter-spacing: .2px;
+            padding: 12px 14px;
+            white-space: nowrap;
+        }
+
+        .dp-tickets .table > tbody > tr > td {
+            border-top: 1px solid var(--tk-line-soft);
+            padding: 14px;
+            vertical-align: middle;
+        }
+
+    .dp-tickets .table-hover > tbody > tr {
+        transition: background .18s ease;
+    }
+
+        .dp-tickets .table-hover > tbody > tr:hover {
+            background: var(--tk-bg-soft);
+        }
+
+    /* ---- Badges ---- */
+    .dp-tickets .badge {
+        font-weight: 700;
+        font-size: 11.5px;
+        padding: .45em .7em;
+        border-radius: 999px;
+        line-height: 1;
+    }
+
+        .dp-tickets .badge.bg-light {
+            background: var(--tk-bg-softer) !important;
+            color: var(--tk-ink-soft) !important;
+            border: 1px solid var(--tk-line) !important;
+        }
+
+    /* ---- Title link ---- */
+    .dp-tickets .decoration-none {
+        text-decoration: none;
+    }
+
+        .dp-tickets .decoration-none:hover {
+            text-decoration: underline;
+        }
+
+    /* ---- Mobile card (status-tinted stripe) ---- */
+    .dp-tickets .tr-card {
+        border: 1px solid var(--tk-line);
+        border-right: 4px solid var(--tk-line);
+        border-radius: var(--tk-radius);
+        background: var(--tk-bg);
+        padding: 14px 16px;
+        margin-bottom: 10px;
+        box-shadow: var(--tk-shadow-sm);
+        transition: box-shadow .2s ease, transform .2s ease;
+    }
+
+        .dp-tickets .tr-card:hover {
+            box-shadow: var(--tk-shadow-md);
+            transform: translateY(-1px);
+        }
+
+    /* Soft tints per status — no pure black */
+    .dp-tickets .tr-card--open {
+        border-right-color: #4b5563;
+    }
+    /* soft dark gray */
+    .dp-tickets .tr-card--pending {
+        border-right-color: #f1c40f;
+    }
+
+    .dp-tickets .tr-card--answered {
+        border-right-color: #2a9d8f;
+    }
+
+    .dp-tickets .tr-card--userreplied {
+        border-right-color: #3498db;
+    }
+
+    .dp-tickets .tr-card--closed {
+        border-right-color: var(--tk-line);
+    }
+
+/* ---- Responsive ---- */
+@media (max-width: 768px) {
+    .dp-tickets .card-body {
+        padding: 1.1rem 1rem;
+    }
+
+    .dp-tickets .table > tbody > tr > td {
+        padding: 12px 10px;
+    }
+}
+
+/* ============================================================
+   PAGE: TICKET DETAILS (.dp-ticket-details)
+   ============================================================ */
+.dp-ticket-details {
+    --td-ink: #0a0a0a;
+    --td-ink-soft: #374151;
+    --td-muted: #6b7280;
+    --td-line: #e5e7eb;
+    --td-line-soft: #f1f2f4;
+    --td-bg: #ffffff;
+    --td-bg-soft: #f9fafb;
+    --td-radius: 14px;
+    --td-radius-sm: 9px;
+    --td-shadow-sm: 0 1px 2px rgba(0, 0, 0, .04);
+    --td-shadow-md: 0 10px 24px -16px rgba(0, 0, 0, .18);
+}
+
+    /* ---- Cards ---- */
+    .dp-ticket-details .card {
+        background: var(--td-bg);
+        border: 1px solid var(--td-line);
+        border-radius: var(--td-radius);
+        box-shadow: var(--td-shadow-sm);
+        overflow: hidden;
+    }
+
+    .dp-ticket-details .card-body {
+        padding: 1.4rem 1.4rem;
+    }
+
+    .dp-ticket-details .card-title {
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--td-ink);
+    }
+
+    .dp-ticket-details .card-body > h6 {
+        font-size: 13.5px;
+        color: var(--td-ink);
+    }
+
+    /* ---- Form ---- */
+    .dp-ticket-details .form-label {
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--td-ink-soft);
+        margin-bottom: 6px;
+    }
+
+    .dp-ticket-details .form-control,
+    .dp-ticket-details .form-select {
+        background: var(--td-bg);
+        border: 1px solid var(--td-line);
+        border-radius: var(--td-radius-sm);
+        color: var(--td-ink);
+        font-size: 13px;
+        padding: 10px 14px;
+        box-shadow: none;
+        transition: border-color .18s ease, box-shadow .18s ease;
+    }
+
+    .dp-ticket-details textarea.form-control {
+        min-height: 110px;
+        line-height: 1.9;
+        resize: vertical;
+    }
+
+    .dp-ticket-details .form-control::placeholder {
+        color: #9ca3af;
+    }
+
+    .dp-ticket-details .form-control:focus,
+    .dp-ticket-details .form-select:focus {
+        border-color: var(--td-ink);
+        box-shadow: 0 0 0 3px rgba(0, 0, 0, .05);
+        outline: none;
+    }
+
+    /* File input */
+    .dp-ticket-details input[type="file"].form-control {
+        padding: 8px 12px;
+        min-height: 42px;
+        font-size: 12.5px;
+    }
+
+        .dp-ticket-details input[type="file"].form-control::file-selector-button {
+            background: var(--td-bg-soft);
+            border: 1px solid var(--td-line);
+            border-radius: 6px;
+            color: var(--td-ink-soft);
+            font-size: 12px;
+            font-weight: 600;
+            padding: 5px 12px;
+            margin-inline-end: 10px;
+            cursor: pointer;
+            transition: background .15s ease, border-color .15s ease;
+        }
+
+            .dp-ticket-details input[type="file"].form-control::file-selector-button:hover {
+                background: #f3f4f6;
+                border-color: var(--td-ink);
+            }
+
+    /* Validation errors */
+    .dp-ticket-details .text-danger {
+        color: #dc2626 !important;
+        font-size: 11.5px;
+    }
+
+    /* ---- Buttons ---- */
+    .dp-ticket-details .btn {
+        border-radius: var(--td-radius-sm);
+        font-size: 13px;
+        font-weight: 700;
+        padding: 9px 18px;
+        transition: transform .15s ease, box-shadow .2s ease, background .2s ease, border-color .2s ease;
+    }
+
+        .dp-ticket-details .btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .dp-ticket-details .btn:active {
+            transform: translateY(0);
+        }
+
+    .dp-ticket-details .btn-dark {
+        background: var(--td-ink);
+        border-color: var(--td-ink);
+        color: #fff;
+    }
+
+        .dp-ticket-details .btn-dark:hover,
+        .dp-ticket-details .btn-dark:focus {
+            background: #000;
+            border-color: #000;
+            color: #fff;
+            box-shadow: 0 10px 22px -14px rgba(0, 0, 0, .5);
+        }
+
+    .dp-ticket-details .btn-outline-dark {
+        background: transparent;
+        color: var(--td-ink);
+        border: 1px solid var(--td-line);
+    }
+
+        .dp-ticket-details .btn-outline-dark:hover {
+            background: var(--td-bg-soft);
+            border-color: var(--td-ink);
+            color: var(--td-ink);
+        }
+
+    /* Close-ticket action (form-as-button) — semantic red kept, softened */
+    .dp-ticket-details .btn-danger {
+        background: rgba(220, 38, 38, .08);
+        color: #b91c1c;
+        border: 1px solid rgba(220, 38, 38, .22);
+        cursor: pointer;
+        user-select: none;
+    }
+
+        .dp-ticket-details .btn-danger:hover {
+            background: rgba(220, 38, 38, .14);
+            border-color: rgba(220, 38, 38, .4);
+            color: #991b1b;
+            box-shadow: 0 10px 22px -14px rgba(220, 38, 38, .4);
+        }
+
+    .dp-ticket-details .btn-sm {
+        padding: 8px 14px;
+        font-size: 12.5px;
+        border-radius: 8px;
+    }
+
+    /* ---- Alert ---- */
+    .dp-ticket-details .alert {
+        border: 1px solid var(--td-line);
+        border-radius: var(--td-radius);
+        padding: 14px 18px;
+        font-size: 13.5px;
+    }
+
+    .dp-ticket-details .alert-danger {
+        background: rgba(220, 38, 38, .06);
+        border-color: rgba(220, 38, 38, .22);
+        color: #b91c1c;
+    }
+
+/* ---- Responsive ---- */
+@media (max-width: 768px) {
+    .dp-ticket-details .card-body {
+        padding: 1.1rem 1rem;
+    }
+
+    .dp-ticket-details .btn-sm {
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+
+    .dp-ticket-details .d-flex.flex-row {
+        flex-direction: column !important;
+    }
+}
+
+/* ============================================================
+   PAGE: CREATE TICKET (.dp-ticket-create)
+   ============================================================ */
+.dp-ticket-create {
+    --tc-ink: #0a0a0a;
+    --tc-ink-soft: #374151;
+    --tc-muted: #6b7280;
+    --tc-line: #e5e7eb;
+    --tc-line-soft: #f1f2f4;
+    --tc-bg: #ffffff;
+    --tc-bg-soft: #f9fafb;
+    --tc-radius: 14px;
+    --tc-radius-sm: 9px;
+    --tc-shadow-sm: 0 1px 2px rgba(0, 0, 0, .04);
+}
+
+    /* ---- Cards ---- */
+    .dp-ticket-create .card {
+        background: var(--tc-bg);
+        border: 1px solid var(--tc-line);
+        border-radius: var(--tc-radius);
+        box-shadow: var(--tc-shadow-sm);
+        overflow: hidden;
+    }
+
+        .dp-ticket-create .card.bg-light {
+            background: var(--tc-bg-soft) !important;
+        }
+
+    .dp-ticket-create .card-body {
+        padding: 1.4rem 1.4rem;
+    }
+
+    /* ---- Card title + divider ---- */
+    .dp-ticket-create .card-title {
+        font-size: 14.5px;
+        font-weight: 700;
+        color: var(--tc-ink);
+        display: flex;
+        align-items: center;
+    }
+
+    .dp-ticket-create .card-divider {
+        border: 0;
+        border-top: 1px solid var(--tc-line-soft);
+        margin: 0 0 1.25rem;
+        opacity: 1;
+    }
+
+    /* ---- Sidebar helper card heading + text ---- */
+    .dp-ticket-create .card-body > h6 {
+        font-size: 13.5px;
+        color: var(--tc-ink);
+    }
+
+    .dp-ticket-create .card-body > p {
+        font-size: 12.5px;
+        color: var(--tc-muted);
+        line-height: 1.9;
+        margin: 0;
+    }
+
+    /* ---- Form ---- */
+    .dp-ticket-create .form-label {
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--tc-ink-soft);
+        margin-bottom: 6px;
+    }
+
+    .dp-ticket-create .form-control,
+    .dp-ticket-create .form-select {
+        background: var(--tc-bg);
+        border: 1px solid var(--tc-line);
+        border-radius: var(--tc-radius-sm);
+        color: var(--tc-ink);
+        font-size: 13px;
+        min-height: 42px;
+        padding: 10px 14px;
+        box-shadow: none;
+        transition: border-color .18s ease, box-shadow .18s ease;
+    }
+
+    .dp-ticket-create textarea.form-control {
+        min-height: 140px;
+        line-height: 1.9;
+        resize: vertical;
+        padding-top: 12px;
+    }
+
+    .dp-ticket-create .form-control::placeholder {
+        color: #9ca3af;
+    }
+
+    .dp-ticket-create .form-control:focus,
+    .dp-ticket-create .form-select:focus {
+        border-color: var(--tc-ink);
+        box-shadow: 0 0 0 3px rgba(0, 0, 0, .05);
+        outline: none;
+    }
+
+    /* File input */
+    .dp-ticket-create input[type="file"].form-control {
+        padding: 8px 12px;
+        min-height: 42px;
+        font-size: 12.5px;
+    }
+
+        .dp-ticket-create input[type="file"].form-control::file-selector-button {
+            background: var(--tc-bg-soft);
+            border: 1px solid var(--tc-line);
+            border-radius: 6px;
+            color: var(--tc-ink-soft);
+            font-size: 12px;
+            font-weight: 600;
+            padding: 5px 12px;
+            margin-inline-end: 10px;
+            cursor: pointer;
+            transition: background .15s ease, border-color .15s ease;
+        }
+
+            .dp-ticket-create input[type="file"].form-control::file-selector-button:hover {
+                background: #f3f4f6;
+                border-color: var(--tc-ink);
+            }
+
+    /* Helper hint under file input */
+    .dp-ticket-create .form-hint {
+        font-size: 11.5px;
+        color: var(--tc-muted);
+        line-height: 1.7;
+    }
+
+    /* Validation errors */
+    .dp-ticket-create .text-danger {
+        color: #dc2626 !important;
+        font-size: 11.5px;
+    }
+
+    /* ---- Buttons ---- */
+    .dp-ticket-create .btn {
+        border-radius: var(--tc-radius-sm);
+        font-size: 13px;
+        font-weight: 700;
+        padding: 10px 20px;
+        min-height: 42px;
+        transition: transform .15s ease, box-shadow .2s ease, background .2s ease, border-color .2s ease, color .2s ease;
+    }
+
+        .dp-ticket-create .btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .dp-ticket-create .btn:active {
+            transform: translateY(0);
+        }
+
+    .dp-ticket-create .btn-dark {
+        background: var(--tc-ink);
+        border-color: var(--tc-ink);
+        color: #fff;
+    }
+
+        .dp-ticket-create .btn-dark:hover,
+        .dp-ticket-create .btn-dark:focus {
+            background: #000;
+            border-color: #000;
+            color: #fff;
+            box-shadow: 0 10px 22px -14px rgba(0, 0, 0, .5);
+        }
+
+    .dp-ticket-create .btn-outline-secondary {
+        background: transparent;
+        color: var(--tc-ink-soft);
+        border: 1px solid var(--tc-line);
+    }
+
+        .dp-ticket-create .btn-outline-secondary:hover {
+            background: var(--tc-bg-soft);
+            border-color: var(--tc-ink);
+            color: var(--tc-ink);
+        }
+
+/* ---- Responsive ---- */
+@media (max-width: 768px) {
+    .dp-ticket-create .card-body {
+        padding: 1.1rem 1rem;
+    }
+
+    .dp-ticket-create .w-100 {
+        width: 100% !important;
+    }
 }

@@ -1,202 +1,135 @@
-﻿@using Application.Dtos.Users.ClientSide
-@using Application.Tools
-@model ClientSideUserDetailsDto
-
-@{
+﻿@{
     ViewData["Title"] = "پنل کاربری";
 }
 
-<div class="container-fluid">
+<div class="dp-panel-index">
+    <div class="container-fluid">
 
-    <div class="row">
-        <div class="col-sm-6">
-            <div class="page-title-box">
-                <h4>پنل کاربری</h4>
-                <ol class="breadcrumb m-0">
-                    <li class="breadcrumb-item active">صفحه نخست</li>
-                </ol>
-            </div>
-        </div>
-    </div>
-
-    <div class="row align-items-stretch">
-
-        <div class="col-xl-4 col-lg-5 mb-4 d-flex">
-            <div class="card border border-dark w-100 mb-0 d-flex flex-column justify-content-between" style="border-top: 4px solid #000000 !important;">
-                <div class="card-body d-flex flex-column justify-content-between gap-4">
-
-                    <div class="text-center pt-2">
-                        <div class="mb-3">
-                            <div class="avatar-sm mx-auto bg-dark rounded-circle d-flex align-items-center justify-content-center" style="width: 72px; height: 72px;">
-                                @if (!string.IsNullOrEmpty(Model.FirstName))
-                                {
-                                    <span class="text-white font-size-24 fw-bold">@Model.FirstName.FirstOrDefault()</span>
-                                }
-                                else
-                                {
-                                    <i class="mdi mdi-account text-white font-size-24"></i>
-                                }
-                            </div>
-                        </div>
-
-                        @if (string.IsNullOrEmpty(Model.FirstName) && string.IsNullOrEmpty(Model.LastName))
-                        {
-                            <h5 class="font-size-16 mb-1 text-dark fw-bold">کاربر بدون نام</h5>
-                        }
-                        else
-                        {
-                            <h5 class="font-size-16 mb-1 text-dark fw-bold">
-                                @(Model.FirstName ?? "") @(Model.LastName ?? "")
-                            </h5>
-                        }
-
-                        <div class="mt-2">
-                            <span class="badge bg-dark px-3 py-2 font-size-12">
-                                حساب کاربری @(Model.IsUserBanned ? "غیرفعال" : "فعال")
-                            </span>
-                        </div>
-                    </div>
-
-                    <div class="pt-3 border-top border-light">
-                        <h4 class="card-title mb-3 pb-2 text-dark font-size-14">
-                            <i class="mdi mdi-information-outline me-1 text-muted"></i> اطلاعات ارتباطی و سیستم
-                        </h4>
-
-                        <div class="table-responsive">
-                            <table class="table table-borderless mb-0 font-size-13">
-                                <tbody>
-                                    <tr>
-                                        <th scope="row" class="text-muted ps-0" style="width: 40%;">شماره موبایل:</th>
-                                        <td class="text-end fw-bold text-dark" dir="ltr">@Model.Mobile</td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row" class="text-muted ps-0">نقش‌های کاربری:</th>
-                                        <td class="text-end">
-                                            @if (Model.UserRoles?.Any() ?? false)
-                                            {
-                                                foreach (var item in Model.UserRoles)
-                                                {
-                                                    <span class="badge border border-dark text-dark bg-transparent me-1">@item.Title</span>
-                                                }
-                                            }
-                                            else
-                                            {
-                                                <span class="badge bg-light text-muted border">کاربر عادی</span>
-                                            }
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
+        <!-- ============ PAGE TITLE ============ -->
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="page-title-box">
+                    <h4>پنل کاربری</h4>
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item active">صفحه نخست</li>
+                    </ol>
                 </div>
             </div>
         </div>
 
-        <div class="col-xl-8 col-lg-7 mb-4 d-flex flex-column justify-content-between gap-3">
+        <!-- ============ TWO ACTION CARDS ============ -->
+        <div class="row">
 
-            <div class="card border border-dark mb-0 flex-grow-1 d-flex flex-column justify-content-center" style="border-top: 4px solid #000000 !important;">
-                <div class="card-body">
-                    <h4 class="card-title mb-4 pb-2 border-bottom text-dark font-size-14 d-flex justify-content-between align-items-center">
-                        <span><i class="mdi mdi-star-outline me-1 text-muted"></i> وضعیت اشتراک فعلی</span>
-                        @if (Model.SubscriptionEndDate is null || Model.SubscriptionEndDate.Value < DateTime.Now)
-                        {
-                            <span class="badge bg-danger font-size-11">غیر فعال</span>
-                        }
-                        else
-                        {
-                            <span class="badge bg-success font-size-11">فعال</span>
-                        }
-                    </h4>
-                    <div class="row align-items-center">
-                        <div class="col-md-4 mb-3 mb-md-0">
-                            <span class="text-muted font-size-13 d-block mb-1">وضعیت حساب:</span>
-                            <h5 class="font-size-15 fw-bold text-dark mb-0">
-                                @if (Model.SubscriptionEndDate is null || Model.SubscriptionEndDate.Value < DateTime.Now)
-                                {
-                                    <span class="text-danger">بدون اشتراک فعال</span>
-                                }
-                                else
-                                {
-                                    <span class="text-success">دارای اشتراک ویژه پایش</span>
-                                }
-                            </h5>
-                        </div>
-                        <div class="col-md-4 mb-3 mb-md-0">
-                            <span class="text-muted font-size-13 d-block mb-1">تاریخ پایان اعتبار پایش و پیامک:</span>
-                            <h5 class="font-size-15 fw-bold text-dark mb-0">
-                                @if (Model.SubscriptionEndDate is null)
-                                {
-                                    <span class="text-muted font-size-14">—</span>
-                                }
-                                else
-                                {
-                                    @Model.SubscriptionEndDate?.GetEndDateInDays()
-                                    <br />
-                                    @:(
-                                    @Model.SubscriptionEndDate?.GetDateTime()
-                                    @:)
-                                }
-                            </h5>
-                        </div>
-                        <div class="col-md-4 text-md-end">
-                            <a asp-area="" asp-controller="Subscription" asp-action="Pricing" class="btn btn-sm btn-dark waves-effect waves-light">
-                                <i class="mdi mdi-flash me-1"></i> خرید یا تمدید اشتراک
-                            </a>
-                        </div>
+            <!-- ===== Card 1: Notification — ACTIVE ===== -->
+            <div class="col-lg-6">
+                <a href="/panel/products" class="dp-card dp-card--active">
+
+                    <span class="dp-card-days">
+                        <b>۴۵</b>
+                        <span>روز</span>
+                    </span>
+
+                    <div class="dp-card-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M18 8C18 6.4087 17.3679 4.88258 16.2426 3.75736C15.1174 2.63214 13.5913 2 12 2C10.4087 2 8.88258 2.63214 7.75736 3.75736C6.63214 4.88258 6 6.4087 6 8C6 15 3 17 3 17H21C21 17 18 15 18 8Z"
+                                  stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M13.73 21C13.5542 21.3031 13.3019 21.5547 12.9982 21.7295C12.6946 21.9044 12.3504 21.9965 12 21.9965C11.6496 21.9965 11.3054 21.9044 11.0018 21.7295C10.6982 21.5547 10.4458 21.3031 10.27 21"
+                                  stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
                     </div>
-                </div>
+
+                    <h5 class="dp-card-title">اعلان تغییر قیمت</h5>
+                    <p class="dp-card-desc">
+                        کالاهایت را اضافه کن، هر تغییر قیمت رقیب را فورا در تلگرام دریافت کن.
+                    </p>
+
+                    <div class="dp-card-foot">
+                        <span>مدیریت کالاها</span>
+                        <span class="dp-card-arrow">←</span>
+                    </div>
+
+                </a>
             </div>
 
-            <div class="card border border-dark mb-0 flex-grow-1 d-flex align-items-center">
-                <div class="card-body w-100">
-                    <div class="row align-items-center">
-                        <div class="col-sm-7 mb-3 mb-sm-0">
-                            <div class="d-flex align-items-center">
-                                <div class="avatar-xs me-3 bg-dark text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                                    <i class="mdi mdi-package-variant-closed font-size-20"></i>
-                                </div>
-                                <div>
-                                    <span class="text-muted font-size-13 d-block mb-1">کالاها و خدمات ثبت شده:</span>
-                                    <h4 class="font-size-16 fw-bold text-dark mb-0">مدیریت و پایش محصولات شما</h4>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-sm-5 text-sm-end">
-                            <a asp-area="UserPanel" asp-controller="Product" asp-action="ProductsList" class="btn btn-dark waves-effect waves-light">
-                                <i class="mdi mdi-arrow-left-circle me-1"></i>
-                                مدیریت محصولات
-                            </a>
-                        </div>
+            <!-- ===== Card 2: Auto-Pricing — INACTIVE ===== -->
+            <div class="col-lg-6">
+                <a href="/subscription" class="dp-card dp-card--inactive">
+
+                    <span class="dp-card-badge">غیرفعال</span>
+
+                    <div class="dp-card-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
                     </div>
-                </div>
+
+                    <h5 class="dp-card-title">قیمت‌گذاری خودکار</h5>
+                    <p class="dp-card-desc">
+                        کف قیمت را تعیین کن، سیستم خودکار قیمت را برای حفظ بای‌باکس تنظیم می‌کند.
+                    </p>
+
+                    <div class="dp-card-foot">
+                        <span>فعال‌سازی سرویس</span>
+                        <span class="dp-card-arrow">←</span>
+                    </div>
+
+                </a>
             </div>
 
-            <div class="card border border-dark mb-0 flex-grow-1 d-flex align-items-center">
-                <div class="card-body w-100">
-                    <div class="row align-items-center">
-                        <div class="col-sm-7 mb-3 mb-sm-0">
-                            <div class="d-flex align-items-center">
-                                <div class="avatar-xs me-3 bg-dark text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                                    <i class="mdi mdi-wallet font-size-20"></i>
-                                </div>
-                                <div>
-                                    <span class="text-muted font-size-13 d-block mb-1">موجودی فعلی کیف پول:</span>
-                                    <h4 class="font-size-20 fw-bold text-dark mb-0">@Model.Balance.ToTomanFormat() <span class="font-size-13 fw-normal text-muted">تومان</span></h4>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-sm-5 text-sm-end">
-                            <a asp-area="UserPanel" asp-controller="User" asp-action="MyTransactions" class="btn btn-dark waves-effect waves-light">
-                                <i class="fas fa-money-check-alt"></i>
-                                تراکنش های مالی
-                            </a>
-                        </div>
+        </div>
+
+        <!-- ============ ACCOUNT BALANCE ============ -->
+        <div class="row">
+            <div class="col-12">
+                <div class="dp-balance">
+
+                    <div class="dp-balance-head">
+                        <span class="dp-balance-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                <rect x="2" y="6" width="20" height="14" rx="2.5" stroke="currentColor" stroke-width="1.8" />
+                                <path d="M2 10h20" stroke="currentColor" stroke-width="1.8" />
+                                <circle cx="17" cy="15" r="1.6" fill="currentColor" />
+                            </svg>
+                        </span>
+                        <span class="dp-balance-label">موجودی حساب</span>
                     </div>
+
+                    <div class="dp-balance-value">
+
+                        <input type="checkbox" id="dpBalanceToggle" class="dp-balance-input">
+
+                        <span class="dp-balance-masked">•••••••</span>
+
+                        <span class="dp-balance-real">
+                            ۴۵۰,۰۰۰
+                            <small>تومان</small>
+                        </span>
+
+                        <label for="dpBalanceToggle" class="dp-balance-eye" aria-label="نمایش یا مخفی کردن موجودی">
+                            <svg class="dp-eye-open" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"
+                                      stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+                                <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8" />
+                            </svg>
+                            <svg class="dp-eye-closed" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"
+                                      stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                                <line x1="1" y1="1" x2="23" y2="23"
+                                      stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                            </svg>
+                        </label>
+
+                    </div>
+
+                    <a href="/panel/wallet" class="dp-balance-action">
+                        افزایش موجودی
+                        <span class="dp-balance-action-arrow">←</span>
+                    </a>
+
                 </div>
             </div>
-
         </div>
 
     </div>
