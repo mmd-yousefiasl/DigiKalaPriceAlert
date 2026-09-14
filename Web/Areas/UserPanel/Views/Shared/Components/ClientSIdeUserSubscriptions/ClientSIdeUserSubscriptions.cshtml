@@ -5,7 +5,7 @@
 {
     <div class="row">
 
-        <!-- ===== Card 1: Auto-Pricing — INACTIVE ===== -->
+        @*         <!-- ===== Card 1: Auto-Pricing — INACTIVE ===== -->
         <div class="col-lg-6">
             <a href="@(Model.DaysToAutoPriceSubscriptionEnd <= 0 ? "/subscription/pricing" : "/user/products/list")"
                class="dp-card @(Model.DaysToAutoPriceSubscriptionEnd <= 0 ? "dp-card--inactive" : "dp-card--active")">
@@ -44,6 +44,28 @@
                 </div>
 
             </a>
+        </div> *@
+
+        <div class="col-lg-6">
+            <div class="dp-card dp-card--disabled" aria-disabled="true" style="pointer-events: none; opacity: .6; filter: grayscale(1); cursor: not-allowed;">
+
+                <span class="dp-card-badge">به زودی</span>
+
+                <div class="dp-card-icon">
+                    <i class="mdi mdi-robot-outline" style="color: #9aa0a6; font-size: 24px;"></i>
+                </div>
+
+                <h5 class="dp-card-title">قیمت‌گذاری خودکار</h5>
+                <p class="dp-card-desc">
+                    کف قیمت را تعیین کن، سیستم خودکار قیمت را برای حفظ بای‌باکس تنظیم می‌کند.
+                </p>
+
+                <div class="dp-card-foot">
+                    <span>به زودی</span>
+                    <span class="dp-card-arrow">←</span>
+                </div>
+
+            </div>
         </div>
 
         <!-- ===== Card 2: Notification — ACTIVE ===== -->

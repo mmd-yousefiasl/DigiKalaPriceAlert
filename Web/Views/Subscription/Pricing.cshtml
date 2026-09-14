@@ -17,33 +17,64 @@
         <h1 class="digito-hero-title">
             خرید اشتراک؛ سرمایه‌گذاری روی <span class="highlight">حفظ بای‌باکس</span>
         </h1>
+
+        @* ==== HERO DESC — NOTIFICATION (active) ==== *@
+        <p class="digito-hero-desc">
+            با <b>اعلان تغییر قیمت</b> دیجیتو، هر لحظه که رقیبت قیمتش رو عوض کنه، سریع خبردار می‌شی — همیشه یک قدم جلوتر از بازار.
+        </p>
+
+        @* ==== HERO DESC — AUTO-PRICING (uncomment to switch) ====
         <p class="digito-hero-desc">
             با <b>قیمت‌گذاری خودکار</b> دیجیتو، قیمت محصولاتت همیشه در محدوده رقابتی می‌مونه — بدون نیاز به دخالت دستی. دستیار هوشمندی که شبانه‌روز مراقب بای‌باکس شماست.
         </p>
+        *@
 
         <!-- Service Toggle -->
+        <!-- Service Toggle -->
         <div class="digito-toggle" role="tablist">
-            <button class="digito-toggle-btn active" data-service="auto" role="tab" aria-selected="true">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                    <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                    <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                    <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                </svg>
-                قیمت‌گذاری خودکار
-                <span class="digito-toggle-tag">ویژه</span>
-            </button>
-            <button class="digito-toggle-btn" data-service="notify" role="tab" aria-selected="false">
+
+            @* ==== TOGGLE — NOTIFICATION (active, first) ==== *@
+            <button class="digito-toggle-btn active" data-service="notify" role="tab" aria-selected="true">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
                     <path d="M18 8C18 6.4087 17.3679 4.88258 16.2426 3.75736C15.1174 2.63214 13.5913 2 12 2C10.4087 2 8.88258 2.63214 7.75736 3.75736C6.63214 4.88258 6 6.4087 6 8C6 15 3 17 3 17H21C21 17 18 15 18 8Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                     <path d="M13.73 21C13.5542 21.3031 13.3019 21.5547 12.9982 21.7295C12.6946 21.9044 12.3504 21.9965 12 21.9965C11.6496 21.9965 11.3054 21.9044 11.0018 21.7295C10.6982 21.5547 10.4458 21.3031 10.27 21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                 </svg>
                 اعلان تغییر قیمت
             </button>
+
+            @* ==== TOGGLE — AUTO-PRICING (VISIBLE, disabled, "به زودی") ==== *@
+            <button class="digito-toggle-btn" data-service="auto" data-coming-soon role="tab" aria-selected="false" disabled
+                    style="opacity:.55; cursor:not-allowed; pointer-events:none;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+                قیمت‌گذاری خودکار
+                <span class="digito-toggle-tag">به زودی</span>
+            </button>
+
+            @* ==== TOGGLE — AUTO-PRICING (enabled version, for future swap) ====
+    <button class="digito-toggle-btn" data-service="auto" role="tab" aria-selected="false">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        قیمت‌گذاری خودکار
+        <span class="digito-toggle-tag">ویژه</span>
+    </button>
+    *@
+
         </div>
     </section>
 
-    <!-- ============ AUTO-PRICING GRID ============ -->
-    <section class="digito-pricing-grid" id="autoPricing">
+    @* ============================================================
+       ============ AUTO-PRICING GRID (currently hidden) ==========
+       ==== Uncomment this AND comment out the notify grid below ====
+       ============================================================ *@
+    @*
+    <section class="digito-pricing-grid" id="autoPricing" data-service-panel="auto">
 
         <!-- Plan 1 -->
         <div class="digito-pricing-card">
@@ -119,9 +150,10 @@
             <a asp-area="" asp-controller="Subscription" asp-action="Purchase" asp-route-planId="4" class="digito-btn digito-btn-outline">خرید پلن ۳۰ روزه</a>
         </div>
     </section>
+    *@
 
-    <!-- ============ NOTIFICATION GRID (same card design) ============ -->
-    <section class="digito-pricing-grid" id="notifyPricing" hidden>
+    <!-- ============ NOTIFICATION GRID (active) ============ -->
+    <section class="digito-pricing-grid" id="notifyPricing" data-service-panel="notify">
 
         <!-- Plan 1 -->
         <div class="digito-pricing-card">
@@ -202,27 +234,83 @@
     <!-- ============ ROI BANNER ============ -->
     <section class="digito-roi-banner" id="roiBanner">
         <div class="digito-roi-content">
+
+            @* ==== ROI COPY — NOTIFICATION (active) ==== *@
+            <h3 class="digito-roi-title" id="roiTitle">
+                آیا ۴۶۰ هزار تومان در ماه هزینه زیادی است؟
+            </h3>
+            <p class="digito-roi-desc" id="roiDesc">
+                تصور کنید فقط یک بار تغییر قیمت رقیب را از دست بدهید و یک روز کامل بای‌باکس را از دست بدهید. با میانگین سود ۵۰ هزار تومان روی هر کالا، همین یک روز می‌تواند ۲۵۰ هزار تومان ضرر باشد. <b>اعلان فوری قیمت</b> دیجیتو در تلگرام، این ریسک را حذف می‌کند.
+            </p>
+
+            @* ==== ROI COPY — AUTO-PRICING (uncomment to switch) ====
             <h3 class="digito-roi-title" id="roiTitle">
                 آیا ۶۹۰ هزار تومان در ماه هزینه زیادی است؟
             </h3>
             <p class="digito-roi-desc" id="roiDesc">
                 تصور کنید روزانه فقط ۵ فروش را به خاطر تغییر قیمت رقیبتان از دست بدهید. با میانگین سود ۵۰ هزار تومان روی هر کالا، روزانه ۲۵۰ هزار تومان از دست می‌دهید! <b>قیمت‌گذاری خودکار</b> دیجیتو این ضرر را صفر می‌کند — قیمت را بدون دخالت شما همیشه در محدوده رقابتی نگه می‌دارد.
             </p>
+            *@
+
         </div>
         <div class="digito-roi-cta">
-            <a asp-area="" asp-controller="Subscription" asp-action="Purchase" asp-route-planId="12"
+
+            @* ==== ROI CTA — NOTIFICATION (active) ==== *@
+            <a asp-area="" asp-controller="Subscription" asp-action="Purchase" asp-route-planId="1"
                class="digito-btn digito-btn-primary digito-btn-lg"
-               id="roiCta"
-               data-auto-plan="6"
-               data-notify-plan="1">
+               id="roiCta">
+                شروع تست ۷ روزه!
+            </a>
+
+            @* ==== ROI CTA — AUTO-PRICING (uncomment to switch) ====
+            <a asp-area="" asp-controller="Subscription" asp-action="Purchase" asp-route-planId="6"
+               class="digito-btn digito-btn-primary digito-btn-lg"
+               id="roiCta">
                 شروع تست رایگان!
             </a>
+            *@
+
         </div>
     </section>
 
 </div>
 
 @section FooterReferences {
+
+    @* ==== JSON-LD — NOTIFICATION ONLY (active) ==== *@
+    <script type="application/ld+json">
+        {
+          "@@context": "https://schema.org",
+          "@@type": "Service",
+          "name": "اشتراک دیجیتو",
+          "description": "سیستم هوشمند پایش قیمت رقبا برای دیجی‌کالا",
+          "brand": { "@@type": "Brand", "name": "دیجیتو" },
+          "offers": [
+            { "@@type": "Offer", "name": "اعلان قیمت ۳۰ روزه", "price": "4600000", "priceCurrency": "IRR", "url": "https://digipricealert.ir/subscription/purchase/2" },
+            { "@@type": "Offer", "name": "اعلان قیمت ۹۰ روزه", "price": "9900000", "priceCurrency": "IRR", "url": "https://digipricealert.ir/subscription/purchase/3" },
+            { "@@type": "Offer", "name": "تست ۷ روزه اعلان قیمت", "price": "0", "priceCurrency": "IRR", "url": "https://digipricealert.ir/subscription/purchase/1" }
+          ]
+        }
+    </script>
+
+    @* ==== JSON-LD — AUTO-PRICING ONLY (uncomment to switch) ====
+    <script type="application/ld+json">
+        {
+          "@@context": "https://schema.org",
+          "@@type": "Service",
+          "name": "اشتراک دیجیتو",
+          "description": "سیستم هوشمند قیمت‌گذاری خودکار برای دیجی‌کالا",
+          "brand": { "@@type": "Brand", "name": "دیجیتو" },
+          "offers": [
+            { "@@type": "Offer", "name": "قیمت‌گذاری خودکار ۳۰ روزه", "price": "6900000", "priceCurrency": "IRR", "url": "https://digipricealert.ir/subscription/purchase/10" },
+            { "@@type": "Offer", "name": "قیمت‌گذاری خودکار ۹۰ روزه", "price": "15900000", "priceCurrency": "IRR", "url": "https://digipricealert.ir/subscription/purchase/11" },
+            { "@@type": "Offer", "name": "تست ۷ روزه قیمت‌گذاری خودکار", "price": "0", "priceCurrency": "IRR", "url": "https://digipricealert.ir/subscription/purchase/12" }
+          ]
+        }
+    </script>
+    *@
+
+    @* ==== JSON-LD — BOTH SERVICES (uncomment to switch) ====
     <script type="application/ld+json">
         {
           "@@context": "https://schema.org",
@@ -240,5 +328,7 @@
           ]
         }
     </script>
+    *@
+
     <script src="/js/pricing.js" asp-append-version="true"></script>
 }
