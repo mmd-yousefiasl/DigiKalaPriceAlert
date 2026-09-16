@@ -16,6 +16,7 @@ using Domain.Shared;
 using Domain.Statics;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 using System.Security.Cryptography;
 
 namespace Application.Services.Implementaions
@@ -109,11 +110,24 @@ namespace Application.Services.Implementaions
                 loginUser.IsUserBanned = false;
 
                 _context.Users.Add(loginUser);
-                await _context.SaveChangesAsync();
 
-                UserCreatedEvent UserCreatedEvent = new UserCreatedEvent(loginUser.Mobile);
+                try
+                {
+                    await _context.SaveChangesAsync();
 
-                await _mediator.PublishEvent(UserCreatedEvent);
+                    UserCreatedEvent UserCreatedEvent = new UserCreatedEvent(loginUser.Mobile);
+                    await _mediator.PublishEvent(UserCreatedEvent);
+                }
+                catch (DbUpdateException ex)
+                    when (ex.InnerException is PostgresException pg && pg.SqlState == "23505" && pg.ConstraintName == "IX_Users_Mobile")
+                {
+                    _context.Entry(loginUser).State = EntityState.Detached;
+                    loginUser = await _context.Users
+                        .FirstOrDefaultAsync(u => u.Mobile == model.Mobile);
+
+                    if (loginUser is null)
+                        return Result.Failure<DateTime>(Messages.OperationFailedError);
+                }
             }
             else
             {
