@@ -42,6 +42,7 @@ namespace Web
             services.AddSingleton<IBuyBoxStrategy, HighestRankBuyBoxStrategy>();
             services.AddSingleton<IDigiKalaProductParser, DigiKalaProductParser>();
             services.AddSingleton<ITelegramUpdateQueue, TelegramUpdateQueue>();
+            services.AddSingleton<IBaleUpdateQueue, BaleUpdateQueue>();
             #endregion
 
             #region HttpClient Services
@@ -86,6 +87,8 @@ namespace Web
                 client.BaseAddress = new Uri(config["DkMarketplace:BaseUrl"]!);
                 client.DefaultRequestHeaders.Add("Accept", "application/json");
             });
+
+            services.AddHttpClient<IBaleService, BaleService>();
             #endregion
 
             #region Scoped Services
@@ -122,6 +125,7 @@ namespace Web
             services.AddHostedService<PriceMonitorWorker>();
             services.AddHostedService<SmsConsumerWorker>();
             services.AddHostedService<TelegramUpdateWorker>();
+            services.AddHostedService<BaleUpdateBackgroundService>();
             #endregion
         }
     }

@@ -89,5 +89,13 @@
         public static string DkApiServiceBase { get; set; }
 
         #endregion
+
+        #region Bale
+
+        public static string BaleBotToken { get; set; }
+        public static string BaleBaseUrl { get; set; }
+        public static string BaleSecretToken { get; set; }
+
+        #endregion
     }
 }
