@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Data.Context.Configurations.Users
 {
-    public class TelegramValidationConfig : IEntityTypeConfiguration<TelegramValidation>
+    public class BaleValidationConfig : IEntityTypeConfiguration<BaleValidation>
     {
-        public void Configure(EntityTypeBuilder<TelegramValidation> builder)
+        public void Configure(EntityTypeBuilder<BaleValidation> builder)
         {
-            builder.ToTable("TelegramValidation");
+            builder.ToTable("BaleValidation");
 
             builder.HasKey(uv => uv.Id);
             builder.HasQueryFilter(uv => !uv.IsDeleted);

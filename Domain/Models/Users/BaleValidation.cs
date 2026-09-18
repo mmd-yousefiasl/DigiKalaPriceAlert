@@ -1,6 +1,6 @@
 ﻿namespace Domain.Models.Users
 {
-    public class TelegramValidation : AuditBaseEntity<int>
+    public class BaleValidation : AuditBaseEntity<int>
     {
         public int UserId { get; set; }
         public string Code { get; set; }

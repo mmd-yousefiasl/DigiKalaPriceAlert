@@ -44,7 +44,7 @@ namespace Web.Areas.UserPanel.Controllers
         {
             if (!ModelState.IsValid)
             {
-                var firstError = ModelState.Values.SelectMany(v => v.Errors).FirstOrDefault()?.ErrorMessage ?? Messages.InvalidDataErorr;
+                var firstError = ModelState.Values.SelectMany(v => v.Errors).FirstOrDefault()?.ErrorMessage ?? Messages.InvalidDataError;
                 return Json(new { success = false, message = firstError });
             }
 
@@ -62,7 +62,7 @@ namespace Web.Areas.UserPanel.Controllers
         {
             if (!ModelState.IsValid)
             {
-                var firstError = ModelState.Values.SelectMany(v => v.Errors).FirstOrDefault()?.ErrorMessage ?? Messages.InvalidDataErorr;
+                var firstError = ModelState.Values.SelectMany(v => v.Errors).FirstOrDefault()?.ErrorMessage ?? Messages.InvalidDataError;
                 return Json(new { success = false, message = firstError });
             }
 

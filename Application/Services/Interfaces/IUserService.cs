@@ -64,9 +64,9 @@ namespace Application.Services.Interfaces
 
         Task<Result<ClientSideUpdateProfileDto>> ClientSideGetUserProfileForUpdate();
 
-        Task<Result<string>> ClientSideConnectUserToTelegram();
+        Task<Result<string>> ClientSideConnectUserToBale();
 
-        Task<Result> ClientSideAuthenticateTelegramUserAsync(string authKey, long chatId);
+        Task<Result> ClientSideAuthenticateBaleUserAsync(string authKey, long chatId);
 
         Task<Result<long>> ClientSideGetCurrentUserChatId();
 

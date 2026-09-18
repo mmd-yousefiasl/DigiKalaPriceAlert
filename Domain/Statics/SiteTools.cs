@@ -93,8 +93,10 @@
         #region Bale
 
         public static string BaleBotToken { get; set; }
-        public static string BaleBaseUrl { get; set; }
+        public static string BaleBaseAPIUrl { get; set; }
         public static string BaleSecretToken { get; set; }
+        public static string BaleBotUsername { get; set; }
+        public static string BaleBaseUrl { get; set; }
 
         #endregion
     }

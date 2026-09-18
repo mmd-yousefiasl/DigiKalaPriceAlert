@@ -11,14 +11,17 @@ namespace Web.Areas.UserPanel.Controllers
         #region Fields
         private readonly IUserService _userService;
         private readonly ITelegramService _telegramService;
+        private readonly IBaleService _baleService;
         #endregion
 
         #region Ctor
         public UserController(IUserService userService,
-            ITelegramService telegramService)
+            ITelegramService telegramService,
+            IBaleService baleService)
         {
             _userService = userService;
             _telegramService = telegramService;
+            _baleService = baleService;
         }
         #endregion
 
@@ -52,10 +55,10 @@ namespace Web.Areas.UserPanel.Controllers
             return RedirectToAction("AddNewProduct", "Product", new { area = "UserPanel" });
         }
 
-        [HttpPost("/user/profile/connect-telegram"), ValidateAntiForgeryToken]
-        public async Task<IActionResult> ConnectTelegram()
+        [HttpPost("/user/profile/connect-bale"), ValidateAntiForgeryToken]
+        public async Task<IActionResult> ConnectBale()
         {
-            var result = await _userService.ClientSideConnectUserToTelegram();
+            var result = await _userService.ClientSideConnectUserToBale();
             if (result.IsFailure)
             {
                 TempData[TemporaryErrorMessage] = result.Message;
@@ -65,10 +68,10 @@ namespace Web.Areas.UserPanel.Controllers
             return Redirect(result.Value);
         }
 
-        [HttpPost("/user/profile/send-telegram-test-message"), ValidateAntiForgeryToken]
-        public async Task<IActionResult> SendTelegramTestMessage()
+        [HttpPost("/user/profile/send-bale-test-message"), ValidateAntiForgeryToken]
+        public async Task<IActionResult> SendBaleTestMessage()
         {
-            var result = await _telegramService.SendTelegramTestMessage();
+            var result = await _baleService.SendBaleTestMessage();
             if (result.IsFailure)
             {
                 TempData[TemporaryErrorMessage] = result.Message;
@@ -108,10 +111,10 @@ namespace Web.Areas.UserPanel.Controllers
             return RedirectToAction(nameof(MyInfo));
         }
 
-        [HttpPost("/user/my-info/send-telegram-test-message"), ValidateAntiForgeryToken]
-        public async Task<IActionResult> SendTelegramTestMessageFromMyInfo()
+        [HttpPost("/user/my-info/send-bale-test-message"), ValidateAntiForgeryToken]
+        public async Task<IActionResult> SendBaleTestMessageFromMyInfo()
         {
-            var result = await _telegramService.SendTelegramTestMessage();
+            var result = await _baleService.SendBaleTestMessage();
 
             if (result.IsFailure)
             {

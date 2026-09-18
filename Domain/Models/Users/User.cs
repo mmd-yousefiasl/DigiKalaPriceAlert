@@ -1,4 +1,5 @@
-﻿using Domain.Models.Orders;
+﻿using Domain.Enums.Users;
+using Domain.Models.Orders;
 
 namespace Domain.Models.Users
 {
@@ -13,7 +14,8 @@ namespace Domain.Models.Users
         public decimal Balance { get; set; }
         public int AccessFailedCount { get; set; } = 0;
         public DateTime? LockoutEnd { get; set; }
-        public long? TelegramChatId { get; set; }
+        public long? BaleChatId { get; set; }
+        public UserRegistrationTypeEnum RegistrationType { get; set; } = UserRegistrationTypeEnum.Website;
 
         #region Relations
         public ICollection<UserProductMapping>? Products { get; set; }

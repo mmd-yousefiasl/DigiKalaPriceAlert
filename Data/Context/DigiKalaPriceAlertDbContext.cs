@@ -32,7 +32,7 @@ namespace Data.Context
         public DbSet<BalanceTransaction> BalanceTransactions => Set<BalanceTransaction>();
         public DbSet<UserRoleMapping> UserRoleMapping => Set<UserRoleMapping>();
         public DbSet<UserValidation> UserValidation => Set<UserValidation>();
-        public DbSet<TelegramValidation> TelegramValidation => Set<TelegramValidation>();
+        public DbSet<BaleValidation> BaleValidation => Set<BaleValidation>();
 
         public DbSet<Product> Products => Set<Product>();
         public DbSet<ProductVariantSeller> ProductVariantSellers => Set<ProductVariantSeller>();

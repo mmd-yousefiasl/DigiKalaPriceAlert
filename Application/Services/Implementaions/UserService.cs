@@ -741,7 +741,7 @@ namespace Application.Services.Implementaions
             if (user is null)
                 return Result.Failure(Messages.OperationFailedError);
 
-            if (user.TelegramChatId is null)
+            if (user.BaleChatId is null)
                 return Result.Failure(Messages.TelegramBotNotConnectedError);
 
             return Result.Success();
@@ -758,7 +758,7 @@ namespace Application.Services.Implementaions
             if (user is null)
                 return Result.Failure(Messages.OperationFailedError);
 
-            if (user.TelegramChatId is null)
+            if (user.BaleChatId is null)
                 return Result.Failure(Messages.TelegramBotNotConnectedError);
 
             return Result.Success();
@@ -777,7 +777,7 @@ namespace Application.Services.Implementaions
             if (user is null)
                 return Result.Failure(Messages.OperationFailedError);
 
-            if (user.TelegramChatId is null)
+            if (user.BaleChatId is null)
                 return Result.Failure(Messages.TelegramBotNotConnectedError);
 
             user.FirstName = dto.FirstName;
@@ -826,24 +826,24 @@ namespace Application.Services.Implementaions
             return user;
         }
 
-        public async Task<Result<string>> ClientSideConnectUserToTelegram()
+        public async Task<Result<string>> ClientSideConnectUserToBale()
         {
             var userId = _httpContextAccessor.HttpContext.User.GetUserId();
 
             if (userId < 1)
                 return Result.Failure<string>(Messages.OperationFailedError);
 
-            // Remove existing validation code for this user
-            var existingValidations = await _context.TelegramValidation
+            // Remove any existing validation code for this user
+            var existingValidations = await _context.BaleValidation
                 .Where(n => n.UserId == userId)
                 .ToListAsync();
 
             if (existingValidations.Any())
             {
-                _context.TelegramValidation.RemoveRange(existingValidations);
+                _context.BaleValidation.RemoveRange(existingValidations);
             }
 
-            // Generate a secure random code
+            // Generate a secure, URL-safe random code
             var randomBytes = RandomNumberGenerator.GetBytes(32);
 
             var code = Convert.ToBase64String(randomBytes)
@@ -851,29 +851,28 @@ namespace Application.Services.Implementaions
                 .Replace("/", "_")
                 .TrimEnd('=');
 
-            var validation = new TelegramValidation
+            var validation = new BaleValidation
             {
                 UserId = userId,
                 Code = code
             };
 
-            await _context.TelegramValidation.AddAsync(validation);
+            await _context.BaleValidation.AddAsync(validation);
             await _context.SaveChangesAsync();
 
-            var telegramUrl =
-                $"https://t.me/{SiteTools.TelegramBotUsername}?start={code}";
+            var baleUrl = $"{SiteTools.BaleBaseUrl}{SiteTools.BaleBotUsername}?start={code}";
 
-            return telegramUrl;
+            return baleUrl;
         }
 
-        public async Task<Result> ClientSideAuthenticateTelegramUserAsync(string authKey, long chatId)
+        public async Task<Result> ClientSideAuthenticateBaleUserAsync(string authKey, long chatId)
         {
             if (string.IsNullOrWhiteSpace(authKey) || chatId <= 0)
-                return Result.Failure(Messages.InvalidDataErorr);
+                return Result.Failure(Messages.InvalidDataError);
 
             var minimumCreatedDate = DateTime.UtcNow.AddMinutes(-20);
 
-            var authResult = await _context.TelegramValidation
+            var authResult = await _context.BaleValidation
                 .FirstOrDefaultAsync(n =>
                     n.Code == authKey &&
                     n.CreatedDate >= minimumCreatedDate);
@@ -886,10 +885,10 @@ namespace Application.Services.Implementaions
             if (user is null)
                 return Result.Failure(Messages.OperationFailedError);
 
-            user.TelegramChatId = chatId;
+            user.BaleChatId = chatId;
             user.LastUpdatedDate = DateTime.UtcNow;
 
-            _context.TelegramValidation.Remove(authResult);
+            _context.BaleValidation.Remove(authResult);
 
             await _context.SaveChangesAsync();
 
@@ -905,7 +904,7 @@ namespace Application.Services.Implementaions
             var chatId = await _context.Users
                 .AsNoTracking()
                 .Where(n => n.Id == userId)
-                .Select(n => n.TelegramChatId)
+                .Select(n => n.BaleChatId)
                 .FirstOrDefaultAsync();
 
             if (chatId is null || chatId < 1)

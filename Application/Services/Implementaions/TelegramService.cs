@@ -92,7 +92,7 @@ namespace Application.Services.Implementaions
         private async Task HandleStartWithAuthKeyAsync(long chatId, string authKey)
         {
             var result =
-                await _userService.ClientSideAuthenticateTelegramUserAsync(
+                await _userService.ClientSideAuthenticateBaleUserAsync(
                     authKey,
                     chatId);
 
