@@ -4,5 +4,6 @@
     {
         public int DaysToNotificationSubscriptionEnd { get; set; }
         public int DaysToAutoPriceSubscriptionEnd { get; set; }
+        public decimal UserBalance { get; set; }
     }
 }

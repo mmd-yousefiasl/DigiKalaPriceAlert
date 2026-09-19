@@ -1,6 +1,7 @@
 using Application.Dtos.NewsLetter.ClientSide;
 using Application.Services.Interfaces;
 using Application.Tools;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using System.Globalization;
 using System.Xml.Linq;
@@ -12,14 +13,17 @@ namespace Web.Controllers
         #region Fields
         private readonly INewsLetterService _newsLettersService;
         private readonly ISiteMapService _mapService;
+        private readonly ILogger<HomeController> _logger;
         #endregion
 
         #region Ctor
         public HomeController(INewsLetterService newsLettersServices,
-            ISiteMapService mapService)
+            ISiteMapService mapService,
+            ILogger<HomeController> logger)
         {
             _newsLettersService = newsLettersServices;
             _mapService = mapService;
+            _logger = logger;
         }
         #endregion
 
@@ -78,6 +82,9 @@ namespace Web.Controllers
         [HttpGet("/404")]
         public IActionResult PageNotFound()
         {
+            var original = HttpContext.Features.Get<IStatusCodeReExecuteFeature>()?.OriginalPath;
+            _logger.LogWarning("404 for original path: {Path}", original);
+
             ViewData["NoIndex"] = true;
             return View();
         }

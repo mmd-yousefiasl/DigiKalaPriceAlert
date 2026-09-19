@@ -112,3 +112,5 @@
 
     </div>
 }
+
+@await Component.InvokeAsync("ClientSideUserBalance", new { showLink = true, balance = Model?.UserBalance ?? null })

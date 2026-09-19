@@ -12,12 +12,20 @@ namespace Web.Areas.UserPanel.Components
             _userService = userService;
         }
 
-        public async Task<IViewComponentResult> InvokeAsync(bool showLink)
+        public async Task<IViewComponentResult> InvokeAsync(bool showLink, decimal? balance)
         {
-            var balance = await _userService.ClientSideGetCurrentUserBalance();
+            if (balance >= 0)
+            {
+                return View("ClientSideUserBalance", new ClientSideUserBalanceDto()
+                {
+                    Balance = balance.Value,
+                    ShowLink = showLink
+                });
+            }
+            var balanceResult = await _userService.ClientSideGetCurrentUserBalance();
             return View("ClientSideUserBalance", new ClientSideUserBalanceDto()
             {
-                Balance = balance,
+                Balance = balanceResult,
                 ShowLink = showLink
             });
         }

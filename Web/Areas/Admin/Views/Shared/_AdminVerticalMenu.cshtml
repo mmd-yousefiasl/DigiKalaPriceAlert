@@ -40,7 +40,17 @@
                         <i class="mdi mdi-bell-ring-outline"></i>
                         <span>پیام ها</span>
 
-                        @await Component.InvokeAsync("AdminNotificationsCountVerticalMenu")
+                        @if ((int)ViewData["NotificationCount"]! > 0)
+                        {
+                        if ((int)ViewData["NotificationCount"]! > 99)
+                        {
+                        <span class="badge bg-danger rounded-pill float-end">99+</span>
+                        }
+                        else
+                        {
+                        <span class="badge bg-danger rounded-pill float-end">@((int)ViewData["NotificationCount"]!)</span>
+                        }
+                        }
                     </a>
                 </li>
 

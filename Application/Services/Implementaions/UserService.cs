@@ -926,7 +926,8 @@ namespace Application.Services.Implementaions
             return new ClientSideUserSubscriptionsDto()
             {
                 DaysToAutoPriceSubscriptionEnd = user.AutoPriceSubscriptionEndDate.DaysRemaining(),
-                DaysToNotificationSubscriptionEnd = user.NotificationSubscriptionEndDate.DaysRemaining()
+                DaysToNotificationSubscriptionEnd = user.NotificationSubscriptionEndDate.DaysRemaining(),
+                UserBalance = user.Balance,
             };
         }
     }
